@@ -26,7 +26,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/deviceInfo"
+                android:id="@+id/tabInfo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -35,12 +35,21 @@
                 android:textColor="#161616" />
 
             <Button
-                android:id="@+id/deviceSetting"
+                android:id="@+id/tabLED"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#FFFFFF"
-                android:text="설정"
+                android:text="LED"
+                android:textColor="#161616" />
+
+            <Button
+                android:id="@+id/tabTracking"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#FFFFFF"
+                android:text="트래킹"
                 android:textColor="#161616" />
         </LinearLayout>
 

@@ -1,35 +1,54 @@
 package com.helper.helper;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.ScrollView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApi;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.hawk.battery.widget.BatteryView;
+
+import java.util.List;
 
 public class ScrollingActivity extends AppCompatActivity implements OnMapReadyCallback,
                                                                     GoogleApiClient.ConnectionCallbacks,
@@ -38,12 +57,45 @@ public class ScrollingActivity extends AppCompatActivity implements OnMapReadyCa
     private BatteryView batView;
     private GoogleApiClient mGoogleApiClient;
     private GoogleMap mMap;
-    LocationRequest mLocationRequset;
-    Location mCurrentLocation;
+    NestedScrollView mScrollView;
+    private LocationRequest mLocationRequset;
+    private Location mCurrentLocation;
+    private Marker mCurrLocationMarker;
+    private LocationCallback mLocationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            List<Location> locationList = locationResult.getLocations();
+            if (locationList.size() > 0) {
+                //The last location in the list is the newest
+                Location location = locationList.get(locationList.size() - 1);
+                mCurrentLocation = location;
+                if (mCurrLocationMarker != null) {
+                    mCurrLocationMarker.remove();
+                }
+
+                //Place current location marker
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLng);
+                markerOptions.title("Current Position");
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+
+                if(mMap != null) {
+                    mCurrLocationMarker = mMap.addMarker(markerOptions);
+
+                    //move map camera
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                }
+
+            }
+        }
+    };
+
     private Boolean mLocationPermissionGranted = false;
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        Log.d("DEV", "onConnected: called!");
         getDeviceLocation();
     }
 
@@ -92,12 +144,16 @@ public class ScrollingActivity extends AppCompatActivity implements OnMapReadyCa
                         }
                     }
                 });
-                mCurrentLocation = LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequset);
+
+                LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequset, mLocationCallback, Looper.myLooper());
 //                mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 //                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequset, this);
+//                mMap.setMyLocationEnabled(true);
             }
         } else PermissionUtil.requestLocationsPermissions(this);
     }
+
+
 
     @Override
     public void onLocationChanged(Location location) {
@@ -106,6 +162,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.d("DEV", "onMapReady: called!");
         mMap = googleMap;
         //updateLocationUI();
     }
@@ -151,6 +208,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnMapReadyCa
         builder.create();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -178,18 +236,47 @@ public class ScrollingActivity extends AppCompatActivity implements OnMapReadyCa
             PermissionUtil.requestLocationsPermissions(this);
         }
 
+        /* Not fixed scroll bug of map fragment touch
+        SupportMapFragment myMAPF = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        myMAPF.getMapAsync(this);
+        */
+
+        final NestedScrollView mainScrollView = (NestedScrollView) findViewById(R.id.scrollView);
+        ImageView transparentImageView = (ImageView) findViewById(R.id.transparent_image);
+
+        transparentImageView.setOnTouchListener(new View.OnTouchListener() {
+
+                                                    @Override
+                                                    public boolean onTouch(View v, MotionEvent event) {
+                                                        int action = event.getAction();
+                                                        switch (action) {
+                                                            case MotionEvent.ACTION_DOWN:
+                                                                // Disallow ScrollView to intercept touch events.
+                                                                mainScrollView.requestDisallowInterceptTouchEvent(true);
+                                                                // Disable touch on transparent view
+                                                                return false;
+
+                                                            case MotionEvent.ACTION_UP:
+                                                                // Allow ScrollView to intercept touch events.
+                                                                mainScrollView.requestDisallowInterceptTouchEvent(false);
+                                                                return true;
+
+                                                            case MotionEvent.ACTION_MOVE:
+                                                                mainScrollView.requestDisallowInterceptTouchEvent(true);
+                                                                return false;
+
+                                                            default:
+                                                                return true;
+                                                        }
+                                                    }
+                                                });
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
         buildGoogleApiClient();
         mGoogleApiClient.connect();
-
-//        mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                .enableAutoManage(this /* FragmentActivity */,
-//                        this /* OnConnectionFailedListener */)
-//                .addConnectionCallbacks(this)
-//                .addApi(LocationServices.API)
-//                .addApi(Places.GEO_DATA_API)
-//                .addApi(Places.PLACE_DETECTION_API)
-//                .build();
-//        mGoogleApiClient.connect();
     }
 
     @Override

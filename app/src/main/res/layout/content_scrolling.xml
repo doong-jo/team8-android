@@ -2,6 +2,7 @@
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -192,13 +193,33 @@
                     android:padding="10dp"
                     android:text="트래킹" />
 
-                <fragment
-                    android:id="@+id/map"
-                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                <RelativeLayout
+                    android:id="@+id/map_layout"
                     android:layout_width="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_height="match_parent"
-                    />
+                    android:layout_height="match_parent">
+
+                    <fragment
+                        android:id="@+id/map"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"/>
+
+                    <ImageView
+                        android:id="@+id/transparent_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@android:color/transparent" />
+
+                </RelativeLayout>
+
+                <!--<fragment-->
+                    <!--android:id="@+id/map"-->
+                    <!--android:name="com.google.android.gms.maps.SupportMapFragment"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_gravity="center"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--/>-->
             </LinearLayout>
         </android.support.v7.widget.CardView>
         <!--트래킹 끝-->
