@@ -2,6 +2,9 @@ package com.helper.helper;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,6 +28,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 
@@ -153,8 +157,6 @@ public class ScrollingActivity extends AppCompatActivity implements OnMapReadyCa
         } else PermissionUtil.requestLocationsPermissions(this);
     }
 
-
-
     @Override
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
@@ -242,6 +244,12 @@ public class ScrollingActivity extends AppCompatActivity implements OnMapReadyCa
         myMAPF.getMapAsync(this);
         */
 
+        Fragment fragment = new InfoFragment();
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add( R.id.fragment_place, fragment );
+        fragmentTransaction.commit();
+
         final NestedScrollView mainScrollView = (NestedScrollView) findViewById(R.id.scrollView);
         ImageView transparentImageView = (ImageView) findViewById(R.id.transparent_image);
 
@@ -277,6 +285,38 @@ public class ScrollingActivity extends AppCompatActivity implements OnMapReadyCa
 
         buildGoogleApiClient();
         mGoogleApiClient.connect();
+    }
+
+    public void ChangeFragment( View v ) {
+
+        Fragment fragment;
+
+        Log.d("DEV", "click fragment id : " + v.getId());
+
+        switch( v.getId() ) {
+            default:
+            case R.id.tabInfo: {
+                fragment = new InfoFragment();
+                Log.d("DEV", "Info Fragment draw!");
+                break;
+            }
+            case R.id.tabLED: {
+                fragment = new LEDFragment();
+                Log.d("DEV", "LED Fragment draw!");
+                break;
+            }
+
+            case R.id.tabTracking: {
+                fragment = new TrackingFragment();
+                Log.d("DEV", "Tracking Fragment draw!");
+                break;
+            }
+        }
+
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace( R.id.fragment_place, fragment );
+        fragmentTransaction.commit();
     }
 
     @Override

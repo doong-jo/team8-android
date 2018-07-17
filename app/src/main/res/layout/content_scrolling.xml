@@ -14,6 +14,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
         <!--배터리 상태 시작-->
+        <fragment
+            android:id="@+id/fragment_place"
+            android:name="com.helper.helper.InfoFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <android.support.v7.widget.CardView
             android:id="@+id/devicePower"
             android:layout_width="match_parent"
