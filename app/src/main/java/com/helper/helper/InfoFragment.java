@@ -25,7 +25,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,35 +73,40 @@ public class InfoFragment extends Fragment
     private static final int UPDATE_INTERVAL_MS = 15000;
     private static final int FASTEST_UPDATE_INTERVAL_MS = 15000;
 
-//    private LocationCallback mLocationCallback = new LocationCallback() {
-//        @Override
-//        public void onLocationResult(LocationResult locationResult) {
-//            List<Location> locationList = locationResult.getLocations();
-//            if (locationList.size() > 0) {
-//                //The last location in the list is the newest
-//                Location location = locationList.get(locationList.size() - 1);
-//                mCurrentLocation = location;
-//                if (mCurrLocationMarker != null) {
-//                    mCurrLocationMarker.remove();
-//                }
-//
-//                //Place current location marker
-//                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-//                MarkerOptions markerOptions = new MarkerOptions();
-//                markerOptions.position(latLng);
-//                markerOptions.title("Current Position");
-//                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-//
-//                if(mMap != null) {
-//                    mCurrLocationMarker = mMap.addMarker(markerOptions);
-//
-//                    //move map camera
-//                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-//                }
-//
-//            }
-//        }
-//    };
+    public InfoFragment() {
+
+    }
+
+    @SuppressWarnings("MissingPermission")
+    private LocationCallback mLocationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            List<Location> locationList = locationResult.getLocations();
+            if (locationList.size() > 0) {
+                //The last location in the list is the newest
+                Location location = locationList.get(locationList.size() - 1);
+                mCurrentLocation = location;
+                if (mCurrLocationMarker != null) {
+                    mCurrLocationMarker.remove();
+                }
+
+                //Place current location marker
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLng);
+                markerOptions.title("Current Position");
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+
+                if(mMap != null) {
+                    mCurrLocationMarker = mMap.addMarker(markerOptions);
+
+                    //move map camera
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                }
+
+            }
+        }
+    };
 
     public void setCurrentLocation(Location location, String markerTitle, String markerSnippet) {
         if ( mCurrLocationMarker != null ) mCurrLocationMarker.remove();
@@ -138,9 +143,34 @@ public class InfoFragment extends Fragment
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
+        Log.d("DEV", "onCreateView called!");
+        View view = inflater.inflate( R.layout.fragment_info, container, false );
+
+        batView = (BatteryView) view.findViewById(R.id.batView);
+        batView.setPower(78);
+
+        //MapView 초기화 작업
+        mapView = (MapView)view.findViewById(R.id.map);
+        mapView.onCreate(savedInstanceState);
+        mapView.onResume();
+        mapView.getMapAsync(this);
+
+        //MapView
+        adjustMapVerticalTouch(view);
+        return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     public void adjustMapVerticalTouch(View view) {
-        final NestedScrollView mainScrollView = (NestedScrollView) getActivity().findViewById(R.id.scrollView);
+        final NestedScrollView mainScrollView = (NestedScrollView) view.findViewById(R.id.infoScrollView);
         ImageView transparentImageView = (ImageView) view.findViewById(R.id.transparent_image);
 
         transparentImageView.setOnTouchListener(new View.OnTouchListener() {
@@ -173,7 +203,8 @@ public class InfoFragment extends Fragment
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d("DEV", "onMapReady: called!");
+        Log.d("DEV", "onMapReady called!");
+
         mMap = googleMap;
 
         setCurrentLocation(null, "위치정보 가져올 수 없음", "위치 권한과 GPS 활성 여부 확인");
@@ -196,7 +227,23 @@ public class InfoFragment extends Fragment
             } else {
                 //사용권한이 있는경우
                 if ( mGoogleApiClient == null) {
+                    Log.d("DEV", "onMapReady have auth called!");
                     buildGoogleApiClient();
+                    LocationServices.getFusedLocationProviderClient(getActivity()).getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations, this can be null.
+                            if (location != null) {
+                                // Logic to handle location object
+                                Log.d("DEV", "onMapReady get location called!");
+                                mCurrentLocation = location;
+
+                                setCurrentLocation(mCurrentLocation, "내 위치", "GPS Position");
+                            }
+                        }
+                    });
+
+                    LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(mLocationRequset, mLocationCallback, Looper.myLooper());
                 }
 
                 if ( ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
@@ -214,20 +261,6 @@ public class InfoFragment extends Fragment
         }
     }
 
-    @Override
-    public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
-        View view = inflater.inflate( R.layout.fragment_info, container, false );
-
-        mapView = (MapView)view.findViewById(R.id.map);
-        mapView.getMapAsync(this);
-
-        batView = (BatteryView) view.findViewById(R.id.batView);
-        batView.setPower(78);
-
-//        adjustMapVerticalTouch(view);
-        return view;
-    }
-
     public boolean checkLocationServicesStatus() {
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
@@ -237,49 +270,52 @@ public class InfoFragment extends Fragment
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        if ( !checkLocationServicesStatus()) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("위치 서비스 비활성화");
-            builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n" +
-                    "위치 설정을 수정하십시오.");
-            builder.setCancelable(true);
-            builder.setPositiveButton("설정", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    Intent callGPSSettingIntent =
-                            new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivityForResult(callGPSSettingIntent, GPS_ENABLE_REQUEST_CODE);
-                }
-            });
-            builder.setNegativeButton("취소", new DialogInterface.OnClickListener(){
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.cancel();
-                }
-            });
-            builder.create().show();
-        }
+        Log.d("DEV", "onConnected called!");
+//        if ( !checkLocationServicesStatus()) {
+//            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//            builder.setTitle("위치 서비스 비활성화");
+//            builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n" +
+//                    "위치 설정을 수정하십시오.");
+//            builder.setCancelable(true);
+//            builder.setPositiveButton("설정", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialogInterface, int i) {
+//                    Intent callGPSSettingIntent =
+//                            new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//                    startActivityForResult(callGPSSettingIntent, GPS_ENABLE_REQUEST_CODE);
+//                }
+//            });
+//            builder.setNegativeButton("취소", new DialogInterface.OnClickListener(){
+//                @Override
+//                public void onClick(DialogInterface dialogInterface, int i) {
+//                    dialogInterface.cancel();
+//                }
+//            });
+//            builder.create().show();
+//        }
+//
 
-        LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(UPDATE_INTERVAL_MS);
-        locationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_MS);
+        //getDeviceLocation();
+        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
-        if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if ( ActivityCompat.checkSelfPermission(getActivity(),
-                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//        if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if ( ActivityCompat.checkSelfPermission(getActivity(),
+//                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//
+//                LocationServices.FusedLocationApi
+//                        .requestLocationUpdates(mGoogleApiClient, locationRequest, this);
+//            }
+//        } else {
+//            LocationServices.FusedLocationApi
+//                    .requestLocationUpdates(mGoogleApiClient, locationRequest, this);
+//
+//            mMap.getUiSettings().setCompassEnabled(true);
+//            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+//        }
 
-                LocationServices.FusedLocationApi
-                        .requestLocationUpdates(mGoogleApiClient, locationRequest, this);
-            }
-        } else {
-            LocationServices.FusedLocationApi
-                    .requestLocationUpdates(mGoogleApiClient, locationRequest, this);
 
-            mMap.getUiSettings().setCompassEnabled(true);
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-        }
-
+//        getDeviceLocation();
     }
 
     @Override
@@ -294,47 +330,10 @@ public class InfoFragment extends Fragment
 
     @Override
     public void onLocationChanged(Location location) {
-//        Log.i(TAG, "onLocationChanged call..");
-//        searchCurrentPlaces();
+        Log.d("DEV", "onLocationChanged called!");
+        mCurrentLocation = location;
+        setCurrentLocation(mCurrentLocation, "내 위치", "GPS Position");
     }
-
-//    private void searchCurrentPlaces() {
-//        @SuppressWarnings("MissingPermission")
-//        PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
-//                .getCurrentPlace(googleApiClient, null);
-//        result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>(){
-//
-//            @Override
-//            public void onResult(@NonNull PlaceLikelihoodBuffer placeLikelihoods) {
-//                int i = 0;
-//                LikelyPlaceNames = new String[MAXENTRIES];
-//                LikelyAddresses = new String[MAXENTRIES];
-//                LikelyAttributions = new String[MAXENTRIES];
-//                LikelyLatLngs = new LatLng[MAXENTRIES];
-//
-//                for(PlaceLikelihood placeLikelihood : placeLikelihoods) {
-//                    LikelyPlaceNames[i] = (String) placeLikelihood.getPlace().getName();
-//                    LikelyAddresses[i] = (String) placeLikelihood.getPlace().getAddress();
-//                    LikelyAttributions[i] = (String) placeLikelihood.getPlace().getAttributions();
-//                    LikelyLatLngs[i] = placeLikelihood.getPlace().getLatLng();
-//
-//                    i++;
-//                    if(i > MAXENTRIES - 1 ) {
-//                        break;
-//                    }
-//                }
-//
-//                placeLikelihoods.release();
-//
-//                Location location = new Location("");
-//                location.setLatitude(LikelyLatLngs[0].latitude);
-//                location.setLongitude(LikelyLatLngs[0].longitude);
-//
-//                setCurrentLocation(location, LikelyPlaceNames[0], LikelyAddresses[0]);
-//            }
-//        });
-//
-//    }
 
     @Override
     public void onConnectionSuspended(int connect) {
@@ -342,6 +341,8 @@ public class InfoFragment extends Fragment
     }
 
     private void createLocationRequest() {
+        Log.d("DEV", "createLocationRequest called!");
+
         mLocationRequset = new LocationRequest();
         mLocationRequset.setInterval(3000);//10000
         mLocationRequset.setFastestInterval(1500);//5000
@@ -349,6 +350,7 @@ public class InfoFragment extends Fragment
     }
 
     protected synchronized  void buildGoogleApiClient() {
+        Log.d("DEV", "buildGoogleApiClient called!");
         if(mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                     .enableAutoManage((FragmentActivity) getActivity(), this)
@@ -361,6 +363,54 @@ public class InfoFragment extends Fragment
 
         createLocationRequest();
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onLowMemory();
+    }
+//
+//    @Override
+//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+//        super.onActivityCreated(savedInstanceState);
+//
+////액티비티가 처음 생성될 때 실행되는 함수
+//
+//        if(mapView != null)
+//        {
+//            mapView.onCreate(savedInstanceState);
+//        }
+//    }
 //
 //    @Override
 //    public void onLocationChanged(Location location) {
@@ -419,39 +469,5 @@ public class InfoFragment extends Fragment
 //        builder.create();
 //    }
 //
-//    public void adjustMapVerticalTouch() {
-//        final NestedScrollView mainScrollView = (NestedScrollView) findViewById(R.id.scrollView);
-//        ImageView transparentImageView = (ImageView) findViewById(R.id.transparent_image);
-//
-//        transparentImageView.setOnTouchListener(new View.OnTouchListener() {
-//
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                int action = event.getAction();
-//                switch (action) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        // Disallow ScrollView to intercept touch events.
-//                        mainScrollView.requestDisallowInterceptTouchEvent(true);
-//                        // Disable touch on transparent view
-//                        return false;
-//
-//                    case MotionEvent.ACTION_UP:
-//                        // Allow ScrollView to intercept touch events.
-//                        mainScrollView.requestDisallowInterceptTouchEvent(false);
-//                        return true;
-//
-//                    case MotionEvent.ACTION_MOVE:
-//                        mainScrollView.requestDisallowInterceptTouchEvent(true);
-//                        return false;
-//
-//                    default:
-//                        return true;
-//                }
-//            }
-//        });
-//
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
-//    }
     //  Map Reference End
 }

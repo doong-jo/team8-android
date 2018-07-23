@@ -1,35 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/scrollView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ScrollingActivity"
     tools:showIn="@layout/activity_scrolling">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <!--배터리 상태 시작-->
-        <FrameLayout
-            android:id="@+id/fragment_place"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </FrameLayout>
+            android:layout_height="wrap_content" />
 
 
 
-
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_margin="@dimen/text_margin"-->
-            <!--android:text="@string/large_text" />-->
-    </LinearLayout>
-
-
-
-</android.support.v4.widget.NestedScrollView>
+</LinearLayout>

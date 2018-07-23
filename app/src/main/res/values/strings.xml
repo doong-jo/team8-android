@@ -2,4 +2,15 @@
     <string name="app_name">Helper</string>
     <string name="action_settings">사용 설명서</string>
     <string name="title_activity_maps">Map</string>
+
+    <!--Info Fragment-->
+    <string name="cardTitleBattery">Battery</string>
+    <string name="cardTitleBrightnessAndSpeed">Brightness &amp; Speed</string>
+    <string name="cardTitleLED">LED</string>
+    <string name="LEDCardLinkText">LED 제어판 보기</string>
+    <string name="cardTitleTracking">Tracking</string>
+
+    <!--LED Fragment-->
+    <string name="cardTitleLEDDetail">Current LED</string>
+    <string name="cardTitleLEDList">LED List</string>
 </resources>

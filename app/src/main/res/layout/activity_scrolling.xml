@@ -17,51 +17,61 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:theme="@style/AppTheme.AppBar"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:theme="@style/AppTheme.AppBar" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabBackground="@color/tabBackgroundColor"
+            app:tabIndicatorColor="@color/colorAccent"
+            app:tabRippleColor="@color/colorAccent"
+            app:tabSelectedTextColor="@color/colorAccent"
+            app:tabTextColor="@color/textColorPrimary" />
+
+        <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal">-->
+
+        <!--<Button-->
+        <!--android:id="@+id/tabInfo"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:background="#FFFFFF"-->
+        <!--android:onClick="ChangeFragment"-->
+        <!--android:text="정보"-->
+        <!--android:textColor="#161616" />-->
+
+        <!--<Button-->
+        <!--android:id="@+id/tabLED"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:background="#FFFFFF"-->
+        <!--android:onClick="ChangeFragment"-->
+        <!--android:text="LED"-->
+        <!--android:textColor="#161616" />-->
+
+        <!--<Button-->
+        <!--android:id="@+id/tabTracking"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:background="#FFFFFF"-->
+        <!--android:onClick="ChangeFragment"-->
+        <!--android:text="트래킹"-->
+        <!--android:textColor="#161616" />-->
+        <!--</LinearLayout>-->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/tabInfo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="#FFFFFF"
-                android:onClick="ChangeFragment"
-                android:text="정보"
-                android:textColor="#161616" />
-
-            <Button
-                android:id="@+id/tabLED"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="#FFFFFF"
-                android:onClick="ChangeFragment"
-                android:text="LED"
-                android:textColor="#161616" />
-
-            <Button
-                android:id="@+id/tabTracking"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="#FFFFFF"
-                android:onClick="ChangeFragment"
-                android:text="트래킹"
-                android:textColor="#161616" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
             android:background="#FAFAFA"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="20dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -79,6 +89,7 @@
                 android:textColor="#161616"
                 android:textSize="16sp" />
         </LinearLayout>
+
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_scrolling" />
