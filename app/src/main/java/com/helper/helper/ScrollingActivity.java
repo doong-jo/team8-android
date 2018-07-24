@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
@@ -57,6 +58,8 @@ public class ScrollingActivity extends AppCompatActivity {
     private String mBluetoothDeviceAddress;
     private BluetoothGattCharacteristic characteristicTX;
     private BluetoothGattCharacteristic characteristicRX;
+    private String mDeviceName;
+    private String mDeviceAddress;
 
     private boolean mIsConnected = false;
 
@@ -83,6 +86,8 @@ public class ScrollingActivity extends AppCompatActivity {
     private static final int TAB_LED = 1;
     private static final int TAB_TRACKING = 2;
     private static final int REQUEST_ENABLE_BT = 2001;
+    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
+    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
     private static final UUID UUID_SPP = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
@@ -145,7 +150,7 @@ public class ScrollingActivity extends AppCompatActivity {
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-//            mBluetoothLeService.connect(mDeviceAddress);
+            mBluetoothLeService.connect(mDeviceAddress);
         }
 
         @Override
@@ -198,6 +203,10 @@ public class ScrollingActivity extends AppCompatActivity {
             }
         });
 
+        final Intent intent = getIntent();
+        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
+        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
+
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, "기기가 블루투스를 지원하지 않습니다.", Toast.LENGTH_LONG).show();
@@ -209,6 +218,7 @@ public class ScrollingActivity extends AppCompatActivity {
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+
 
 //        Fragment fragment = new InfoFragment();
 //        FragmentManager fragmentManager = getFragmentManager();
@@ -279,18 +289,8 @@ public class ScrollingActivity extends AppCompatActivity {
                                     Log.d("DEV", "searchedDevice : " + searchedDevice.getName() + "\n" + searchedDevice.getAddress());
 
 
-                                    if( searchedDevice.getName().toString().equals("HELPER") && connect(searchedDevice.getAddress()) ) {
-                                        BluetoothGattCharacteristic mSCharacteristic;
-                                        String str = "R";
-                                        final byte[] tx = str.getBytes();
-
-                                        mSCharacteristic = new BluetoothGattCharacteristic(UUID_HM_RX_TX,
-                                                BluetoothGattCharacteristic.PROPERTY_READ
-                                                        | BluetoothGattCharacteristic.PROPERTY_NOTIFY,
-                                                BluetoothGattCharacteristic.PERMISSION_READ);
-
-                                        mSCharacteristic.setValue(tx);
-                                        mBluetoothLeService.writeCharacteristic(mSCharacteristic);
+                                    if( searchedDevice.getName().toString().equals("HELPER") && mBluetoothLeService.connect(searchedDevice.getAddress()) ) {
+                                        Log.d("DEV", "connected HELPER!");
                                     }
 //                                    BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(searchedDevice.getAddress());
 //                                    device.connectGatt(this, false, mGattCallback);
@@ -314,41 +314,6 @@ public class ScrollingActivity extends AppCompatActivity {
                 }
                 break;
         }
-    }
-
-    public boolean connect(final String address) {
-        if (mBluetoothAdapter == null || address == null) {
-            Log.w("DEV", "BluetoothAdapter not initialized or unspecified address.");
-            return false;
-        }
-
-        // Previously connected device.  Try to reconnect.
-        if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)
-                && mBluetoothGatt != null) {
-            Log.d("DEV", "Trying to use an existing mBluetoothGatt for connection.");
-            if (mBluetoothGatt.connect()) {
-                mConnectionState = STATE_CONNECTING;
-                return true;
-            } else {
-                final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-                mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
-                mBluetoothDeviceAddress = address;
-                return false;
-            }
-        }
-
-        final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-        if (device == null) {
-            Log.w("DEV", "Device not found.  Unable to connect.");
-            return false;
-        }
-        // We want to directly connect to the device, so we are setting the autoConnect
-        // parameter to false.
-        mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
-        Log.d("DEV", "Trying to create a new connection.");
-        mBluetoothDeviceAddress = address;
-        mConnectionState = STATE_CONNECTING;
-        return true;
     }
 
 //    void connectToSelectedDevice(String selectedDeviceName) {
@@ -378,6 +343,31 @@ public class ScrollingActivity extends AppCompatActivity {
 //            this.finish();  // App 종료
 //        }
 //    }
+
+    public void sendSignal(View v) {
+        BluetoothGattCharacteristic mSCharacteristic;
+        String str = "R";
+        final byte[] tx = str.getBytes();
+
+        mSCharacteristic = new BluetoothGattCharacteristic(UUID_HM_RX_TX,
+                BluetoothGattCharacteristic.PROPERTY_READ
+                        | BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+                BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        mSCharacteristic.setValue(tx);
+
+        List<BluetoothGattService> gattServices =  mBluetoothLeService.getSupportedGattServices();
+
+        for (BluetoothGattService gattService : gattServices) {
+            // get characteristic when UUID matches RX/TX UUID
+            characteristicTX = gattService.getCharacteristic(BluetoothLeService.UUID_HM_RX_TX);
+            characteristicRX = gattService.getCharacteristic(BluetoothLeService.UUID_HM_RX_TX);
+        }
+
+        characteristicTX.setValue(tx);
+        Log.d("DEV", "sendSignal called! tx : " + tx);
+        mBluetoothLeService.writeCharacteristic(characteristicTX);
+    }
 
     public BluetoothSocket getBluetoothSocket(BluetoothDevice device, UUID uuid) throws IOException {
 
