@@ -286,10 +286,12 @@ public class ScrollingActivity extends AppCompatActivity {
                                 if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
 
                                     BluetoothDevice searchedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                                    if(searchedDevice.getName() == null) { return; }
+
                                     Log.d("DEV", "searchedDevice : " + searchedDevice.getName() + "\n" + searchedDevice.getAddress());
 
-
-                                    if( searchedDevice.getName().toString().equals("HELPER") && mBluetoothLeService.connect(searchedDevice.getAddress()) ) {
+                                    // HELPER
+                                    if( searchedDevice.getName().toString().equals("=ASDF") && mBluetoothLeService.connect(searchedDevice.getAddress()) ) {
                                         Log.d("DEV", "connected HELPER!");
                                     }
 //                                    BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(searchedDevice.getAddress());
@@ -346,15 +348,35 @@ public class ScrollingActivity extends AppCompatActivity {
 
     public void sendSignal(View v) {
         BluetoothGattCharacteristic mSCharacteristic;
-        String str = "R";
+//        String str = v.getTag().toString();
+        String str;
+        Log.d("DEV", v.getResources().getResourceName(v.getId()));
+        switch ( v.getResources().getResourceName(v.getId()) ) {
+            case "com.helper.helper:id/img1" :
+                str = "1";
+                break;
+
+            case "com.helper.helper:id/img2" :
+                str = "2";
+                break;
+
+            case "com.helper.helper:id/img3" :
+                str = "3";
+                break;
+
+            case "com.helper.helper:id/img4" :
+                str = "4";
+                break;
+
+            case "com.helper.helper:id/img5" :
+                str = "5";
+                break;
+
+            default:
+                str = "1";
+        }
+
         final byte[] tx = str.getBytes();
-
-        mSCharacteristic = new BluetoothGattCharacteristic(UUID_HM_RX_TX,
-                BluetoothGattCharacteristic.PROPERTY_READ
-                        | BluetoothGattCharacteristic.PROPERTY_NOTIFY,
-                BluetoothGattCharacteristic.PERMISSION_WRITE);
-
-        mSCharacteristic.setValue(tx);
 
         List<BluetoothGattService> gattServices =  mBluetoothLeService.getSupportedGattServices();
 
