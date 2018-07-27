@@ -33,8 +33,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,6 +49,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class ScrollingActivity extends AppCompatActivity {
+    private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -64,6 +69,7 @@ public class ScrollingActivity extends AppCompatActivity {
     private boolean mIsConnected = false;
 
     private int mConnectionState = STATE_DISCONNECTED;
+
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
@@ -81,97 +87,23 @@ public class ScrollingActivity extends AppCompatActivity {
     public final static UUID UUID_HM_RX_TX =
             UUID.fromString(BluetoothAttributes.HM_RX_TX);
 
-
     private static final int TAB_STATUS = 0;
     private static final int TAB_LED = 1;
     private static final int TAB_TRACKING = 2;
     private static final int REQUEST_ENABLE_BT = 2001;
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
-
-    private static final UUID UUID_SPP = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-
-//    public final static UUID HM_RX_TX = UUID.fromString(BluetoothAttributes.HM_RX_TX);
-
-    private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            String intentAction;
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                intentAction = ACTION_GATT_CONNECTED;
-                mConnectionState = STATE_CONNECTED;
-                broadcastUpdate(intentAction);
-                Log.i("DEV", "Connected to GATT server.");
-                // Attempts to discover services after successful connection.
-                Log.i("DEV", "Attempting to start service discovery:" +
-                        mBluetoothGatt.discoverServices());
-
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                intentAction = ACTION_GATT_DISCONNECTED;
-                mConnectionState = STATE_DISCONNECTED;
-                Log.i("DEV", "Disconnected from GATT server.");
-                broadcastUpdate(intentAction);
-            }
-        }
-
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
-            } else {
-                Log.w("DEV", "onServicesDiscovered received: " + status);
-            }
-        }
-
-        @Override
-        public void onCharacteristicRead(BluetoothGatt gatt,
-                                         BluetoothGattCharacteristic characteristic,
-                                         int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-            }
-        }
-
-        @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt,
-                                            BluetoothGattCharacteristic characteristic) {
-            broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-        }
-    };
-
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            Log.e("DEV", "mBluetoothLeService to initialize Bluetooth");
-            if (!mBluetoothLeService.initialize()) {
-                Log.e("DEV", "Unable to initialize Bluetooth");
-                finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBluetoothLeService = null;
-        }
-    };
-
-
-    public boolean getIsPairing() {
-        return IsPairingDevice;
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
+
+        /* ToolBar UI start */
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        /* ToolBar UI end */
 
+        /* Tab start */
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.addTab(tabLayout.newTab().setText("Status"));
         tabLayout.addTab(tabLayout.newTab().setText("LED"));
@@ -183,13 +115,12 @@ public class ScrollingActivity extends AppCompatActivity {
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
-        // Set TabSelectedListener
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 Log.d("DEV", "onTabSelected called! posistion : " + tab.getPosition());
                 viewPager.setCurrentItem(tab.getPosition());
-//                view
+                //                view
             }
 
             @Override
@@ -202,173 +133,184 @@ public class ScrollingActivity extends AppCompatActivity {
 
             }
         });
+        /* Tab end /*
 
-        final Intent intent = getIntent();
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-
+        /* Valid Bluetooth supports start */
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
-            Toast.makeText(this, "기기가 블루투스를 지원하지 않습니다.", Toast.LENGTH_LONG).show();
-            // Device does not support Bluetooth
+            Toast.makeText(this, "Device does not support Bluetooth", Toast.LENGTH_LONG).show();
             IsSupportedBTDevice = false;
-        }else {
+        } else {
+            Toast.makeText(this, "Device support Bluetooth", Toast.LENGTH_LONG).show();
             IsSupportedBTDevice = true;
         }
+        /* Valid Bluetooth supports end */
 
+
+
+        /* Set GATT Interface start */
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-
-
-//        Fragment fragment = new InfoFragment();
-//        FragmentManager fragmentManager = getFragmentManager();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        fragmentTransaction.add( R.id.fragment_place, fragment );
-//        fragmentTransaction.commit();
+        /* Set GATT Interface end */
     }
 
-    private void broadcastUpdate(final String action) {
-        final Intent intent = new Intent(action);
-        sendBroadcast(intent);
+    /* Tab Move Start */
+    public void moveToLEDDash(View v) {
+        viewPager.setCurrentItem(TAB_LED);
     }
 
-    private void broadcastUpdate(final String action,final BluetoothGattCharacteristic characteristic) {
-        final Intent intent = new Intent(action);
+    public void moveToTrackingDash(View v) {
+        viewPager.setCurrentItem(TAB_TRACKING);
+    }
+    /* Tab Move End */
 
-        // For all other profiles, writes the data formatted in HEX.
-        final byte[] data = characteristic.getValue();
-        Log.i("DEV", "data"+characteristic.getValue());
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
-        if (data != null && data.length > 0) {
-            final StringBuilder stringBuilder = new StringBuilder(data.length);
-            for(byte byteChar : data)
-                stringBuilder.append(String.format("%02X ", byteChar));
-            Log.d("DEV", String.format("%s", new String(data)));
-            // getting cut off when longer, need to push on new line, 0A
-            intent.putExtra(EXTRA_DATA,String.format("%s", new String(data)));
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+            mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
+            Log.d(TAG, "mBluetoothLeService to initialize Bluetooth");
+            if (!mBluetoothLeService.initialize()) {
+                Log.e(TAG, "Unable to initialize Bluetooth");
+                finish();
+            }
 
+            /* Connect Bluetooth Device Start
+               (Automatically connects to the device upon successful start-up initialization.) */
+            if (!mBluetoothAdapter.isEnabled()) {
+                Toast.makeText(getApplicationContext(), "disable bluetooth", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Already enable bluetooth", Toast.LENGTH_LONG).show();
+                connectDevice();
+            }
+            /* Connect Bluetooth Device End */
         }
-        sendBroadcast(intent);
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBluetoothLeService = null;
+        }
+    };
+
+    public void enableBluetooth(View v) {
+        if (!IsSupportedBTDevice) {
+            return;
+        }
+
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            //call onActivityResult
+        } else {
+            Toast.makeText(this, "Already enable bluetooth", Toast.LENGTH_LONG).show();
+            connectDevice();
+        }
+    }
+
+    public void updateConnectionLayout(boolean IsConnected) {
+        LinearLayout connectLayout = (LinearLayout) findViewById(R.id.connect_layout);
+        TextView connectDiscription = (TextView) findViewById(R.id.connect_desc_text);
+        TextView connectToggle = (TextView) findViewById(R.id.connect_toggle_text);
+
+        if( IsConnected ) {
+            connectLayout.setOnClickListener(null);
+            connectDiscription.setText(getString(R.string.connect_state));
+            connectToggle.setText("");
+        } else {
+            connectLayout.setOnClickListener(enableBluetoothView);
+            connectDiscription.setText(getString(R.string.disconnect_state));
+            connectToggle.setText(getString(R.string.connect_device));
+        }
+
+    }
+
+    View.OnClickListener enableBluetoothView = new View.OnClickListener() {
+        public void onClick(View v) {
+            enableBluetooth(v);
+        }
+    };
+
+    public void connectDevice() {
+        // 만약 페어링 기기들 리스트에 있다면 바로 연결
+        List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>(mBluetoothAdapter.getBondedDevices());
+
+        String[] deviceLabels = new String[devices.size()];
+        for (int i = 0; i < deviceLabels.length; ++i) {
+            if( devices.get(i).getName() == getString(R.string.device_bluetooth_name) &&
+                    mBluetoothLeService.connect(devices.get(i).getAddress()) ) {
+                Toast.makeText(this, "connected paired device HELPER!", Toast.LENGTH_LONG).show();
+                updateConnectionLayout(true);
+                break;
+            }
+        }
+
+        // 페어링 기기가 없다면 새로 찾아서 연결
+        if (mBluetoothAdapter.startDiscovery()) {
+            BroadcastReceiver mDiscoveryReceiver = new BroadcastReceiver() {
+
+                @Override
+
+                public void onReceive(Context context, Intent intent) {
+
+                    if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
+
+                        BluetoothDevice searchedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                        if (searchedDevice.getName() == null) {
+                            return;
+                        }
+
+                        Log.d(TAG, "searchedDevice : " + searchedDevice.getName() + "\n" + searchedDevice.getAddress());
+
+                        // HELPER
+                        if (searchedDevice.getName().toString().equals(getString(R.string.device_bluetooth_name)) &&
+                                mBluetoothLeService.connect(searchedDevice.getAddress())) {
+                            Toast.makeText(getApplicationContext(), "connected device HELPER!", Toast.LENGTH_LONG).show();
+                            updateConnectionLayout(true);
+                        }
+                    }
+                }
+
+            };
+
+            registerReceiver(mDiscoveryReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+        }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch(requestCode) {
+        switch (requestCode) {
             case REQUEST_ENABLE_BT:
-                if( resultCode == Activity.RESULT_OK ) {
-                    Log.d("DEV", "Enable Bluetooth");
-//                    AlertDialog.Builder alert = new AlertDialog.Builder(this);
-//                    alert.setTitle("Bluetooth List");
+                // Allow Bluetooth
 
-
-                    //만약 페어링 기기들 리스트에 있다면 바로 연결
-
-                    // BondDevices : 이전에 페어링 되었었던 기기들 리스트
-//                    Log.d("DEV", mBluetoothAdapter.getBondedDevices().toString());
-//                    Log.d("DEV", mBluetoothAdapter.getDe)
-
-                    List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>(mBluetoothAdapter.getBondedDevices());
-                    String[] deviceLabels = new String[devices.size()];
-                    for (int i = 0; i < deviceLabels.length; ++i) {
-                        deviceLabels[i] = devices.get(i).getName() + "\n" + devices.get(i).getAddress();
-                        Log.d("DEV", "deviceLabel : " + deviceLabels[i].toString());
-                    }
-
-                    //페어링 기기가 없다면 새로 연결
-
-                    if( mBluetoothAdapter.startDiscovery() ) {
-                        BroadcastReceiver mDiscoveryReceiver = new BroadcastReceiver() {
-
-                            @Override
-
-                            public void onReceive(Context context, Intent intent) {
-
-                                if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
-
-                                    BluetoothDevice searchedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                                    if(searchedDevice.getName() == null) { return; }
-
-                                    Log.d("DEV", "searchedDevice : " + searchedDevice.getName() + "\n" + searchedDevice.getAddress());
-
-                                    // HELPER
-                                    if( searchedDevice.getName().toString().equals("=ASDF") && mBluetoothLeService.connect(searchedDevice.getAddress()) ) {
-                                        Log.d("DEV", "connected HELPER!");
-                                    }
-//                                    BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(searchedDevice.getAddress());
-//                                    device.connectGatt(this, false, mGattCallback);
-
-//                                    if( searchedDevice.getName().toString().equals("HELPER") && requestConnect(searchedDevice, UUID_SPP) ) {
-//                                        Log.d("DEV", "connected : " + searchedDevice.getName() + "\n" + searchedDevice.getAddress());
-//                                    }
-                                }
-
-                            }
-
-                        };
-
-                        registerReceiver(mDiscoveryReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-                    }
-
-
-//                    alert.show();
+                if (resultCode == Activity.RESULT_OK) {
+                    connectDevice();
                 } else {
-                    Log.d("DEV", "Disable Bluetooth");
+                    Toast.makeText(this, "You can't use interaction helper device", Toast.LENGTH_LONG).show();
                 }
                 break;
         }
     }
 
-//    void connectToSelectedDevice(String selectedDeviceName) {
-//        // BluetoothDevice 원격 블루투스 기기를 나타냄.
-//        m_RemoteDeivce = getDeviceFromBondedList(selectedDeviceName);
-//        // java.util.UUID.fromString : 자바에서 중복되지 않는 Unique 키 생성.
-//        UUID uuid = java.util.UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-//
-//        try {
-//            // 소켓 생성, RFCOMM 채널을 통한 연결.
-//            // createRfcommSocketToServiceRecord(uuid) : 이 함수를 사용하여 원격 블루투스 장치와 통신할 수 있는 소켓을 생성함.
-//            // 이 메소드가 성공하면 스마트폰과 페어링 된 디바이스간 통신 채널에 대응하는 BluetoothSocket 오브젝트를 리턴함.
-//            m_Socket = m_RemoteDeivce.createRfcommSocketToServiceRecord(uuid);
-//            m_Socket.connect(); // 소켓이 생성 되면 connect() 함수를 호출함으로써 두기기의 연결은 완료된다.
-//
-//            // 데이터 송수신을 위한 스트림 얻기.
-//            // BluetoothSocket 오브젝트는 두개의 Stream을 제공한다.
-//            // 1. 데이터를 보내기 위한 OutputStrem
-//            // 2. 데이터를 받기 위한 InputStream
-////            m_InputStream = m_Socket.getInputStream();
-//
-//            // 데이터 수신 준비.
-//            btConnection_receive();
-//
-//        }catch(Exception e) { // 블루투스 연결 중 오류 발생
-//            Toast.makeText(this, "블루투스 연결 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show();
-//            this.finish();  // App 종료
-//        }
-//    }
-
     public void sendSignal(View v) {
-        BluetoothGattCharacteristic mSCharacteristic;
-//        String str = v.getTag().toString();
         String str;
-        Log.d("DEV", v.getResources().getResourceName(v.getId()));
-        switch ( v.getResources().getResourceName(v.getId()) ) {
-            case "com.helper.helper:id/img1" :
+        switch (v.getResources().getResourceName(v.getId())) {
+            case "com.helper.helper:id/img1":
                 str = "1";
                 break;
 
-            case "com.helper.helper:id/img2" :
+            case "com.helper.helper:id/img2":
                 str = "2";
                 break;
 
-            case "com.helper.helper:id/img3" :
+            case "com.helper.helper:id/img3":
                 str = "3";
                 break;
 
-            case "com.helper.helper:id/img4" :
+            case "com.helper.helper:id/img4":
                 str = "4";
                 break;
 
-            case "com.helper.helper:id/img5" :
+            case "com.helper.helper:id/battery":
                 str = "5";
                 break;
 
@@ -378,7 +320,7 @@ public class ScrollingActivity extends AppCompatActivity {
 
         final byte[] tx = str.getBytes();
 
-        List<BluetoothGattService> gattServices =  mBluetoothLeService.getSupportedGattServices();
+        List<BluetoothGattService> gattServices = mBluetoothLeService.getSupportedGattServices();
 
         for (BluetoothGattService gattService : gattServices) {
             // get characteristic when UUID matches RX/TX UUID
@@ -389,79 +331,6 @@ public class ScrollingActivity extends AppCompatActivity {
         characteristicTX.setValue(tx);
         Log.d("DEV", "sendSignal called! tx : " + tx);
         mBluetoothLeService.writeCharacteristic(characteristicTX);
-    }
-
-    public BluetoothSocket getBluetoothSocket(BluetoothDevice device, UUID uuid) throws IOException {
-
-        return device.createInsecureRfcommSocketToServiceRecord(uuid);
-
-    }
-
-    public boolean requestConnect(BluetoothDevice device, UUID uuid) {
-
-        try {
-
-            mConnectSocket = getBluetoothSocket(device, uuid);
-
-            if (mConnectSocket != null) {
-
-                new Thread(new Runnable() {
-
-                    @Override
-
-                    public void run() {
-
-                        try {
-
-                            Log.d("DEV", "Try connect Socket");
-                            mConnectSocket.connect();
-
-                            mIsConnected = true;
-
-                        } catch (IOException e) {
-
-                            Log.d("DEV", "Fail connect Socket");
-                            e.printStackTrace();
-
-                            mIsConnected = false;
-
-                        }
-                    }
-
-                }).start();
-
-            }
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
-            mIsConnected = false;
-
-        }
-
-        return mIsConnected;
-
-    }
-
-    public void enableBluetooth(View v) {
-        if( !IsSupportedBTDevice ) { return; }
-
-
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-    }
-
-    public void moveToLEDDash(View v) {
-        Log.d("DEV", "moveToLEDDash is called!!");
-        viewPager.setCurrentItem(TAB_LED);
-    }
-
-    public void moveToTrackingDash(View v) {
-        Log.d("DEV", "moveToTrackingDash is called!!");
-        viewPager.setCurrentItem(TAB_TRACKING);
     }
 
     //  ToolBar Reference Start
@@ -485,6 +354,5 @@ public class ScrollingActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    //  ToolBar Reference End
+    // ToolBar Reference End
 }

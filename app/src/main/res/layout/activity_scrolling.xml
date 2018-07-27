@@ -30,43 +30,8 @@
             app:tabSelectedTextColor="@color/colorAccent"
             app:tabTextColor="@color/textColorPrimary" />
 
-        <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="horizontal">-->
-
-        <!--<Button-->
-        <!--android:id="@+id/tabInfo"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_weight="1"-->
-        <!--android:background="#FFFFFF"-->
-        <!--android:onClick="ChangeFragment"-->
-        <!--android:text="정보"-->
-        <!--android:textColor="#161616" />-->
-
-        <!--<Button-->
-        <!--android:id="@+id/tabLED"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_weight="1"-->
-        <!--android:background="#FFFFFF"-->
-        <!--android:onClick="ChangeFragment"-->
-        <!--android:text="LED"-->
-        <!--android:textColor="#161616" />-->
-
-        <!--<Button-->
-        <!--android:id="@+id/tabTracking"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_weight="1"-->
-        <!--android:background="#FFFFFF"-->
-        <!--android:onClick="ChangeFragment"-->
-        <!--android:text="트래킹"-->
-        <!--android:textColor="#161616" />-->
-        <!--</LinearLayout>-->
-
         <LinearLayout
+            android:id="@+id/connect_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#FAFAFA"
@@ -75,17 +40,19 @@
             android:onClick="enableBluetooth">
 
             <TextView
+                android:id="@+id/connect_desc_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Helper와 연결이 해제된 상태입니다."
+                android:text="@string/disconnect_state"
                 android:textAlignment="textStart"
                 android:textColor="#161616"
                 android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/connect_toggle_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="연결"
+                android:text="@string/connect_device"
                 android:textAlignment="textEnd"
                 android:textColor="#161616"
                 android:textSize="16sp" />
