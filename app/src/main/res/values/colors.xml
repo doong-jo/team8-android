@@ -7,4 +7,6 @@
     <!--status bar background-->
     <color name="colorPrimaryDark">#FAFAFA</color>
     <color name="colorAccent">#2f6eff</color>
+
+    <color name="tabBackgroundColor">#f1f1f1</color>
 </resources>

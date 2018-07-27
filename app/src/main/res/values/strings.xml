@@ -1,5 +1,20 @@
 <resources>
     <string name="app_name">Helper</string>
-    <string name="action_settings">사용 설명서</string>
+    <string name="device_bluetooth_name">=ASDF</string>
+    <string name="action_settings">Guideline</string>
     <string name="title_activity_maps">Map</string>
+
+    <!--Info Fragment-->
+    <string name="cardTitleBattery">Battery</string>
+    <string name="cardTitleBrightnessAndSpeed">Brightness &amp; Speed</string>
+    <string name="cardTitleLED">LED</string>
+    <string name="LEDCardLinkText">Show LED Dashboard</string>
+    <string name="cardTitleTracking">Tracking</string>
+    <string name="disconnect_state">Disconnected device</string>
+    <string name="connect_state">connected device</string>
+    <string name="connect_device">Connect</string>
+
+    <!--LED Fragment-->
+    <string name="cardTitleLEDDetail">Current LED</string>
+    <string name="cardTitleLEDList">LED List</string>
 </resources>
