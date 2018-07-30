@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
@@ -75,9 +76,7 @@ public class ScrollingActivity extends AppCompatActivity {
     private String mDeviceName;
     private String mDeviceAddress;
 
-    private boolean mIsConnected = false;
-
-    private int mConnectionState = STATE_DISCONNECTED;
+    private boolean mIsRecorded = false;
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
@@ -340,6 +339,23 @@ public class ScrollingActivity extends AppCompatActivity {
         characteristicTX.setValue(tx);
         Log.d("DEV", "sendSignal called! tx : " + tx);
         mBluetoothLeService.writeCharacteristic(characteristicTX);
+    }
+
+    public void toggleRecord(View v) {
+        mIsRecorded = !mIsRecorded;
+
+        InfoFragment infoFrag = (InfoFragment)viewPager
+                .getAdapter()
+                .instantiateItem(viewPager, viewPager.getCurrentItem());
+        infoFrag.stopRecordLocation(mIsRecorded);
+
+        Toast.makeText(this, "IsRecorded : " + mIsRecorded, Toast.LENGTH_LONG).show();
+
+        if( mIsRecorded ) {
+            ((FloatingActionButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_solid, getApplicationContext().getTheme()));
+        } else {
+            ((FloatingActionButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_circle_solid, getApplicationContext().getTheme()));
+        }
     }
 
     @Override

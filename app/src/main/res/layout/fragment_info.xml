@@ -219,6 +219,19 @@
                         android:layout_height="match_parent"
                         android:name="com.google.android.gms.maps.MapFragment"/>
 
+                    <android.support.design.widget.FloatingActionButton
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:onClick="toggleRecord"
+                        android:src="@drawable/ic_circle_solid"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginTop="16dp"
+                        app:useCompatPadding="true"
+                        app:elevation="4dp"/>
+
                     <ImageView
                         android:id="@+id/transparent_image"
                         android:layout_width="match_parent"
