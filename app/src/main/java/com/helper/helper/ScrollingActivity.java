@@ -1,5 +1,6 @@
 package com.helper.helper;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -19,10 +20,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.icu.util.Output;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -37,6 +43,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.w3c.dom.Text;
 
@@ -212,7 +221,7 @@ public class ScrollingActivity extends AppCompatActivity {
         TextView connectDiscription = (TextView) findViewById(R.id.connect_desc_text);
         TextView connectToggle = (TextView) findViewById(R.id.connect_toggle_text);
 
-        if( IsConnected ) {
+        if (IsConnected) {
             connectLayout.setOnClickListener(null);
             connectDiscription.setText(getString(R.string.connect_state));
             connectToggle.setText("");
@@ -236,8 +245,8 @@ public class ScrollingActivity extends AppCompatActivity {
 
         String[] deviceLabels = new String[devices.size()];
         for (int i = 0; i < deviceLabels.length; ++i) {
-            if( devices.get(i).getName() == getString(R.string.device_bluetooth_name) &&
-                    mBluetoothLeService.connect(devices.get(i).getAddress()) ) {
+            if (devices.get(i).getName() == getString(R.string.device_bluetooth_name) &&
+                    mBluetoothLeService.connect(devices.get(i).getAddress())) {
                 Toast.makeText(this, "connected paired device HELPER!", Toast.LENGTH_LONG).show();
                 updateConnectionLayout(true);
                 break;
@@ -333,7 +342,40 @@ public class ScrollingActivity extends AppCompatActivity {
         mBluetoothLeService.writeCharacteristic(characteristicTX);
     }
 
-    //  ToolBar Reference Start
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissinos,
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == PermissionUtil.REQUEST_LOCATION) {
+            if (PermissionUtil.verifyPermission(grantResults)) {
+                Log.d(TAG, "verifyPermission : " + permissinos[0]);
+
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+
+                InfoFragment frag1 = (InfoFragment)viewPager
+                        .getAdapter()
+                        .instantiateItem(viewPager, viewPager.getCurrentItem());
+                frag1.requsetLocation();
+            } else {
+                Log.d(TAG, "verifyPermission fail : " + permissinos[0]);
+//                showRequestAgainDialog();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissinos, grantResults);
+        }
+    }
+
+    /* ToolBar Reference Start */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -354,5 +396,5 @@ public class ScrollingActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    // ToolBar Reference End
+    /* ToolBar Reference End */
 }

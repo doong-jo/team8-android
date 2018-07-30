@@ -30,6 +30,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -58,11 +59,12 @@ public class InfoFragment extends Fragment
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
+    private final static String TAG = InfoFragment.class.getSimpleName() + "/DEV";
+
     private BatteryView batView;
     private MapView mapView;
     private GoogleApiClient mGoogleApiClient;
     private GoogleMap mMap;
-    NestedScrollView mScrollView;
     private LocationRequest mLocationRequset;
     private Location mCurrentLocation;
     private Marker mCurrLocationMarker;
@@ -70,8 +72,8 @@ public class InfoFragment extends Fragment
     private static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2002;
-    private static final int UPDATE_INTERVAL_MS = 15000;
-    private static final int FASTEST_UPDATE_INTERVAL_MS = 15000;
+    private static final int UPDATE_INTERVAL_MS = 1500;
+    private static final int FASTEST_UPDATE_INTERVAL_MS = 1500;
 
     public InfoFragment() {
 
@@ -97,7 +99,7 @@ public class InfoFragment extends Fragment
                 markerOptions.title("Current Position");
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
 
-                if(mMap != null) {
+                if (mMap != null) {
                     mCurrLocationMarker = mMap.addMarker(markerOptions);
 
                     //move map camera
@@ -109,11 +111,11 @@ public class InfoFragment extends Fragment
     };
 
     public void setCurrentLocation(Location location, String markerTitle, String markerSnippet) {
-        if ( mCurrLocationMarker != null ) mCurrLocationMarker.remove();
+        if (mCurrLocationMarker != null) mCurrLocationMarker.remove();
 
-        if ( location != null) {
+        if (location != null) {
             //현재위치의 위도 경도 가져옴
-            LatLng currentLocation = new LatLng( location.getLatitude(), location.getLongitude());
+            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(currentLocation);
@@ -144,15 +146,15 @@ public class InfoFragment extends Fragment
     }
 
     @Override
-    public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
-        Log.d("DEV", "onCreateView called!");
-        View view = inflater.inflate( R.layout.fragment_info, container, false );
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView called!");
+        View view = inflater.inflate(R.layout.fragment_info, container, false);
 
         batView = (BatteryView) view.findViewById(R.id.batView);
         batView.setPower(78);
 
         //MapView 초기화 작업
-        mapView = (MapView)view.findViewById(R.id.map);
+        mapView = (MapView) view.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
         mapView.getMapAsync(this);
@@ -170,7 +172,7 @@ public class InfoFragment extends Fragment
 
     @SuppressLint("ClickableViewAccessibility")
     public void adjustMapVerticalTouch(View view) {
-        final NestedScrollView mainScrollView = (NestedScrollView) view.findViewById(R.id.infoScrollView);
+        final NestedScrollView mainScrollView = (NestedScrollView) view.findViewById(R.id.infoFragment);
         ImageView transparentImageView = (ImageView) view.findViewById(R.id.transparent_image);
 
         transparentImageView.setOnTouchListener(new View.OnTouchListener() {
@@ -201,9 +203,47 @@ public class InfoFragment extends Fragment
         });
     }
 
+    public void requsetLocation() {
+        if (mGoogleApiClient == null) {
+            Log.d(TAG, "onMapReady have auth called!");
+            buildGoogleApiClient();
+
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            LocationServices.getFusedLocationProviderClient(getActivity()).getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    // Got last known location. In some rare situations, this can be null.
+                    if (location != null) {
+                        // Logic to handle location object
+                        Log.d(TAG, "onMapReady get location called!");
+                        mCurrentLocation = location;
+
+                        setCurrentLocation(mCurrentLocation, "내 위치", "GPS Position");
+                    }
+                }
+            });
+
+            LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(mLocationRequset, mLocationCallback, Looper.myLooper());
+        }
+
+        if ( ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        {
+            mMap.setMyLocationEnabled(true);
+        }
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d("DEV", "onMapReady called!");
+        Log.d(TAG, "onMapReady called!");
 
         mMap = googleMap;
 
@@ -221,35 +261,14 @@ public class InfoFragment extends Fragment
             int hasFineLocationPermission = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
 
             if ( hasFineLocationPermission == PackageManager.PERMISSION_DENIED) {
-                //사용권한이 없을경우
-                //권한 재요청
+                /*
+                    사용권한이 없을경우
+                    권한 재요청
+                */
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             } else {
                 //사용권한이 있는경우
-                if ( mGoogleApiClient == null) {
-                    Log.d("DEV", "onMapReady have auth called!");
-                    buildGoogleApiClient();
-                    LocationServices.getFusedLocationProviderClient(getActivity()).getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations, this can be null.
-                            if (location != null) {
-                                // Logic to handle location object
-                                Log.d("DEV", "onMapReady get location called!");
-                                mCurrentLocation = location;
-
-                                setCurrentLocation(mCurrentLocation, "내 위치", "GPS Position");
-                            }
-                        }
-                    });
-
-                    LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(mLocationRequset, mLocationCallback, Looper.myLooper());
-                }
-
-                if ( ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                {
-                    googleMap.setMyLocationEnabled(true);
-                }
+                requsetLocation();
             }
         } else {
 
@@ -270,7 +289,7 @@ public class InfoFragment extends Fragment
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.d("DEV", "onConnected called!");
+        Log.d(TAG, "onConnected called!");
 //        if ( !checkLocationServicesStatus()) {
 //            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 //            builder.setTitle("위치 서비스 비활성화");
@@ -330,7 +349,8 @@ public class InfoFragment extends Fragment
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("DEV", "onLocationChanged called!");
+        Toast.makeText(getActivity(), "onLocationChanged!", Toast.LENGTH_LONG).show();
+        Log.d(TAG, "onLocationChanged called!");
         mCurrentLocation = location;
         setCurrentLocation(mCurrentLocation, "내 위치", "GPS Position");
     }
@@ -341,16 +361,16 @@ public class InfoFragment extends Fragment
     }
 
     private void createLocationRequest() {
-        Log.d("DEV", "createLocationRequest called!");
+        Log.d(TAG, "createLocationRequest called!");
 
         mLocationRequset = new LocationRequest();
-        mLocationRequset.setInterval(3000);//10000
-        mLocationRequset.setFastestInterval(1500);//5000
+        mLocationRequset.setInterval(UPDATE_INTERVAL_MS);//3000
+        mLocationRequset.setFastestInterval(FASTEST_UPDATE_INTERVAL_MS);//1500
         mLocationRequset.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     protected synchronized  void buildGoogleApiClient() {
-        Log.d("DEV", "buildGoogleApiClient called!");
+        Log.d(TAG, "buildGoogleApiClient called!");
         if(mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                     .enableAutoManage((FragmentActivity) getActivity(), this)
@@ -419,29 +439,12 @@ public class InfoFragment extends Fragment
 //
 //    @Override
 //    public void onMapReady(GoogleMap googleMap) {
-//        Log.d("DEV", "onMapReady: called!");
+//        Log.d(TAG, "onMapReady: called!");
 //        mMap = googleMap;
 //        //updateLocationUI();
 //    }
 //
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode,
-//                                           @NonNull String[] permissinos,
-//                                           @NonNull int[] grantResults) {
-//        if (requestCode == PermissionUtil.REQUEST_LOCATION) {
-//            if( PermissionUtil.verifyPermission(grantResults)) {
-//                mLocationPermissionGranted = true;
-//
-//                adjustMapVerticalTouch();
-//                buildGoogleApiClient();
-//                mGoogleApiClient.connect();
-//            } else {
-//                showRequestAgainDialog();
-//            }
-//        } else {
-//            super.onRequestPermissionsResult(requestCode, permissinos, grantResults);
-//        }
-//    }
+
 //
 //    public void showRequestAgainDialog() {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(this);

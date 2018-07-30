@@ -12,7 +12,7 @@ import android.support.v4.app.ActivityCompat;
 
 public class PermissionUtil {
     public static final int REQUEST_STORAGE = 1;
-    public static final int REQUEST_LOCATION = 2;
+    public static final int REQUEST_LOCATION = 2002;
     private static String[] PERMISSIONS_LOCATION = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
