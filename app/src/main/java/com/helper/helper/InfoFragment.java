@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -49,6 +50,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.hawk.battery.widget.BatteryView;
 
@@ -68,12 +70,14 @@ public class InfoFragment extends Fragment
     private LocationRequest mLocationRequset;
     private Location mCurrentLocation;
     private Marker mCurrLocationMarker;
+    private LatLng mBeforeLatlng = null;
+    private boolean mIsRecorded = false;
 
     private static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2002;
-    private static final int UPDATE_INTERVAL_MS = 1500;
-    private static final int FASTEST_UPDATE_INTERVAL_MS = 1500;
+    private static final int UPDATE_INTERVAL_MS = 15000;
+    private static final int FASTEST_UPDATE_INTERVAL_MS = 15000;
 
     public InfoFragment() {
 
@@ -83,11 +87,14 @@ public class InfoFragment extends Fragment
     private LocationCallback mLocationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
+
             List<Location> locationList = locationResult.getLocations();
             if (locationList.size() > 0) {
                 //The last location in the list is the newest
                 Location location = locationList.get(locationList.size() - 1);
+                Toast.makeText(getActivity(), "new position : " + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT).show();
                 mCurrentLocation = location;
+
                 if (mCurrLocationMarker != null) {
                     mCurrLocationMarker.remove();
                 }
@@ -102,8 +109,16 @@ public class InfoFragment extends Fragment
                 if (mMap != null) {
                     mCurrLocationMarker = mMap.addMarker(markerOptions);
 
-                    //move map camera
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                    if( mBeforeLatlng != null  && mIsRecorded ) {
+                        mMap.addPolyline((new PolylineOptions())
+                                .add(
+                                        mBeforeLatlng,
+                                        latLng
+                                ).width(12).color(Color.BLUE)
+                                .geodesic(true));
+                    }
+
+                    mBeforeLatlng = latLng;
                 }
 
             }
@@ -241,6 +256,10 @@ public class InfoFragment extends Fragment
         }
     }
 
+    public void stopRecordLocation(boolean toggle) {
+        mIsRecorded = toggle;
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "onMapReady called!");
@@ -253,6 +272,7 @@ public class InfoFragment extends Fragment
         mMap.getUiSettings().setCompassEnabled(true);
         //매끄럽게 이동함
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15));
         //updateLocationUI();
 
         //  API 23 이상이면 런타임 퍼미션 처리 필요
