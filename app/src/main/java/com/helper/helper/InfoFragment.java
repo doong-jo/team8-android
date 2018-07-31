@@ -125,6 +125,10 @@ public class InfoFragment extends Fragment
         }
     };
 
+    public void setBluetoothReadData(String readData) {
+        Log.d(TAG, "setBluetoothReadData : " + readData);
+    }
+
     public void setCurrentLocation(Location location, String markerTitle, String markerSnippet) {
         if (mCurrLocationMarker != null) mCurrLocationMarker.remove();
 
