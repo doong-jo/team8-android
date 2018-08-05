@@ -18,5 +18,6 @@
     <string name="cardTitleLEDList">LED List</string>
 
     <!--Map Fragment-->
+    <string name="cardTitleRecordedList">Recorded List</string>
     <string name="cardTitleRecordedTracking">Recorded Tracking</string>
 </resources>
