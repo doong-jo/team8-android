@@ -22,13 +22,13 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
         Log.d("DEV", "getItem called! posistion : " + position);
         // Returning the current tabs
         switch (position) {
-            case 0:
+            case 2:
                 InfoFragment infoFragment = new InfoFragment();
                 return infoFragment;
             case 1:
                 LEDFragment LEDfragment = new LEDFragment();
                 return LEDfragment;
-            case 2:
+            case 0:
                 TrackingFragment trackingFragment = new TrackingFragment();
                 return trackingFragment;
             default:
