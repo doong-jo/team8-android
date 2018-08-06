@@ -49,19 +49,42 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.snatik.storage.Storage;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Text;
+import org.xml.sax.SAXException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 public class ScrollingActivity extends AppCompatActivity {
     private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
+    private static final String FILENAME_TRACKINGDATA = "tracking.txt";
 
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
@@ -73,14 +96,33 @@ public class ScrollingActivity extends AppCompatActivity {
     private BluetoothGattCharacteristic characteristicTX;
     private BluetoothGattCharacteristic characteristicRX;
 
-    InfoFragment infoFrag;
+    private InfoFragment infoFrag;
+
+    public boolean ismIsRecorded() {
+        return mIsRecorded;
+    }
 
     private boolean mIsRecorded = false;
+
+    public boolean ismHasRecordData() {
+        return mHasRecordData;
+    }
+
+    private boolean mHasRecordData = false;
+    private String mRecordDate;
+    private String mRecordStartTime;
+    private String mRecordEndTime;
+    private float mRecordDistance;
+
 
     private static final int TAB_STATUS = 0;
     private static final int TAB_LED = 1;
     private static final int TAB_TRACKING = 2;
     private static final int REQUEST_ENABLE_BT = 2001;
+
+    public void setmHasRecordData(boolean mHasRecordData) {
+        this.mHasRecordData = mHasRecordData;
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -110,7 +152,45 @@ public class ScrollingActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 Log.d("DEV", "onTabSelected called! posistion : " + tab.getPosition());
                 mViewPager.setCurrentItem(tab.getPosition());
-                //                view
+
+                if( tab.getPosition() == TAB_STATUS ) {
+                    infoFrag = (InfoFragment)mViewPager
+                            .getAdapter()
+                            .instantiateItem(mViewPager, mViewPager.getCurrentItem());
+
+                    if( mIsRecorded ) {
+                        ((FloatingActionButton) infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_solid, getApplicationContext().getTheme()));
+                    }
+                    else {
+                        ((FloatingActionButton) infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_circle_solid, getApplicationContext().getTheme()));
+                    }
+
+                    initilizeDataForInfoFragment();
+                }
+                else if( tab.getPosition() == TAB_TRACKING ) {
+                    TrackingFragment trackingFragment = (TrackingFragment)mViewPager
+                            .getAdapter()
+                            .instantiateItem(mViewPager, mViewPager.getCurrentItem());
+                    infoFrag = (InfoFragment) mViewPager.getAdapter().instantiateItem(mViewPager, TAB_STATUS);
+
+                    if( mHasRecordData ) {
+                        trackingFragment.makeRecordedCard(
+                                mRecordDate,
+                                mRecordStartTime,
+                                mRecordEndTime,
+                                String.format("%.2f", infoFrag.getmCurTrackingDistance()),
+                                infoFrag.getmCurrRecordedLocationList());
+
+                        infoFrag.recordStopAndEraseLocationList();
+
+                        try {
+                            writeTrackingDataInternalStorage();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
             }
 
             @Override
@@ -142,6 +222,25 @@ public class ScrollingActivity extends AppCompatActivity {
         }
         /* Valid Bluetooth supports end */
 
+        /* Internal File Storage setup start */
+
+        // init
+        Storage storage = new Storage(getApplicationContext());
+
+        // get external storage
+        String path = storage.getInternalFilesDirectory();
+
+        // new dir
+        String newDir = path + File.separator + "user_data";
+        storage.createDirectory(newDir);
+
+        boolean dirExists = storage.isDirectoryExists(path);
+
+        if( dirExists ) {
+            Toast.makeText(this, newDir + " is exist", Toast.LENGTH_SHORT).show();
+        }
+
+        /* Internal File Storage setup end */
 
 
         /* Set GATT Interface start */
@@ -150,6 +249,9 @@ public class ScrollingActivity extends AppCompatActivity {
         /* Set GATT Interface end */
     }
 
+    public void initilizeDataForInfoFragment() {
+        mHasRecordData = false;
+    }
     /* Tab Move Start */
     public void moveToLEDDash(View v) {
         mViewPager.setCurrentItem(TAB_LED);
@@ -358,10 +460,122 @@ public class ScrollingActivity extends AppCompatActivity {
 
         Toast.makeText(this, "IsRecorded : " + mIsRecorded, Toast.LENGTH_SHORT).show();
 
+        infoFrag = (InfoFragment)mViewPager
+                .getAdapter()
+                .instantiateItem(mViewPager, mViewPager.getCurrentItem());
+        infoFrag.toggleRecordLocation(mIsRecorded);
+
         if( mIsRecorded ) {
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            mRecordDate = dateFormat.format(date);
+
+            SimpleDateFormat startTimeFormat = new SimpleDateFormat("hh:mm");
+            mRecordStartTime = startTimeFormat.format(date);
+
             ((FloatingActionButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_solid, getApplicationContext().getTheme()));
         } else {
             ((FloatingActionButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_circle_solid, getApplicationContext().getTheme()));
+
+            mHasRecordData = true;
+
+            Date date = new Date();
+
+            SimpleDateFormat endTimeFormat = new SimpleDateFormat("hh:mm");
+            mRecordEndTime = endTimeFormat.format(date);
+        }
+    }
+
+    private void writeTrackingDataInternalStorage() throws IOException {
+        try
+        {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            Storage internalStorage = new Storage(getApplicationContext());
+
+            String path = internalStorage.getInternalFilesDirectory();
+            String dir = path + File.separator + "user_data";
+            String xmlFilePath =  dir + File.separator + "tracking.xml";
+            boolean fileExists = internalStorage.isFileExist(xmlFilePath);
+
+            FileInputStream fis = getApplicationContext().openFileInput(xmlFilePath);
+            InputStreamReader isr = new InputStreamReader(fis);
+
+            InputStream is = new FileInputStream(xmlFilePath);
+            Document existDom = docBuilder.parse(is);
+
+            Document doc = docBuilder.newDocument();
+
+            /* Read exist xml start */
+
+            /* Read exist xml end */
+
+            /* Make elements start */
+            Element rootElement;
+            if( fileExists ) {
+                rootElement = existDom.getDocumentElement();
+            } else {
+                rootElement = doc.createElement("tracking");
+            }
+
+            Element mapElement = doc.createElement("map");
+            doc.appendChild(mapElement);
+            /* Make elements end */
+
+            /* Define attributes start */
+            mapElement.setAttribute("date", "date value");
+            mapElement.setAttribute("start_time", "start_time value");
+            mapElement.setAttribute("end_time", "end_time value");
+            mapElement.setAttribute("distance", "distance value");
+            /* Define attributes end */
+
+            for (int i = 0; i < 10; i++) {
+                Element locationElement = doc.createElement("location");
+
+                    Element latitudeElement = doc.createElement("latitude");
+                    latitudeElement.appendChild(doc.createTextNode("latitude value"));
+
+                    Element longitudeElement = doc.createElement("logitude");
+                    longitudeElement.appendChild(doc.createTextNode("logitude value"));
+
+                locationElement.appendChild(latitudeElement);
+                locationElement.appendChild(longitudeElement);
+
+                mapElement.appendChild(locationElement);
+            }
+
+            rootElement.appendChild(mapElement);
+
+            // XML 파일로 쓰기
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            DOMSource source = new DOMSource(doc);
+
+            boolean dirExists = internalStorage.isDirectoryExists(dir);
+            if( !dirExists ) {
+                internalStorage.createDirectory(dir);
+            }
+
+            StreamResult result = new StreamResult(new FileOutputStream(new File(xmlFilePath), fileExists));
+
+//            StreamResult result = new StreamResult(System.out);
+            transformer.transform(source, result);
+//
+            Log.d(TAG, "File saved!");
+        }
+        catch (ParserConfigurationException pce)
+        {
+            pce.printStackTrace();
+        }
+        catch (TransformerException tfe)
+        {
+            tfe.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
         }
     }
 

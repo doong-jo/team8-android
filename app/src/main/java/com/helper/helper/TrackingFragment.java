@@ -1,16 +1,22 @@
 package com.helper.helper;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -21,11 +27,28 @@ import java.util.List;
 import java.util.Random;
 
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 
-public class TrackingFragment extends Fragment {
+public class TrackingFragment extends Fragment
+        implements OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener{
 
     private final static String TAG = TrackingFragment.class.getSimpleName() + "/DEV";
     private static final float MIN_BRIGHTNESS = 0.8f;
+
+    private MapView mapView;
+    private GoogleApiClient mGoogleApiClient;
+    private GoogleMap mMap;
+    private int mTrackingIndex;
+    private TrackingRecordedListAdapter mAdapter;
+
 
 //    private CardViewAdapter mAdapter;
 //    private ArrayList<String> mItems;
@@ -59,56 +82,78 @@ public class TrackingFragment extends Fragment {
 //        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 //        recyclerView.setAdapter(mAdapter);
 //
-//        SwipeableRecyclerViewTouchListener swipeTouchListener =
-//                new SwipeableRecyclerViewTouchListener(recyclerView,
-//                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
-//                            @Override
-//                            public boolean canSwipeLeft(int position) {
-//                                return true;
-//                            }
-//
-//                            @Override
-//                            public boolean canSwipeRight(int position) {
-//                                return true;
-//                            }
-//
-//                            @Override
-//                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
-//                                for (int position : reverseSortedPositions) {
-////                                    Toast.makeText(MainActivity.this, mItems.get(position) + " swiped left", Toast.LENGTH_SHORT).show();
-//                                    mItems.remove(position);
-//                                    mAdapter.notifyItemRemoved(position);
-//                                }
-//                                mAdapter.notifyDataSetChanged();
-//                            }
-//
-//                            @Override
-//                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
-//                                for (int position : reverseSortedPositions) {
-////                                    Toast.makeText(MainActivity.this, mItems.get(position) + " swiped right", Toast.LENGTH_SHORT).show();
-//                                    mItems.remove(position);
-//                                    mAdapter.notifyItemRemoved(position);
-//                                }
-//                                mAdapter.notifyDataSetChanged();
-//                            }
-//                        });
+
 //
 //        recyclerView.addOnItemTouchListener(swipeTouchListener);
 
-        mRecordedItemList = new ArrayList<TrackingRecordedListItem>();
+//        if( ((ScrollingActivity)getActivity()).ismHasRecordData() ) {
+//            ((ScrollingActivity)getActivity()).setmHasRecordData(false);
+//
+//            Toast.makeText(getContext(), "Has Record Data!", Toast.LENGTH_LONG).show();
+//        }
+        Log.d(TAG, "Tracking onCreateView!");
+        Log.d(TAG, "Tracking onCreateView! List? " + mRecordedItemList);
+        if( mRecordedItemList == null ) {
+            mRecordedItemList = new ArrayList<TrackingRecordedListItem>();
+            initData();
+        }
 
         initLayout(view);
-        initData();
+
+        //MapView 초기화 작업
+        mapView.onCreate(savedInstanceState);
+        mapView.onResume();
+        mapView.getMapAsync(this);
+
+        adjustMapVerticalTouch(view);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TrackingRecordedListAdapter(mRecordedItemList, R.layout.cardview_recorded_tracking));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        mAdapter = new TrackingRecordedListAdapter(mRecordedItemList, R.layout.cardview_recorded_tracking);
+        recyclerView.setAdapter(mAdapter);
+//        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        SwipeableRecyclerViewTouchListener swipeTouchListener =
+                new SwipeableRecyclerViewTouchListener(recyclerView,
+                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
+                            @Override
+                            public boolean canSwipeLeft(int position) {
+                                return true;
+                            }
+
+                            @Override
+                            public boolean canSwipeRight(int position) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                for (int position : reverseSortedPositions) {
+                                    Toast.makeText(getContext(), mRecordedItemList.get(position) + " swiped left", Toast.LENGTH_SHORT).show();
+                                    mRecordedItemList.remove(position);
+                                    mAdapter.notifyItemRemoved(position);
+                                }
+                                mAdapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                for (int position : reverseSortedPositions) {
+                                    Toast.makeText(getContext(), mRecordedItemList.get(position) + " swiped right", Toast.LENGTH_SHORT).show();
+                                    mRecordedItemList.remove(position);
+                                    mAdapter.notifyItemRemoved(position);
+                                }
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
+
+        recyclerView.addOnItemTouchListener(swipeTouchListener);
 
         return view;
     }
 
     private void initLayout(View view) {
         recyclerView = (RecyclerView) view.findViewById(R.id.recordedRecyclerView);
+        mapView = (MapView) view.findViewById(R.id.recordedMap);
     }
 
     private void initData() {
@@ -150,9 +195,10 @@ public class TrackingFragment extends Fragment {
                     "Distance. " + String.format("%.2f", rnd.nextFloat() * 10) + "km");
 
             mRecordedItemList.add(recordedItem);
+
+            mTrackingIndex = i;
         }
     }
-
 //    public static String hsvToRgb(float hue, float saturation, float value) {
 //
 //        int h = (int)(hue * 6);
@@ -182,5 +228,98 @@ public class TrackingFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    public void adjustMapVerticalTouch(View view) {
+        final NestedScrollView mainScrollView = (NestedScrollView) view.findViewById(R.id.trackingFragment);
+        ImageView transparentImageView = (ImageView) view.findViewById(R.id.recordedMap_transparent_image);
+
+        transparentImageView.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        mainScrollView.requestDisallowInterceptTouchEvent(true);
+                        // Disable touch on transparent view
+                        return false;
+
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        mainScrollView.requestDisallowInterceptTouchEvent(false);
+                        return true;
+
+                    case MotionEvent.ACTION_MOVE:
+                        mainScrollView.requestDisallowInterceptTouchEvent(true);
+                        return false;
+
+                    default:
+                        return true;
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        //buildGoogleApiClient();
+    }
+
+    protected synchronized  void buildGoogleApiClient() {
+        Log.d(TAG, "buildGoogleApiClient called!");
+        if(mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                    .enableAutoManage((FragmentActivity) getActivity(), this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+            mGoogleApiClient.connect();
+        }
+    }
+
+    public void makeRecordedCard(String date, String startTime, String endTime, String Distance, List<LatLng> latLngs) {
+
+        Log.d(TAG, "onLocationChanged location list : " + latLngs.toString());
+
+        Random rnd = new Random();
+        int r = rnd.nextInt(128) + 90; // 128 ... 255
+        int g = rnd.nextInt(128) + 90; // 128 ... 255
+        int b = rnd.nextInt(128) + 90; // 128 ... 255
+
+        TrackingRecordedListItem recordedItem = new TrackingRecordedListItem(
+                Color.rgb(r, g, b),
+                "Tracking#" + String.format("%d", (++mTrackingIndex)+1) + " " + date,
+                "start time. " + startTime,
+                "end time. " + endTime,
+                "Distance. " + Distance + "km");
+
+        mRecordedItemList.add(recordedItem);
+
+        ((ScrollingActivity) getActivity()).setmHasRecordData(false);
+
+        Log.d(TAG, "Add Card!");
+        Log.d(TAG, "mRecordedItemList size : " + mRecordedItemList.size());
+        Log.d(TAG, "mTrackingIndex : " + mTrackingIndex);
     }
 }

@@ -240,6 +240,7 @@
                         android:name="com.google.android.gms.maps.MapFragment"/>
 
                     <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/recordToggleBtn"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
                         android:layout_width="wrap_content"

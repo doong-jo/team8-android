@@ -54,6 +54,8 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.hawk.battery.widget.BatteryView;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class InfoFragment extends Fragment
@@ -72,6 +74,18 @@ public class InfoFragment extends Fragment
     private Marker mCurrLocationMarker;
     private LatLng mBeforeLatlng = null;
     private boolean mIsRecorded = false;
+
+    public double getmCurTrackingDistance() {
+        return mCurTrackingDistance;
+    }
+
+    private double mCurTrackingDistance = 0.0;
+
+    public List<LatLng> getmCurrRecordedLocationList() {
+        return mCurrRecordedLocationList;
+    }
+
+    private List<LatLng> mCurrRecordedLocationList;
 
     private static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -99,31 +113,67 @@ public class InfoFragment extends Fragment
                     mCurrLocationMarker.remove();
                 }
 
-                //Place current location marker
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latLng);
-                markerOptions.title("Current Position");
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+
 
                 if (mMap != null) {
-                    mCurrLocationMarker = mMap.addMarker(markerOptions);
+                    //Place current location marker
+                    setCurrentLocation(location, "Current Position", "GPS Position");
+                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-                    if( mBeforeLatlng != null  && mIsRecorded ) {
-                        mMap.addPolyline((new PolylineOptions())
-                                .add(
-                                        mBeforeLatlng,
-                                        latLng
-                                ).width(12).color(Color.BLUE)
-                                .geodesic(true));
+                    if( mIsRecorded ) {
+                        mCurrRecordedLocationList.add(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+                        Log.d(TAG, "onLocationChanged location list : " + mCurrRecordedLocationList.toString());
+
+                        if( mBeforeLatlng != null ) {
+                            Toast.makeText(getContext(), "draw polyline", Toast.LENGTH_SHORT).show();
+                            mMap.addPolyline((new PolylineOptions())
+                                    .add(
+                                            mBeforeLatlng,
+                                            latLng
+                                    ).width(12).color(Color.BLUE)
+                                    .geodesic(true));
+
+                            mCurTrackingDistance += CalculationByDistance(mBeforeLatlng, latLng);
+
+                            Log.d(TAG, "onLocationChanged mCurTrackingDistance : " + mCurTrackingDistance);
+                            Toast.makeText(getContext(), "mCurTrackingDistance : " + mCurTrackingDistance, Toast.LENGTH_SHORT).show();
+                        }
                     }
-
                     mBeforeLatlng = latLng;
                 }
-
             }
         }
     };
+
+    public double CalculationByDistance(LatLng StartP, LatLng EndP) {
+        int Radius = 6371;// radius of earth in Km
+        double lat1 = StartP.latitude;
+        double lat2 = EndP.latitude;
+        double lon1 = StartP.longitude;
+        double lon2 = EndP.longitude;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        double valueResult = Radius * c;
+        double km = valueResult / 1;
+        DecimalFormat newFormat = new DecimalFormat("####");
+        int kmInDec = Integer.valueOf(newFormat.format(km));
+        double meter = valueResult % 1000;
+        int meterInDec = Integer.valueOf(newFormat.format(meter));
+        Log.i("Radius Value", "" + valueResult + "   KM  " + kmInDec
+                + " Meter   " + meterInDec);
+
+        Log.d(TAG, "CalculationByDistance Meter : " + meterInDec);
+
+        Toast.makeText(getContext(), "Meter : " + meter, Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), "Meter desc : " + meterInDec, Toast.LENGTH_LONG).show();
+
+        return meter;
+    }
 
     public void setBluetoothReadData(String readData) {
         Log.d(TAG, "setBluetoothReadData : " + readData);
@@ -169,6 +219,8 @@ public class InfoFragment extends Fragment
         Log.d(TAG, "onCreateView called!");
         View view = inflater.inflate(R.layout.fragment_info, container, false);
 
+        mCurrRecordedLocationList = new ArrayList<LatLng>();
+
         batView = (BatteryView) view.findViewById(R.id.batView);
         batView.setPower(78);
 
@@ -181,6 +233,13 @@ public class InfoFragment extends Fragment
         //MapView
         adjustMapVerticalTouch(view);
         return view;
+    }
+
+    @Override
+    public void onAttachFragment(Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+
+        Toast.makeText(getContext(), "onAttachFragment InfoFragment", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -246,7 +305,7 @@ public class InfoFragment extends Fragment
                         Log.d(TAG, "onMapReady get location called!");
                         mCurrentLocation = location;
 
-                        setCurrentLocation(mCurrentLocation, "내 위치", "GPS Position");
+                        setCurrentLocation(mCurrentLocation, "GPS Position", "GPS Position");
                     }
                 }
             });
@@ -260,7 +319,7 @@ public class InfoFragment extends Fragment
         }
     }
 
-    public void stopRecordLocation(boolean toggle) {
+    public void toggleRecordLocation(boolean toggle) {
         mIsRecorded = toggle;
     }
 
@@ -276,7 +335,13 @@ public class InfoFragment extends Fragment
         mMap.getUiSettings().setCompassEnabled(true);
         //매끄럽게 이동함
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15));
+        if( mCurrentLocation == null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15));
+        } else {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), 15));
+            setCurrentLocation(mCurrentLocation, "Current Position", "GPS Position");
+        }
+
         //updateLocationUI();
 
         //  API 23 이상이면 런타임 퍼미션 처리 필요
@@ -377,6 +442,10 @@ public class InfoFragment extends Fragment
         Log.d(TAG, "onLocationChanged called!");
         mCurrentLocation = location;
         setCurrentLocation(mCurrentLocation, "내 위치", "GPS Position");
+    }
+
+    public void recordStopAndEraseLocationList() {
+        mCurrRecordedLocationList.clear();
     }
 
     @Override

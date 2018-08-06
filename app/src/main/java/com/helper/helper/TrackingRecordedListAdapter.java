@@ -17,6 +17,7 @@ public class TrackingRecordedListAdapter extends RecyclerView.Adapter<TrackingRe
 
     private List<TrackingRecordedListItem> recordList;
     private int itemLayout;
+    private RecyclerView.OnItemTouchListener onItemTouchListener;
 
     /**
      * 생성자
