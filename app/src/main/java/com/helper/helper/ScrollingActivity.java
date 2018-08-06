@@ -48,6 +48,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.snatik.storage.Storage;
 
@@ -487,8 +488,7 @@ public class ScrollingActivity extends AppCompatActivity {
     }
 
     private void writeTrackingDataInternalStorage() throws IOException {
-        try
-        {
+        try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
@@ -497,47 +497,42 @@ public class ScrollingActivity extends AppCompatActivity {
             String path = internalStorage.getInternalFilesDirectory();
             String dir = path + File.separator + "user_data";
             String xmlFilePath =  dir + File.separator + "tracking.xml";
+
             boolean fileExists = internalStorage.isFileExist(xmlFilePath);
-
-            FileInputStream fis = getApplicationContext().openFileInput(xmlFilePath);
-            InputStreamReader isr = new InputStreamReader(fis);
-
-            InputStream is = new FileInputStream(xmlFilePath);
-            Document existDom = docBuilder.parse(is);
 
             Document doc = docBuilder.newDocument();
 
-            /* Read exist xml start */
-
-            /* Read exist xml end */
-
-            /* Make elements start */
             Element rootElement;
             if( fileExists ) {
-                rootElement = existDom.getDocumentElement();
+//                FileInputStream is = new FileInputStream(xmlFilePath);
+                doc = docBuilder.parse(new File(xmlFilePath));
+//                rootElement = (Element) existDom.getDocumentElement().getElementsByTagName("tracking").item(0);
+                rootElement = (Element) doc.getDocumentElement();
+//                rootElement = (Element) existDom.getFirstChild();
             } else {
                 rootElement = doc.createElement("tracking");
             }
 
+            /* Make elements start */
+
             Element mapElement = doc.createElement("map");
-            doc.appendChild(mapElement);
             /* Make elements end */
 
             /* Define attributes start */
-            mapElement.setAttribute("date", "date value");
-            mapElement.setAttribute("start_time", "start_time value");
-            mapElement.setAttribute("end_time", "end_time value");
-            mapElement.setAttribute("distance", "distance value");
+            mapElement.setAttribute("date", mRecordDate);
+            mapElement.setAttribute("start_time", mRecordStartTime);
+            mapElement.setAttribute("end_time", mRecordEndTime);
+            mapElement.setAttribute("distance", String.format("%.2f", infoFrag.getmCurTrackingDistance()));
             /* Define attributes end */
 
-            for (int i = 0; i < 10; i++) {
+            for(LatLng currentLat : infoFrag.getmCurrRecordedLocationList()) {
                 Element locationElement = doc.createElement("location");
 
                     Element latitudeElement = doc.createElement("latitude");
-                    latitudeElement.appendChild(doc.createTextNode("latitude value"));
+                    latitudeElement.appendChild(doc.createTextNode(String.format("%f", currentLat.latitude)));
 
                     Element longitudeElement = doc.createElement("logitude");
-                    longitudeElement.appendChild(doc.createTextNode("logitude value"));
+                    longitudeElement.appendChild(doc.createTextNode(String.format("%f", currentLat.longitude)));
 
                 locationElement.appendChild(latitudeElement);
                 locationElement.appendChild(longitudeElement);
@@ -546,6 +541,10 @@ public class ScrollingActivity extends AppCompatActivity {
             }
 
             rootElement.appendChild(mapElement);
+
+            if( !fileExists ) {
+                doc.appendChild(rootElement);
+            }
 
             // XML 파일로 쓰기
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -560,8 +559,9 @@ public class ScrollingActivity extends AppCompatActivity {
                 internalStorage.createDirectory(dir);
             }
 
-            StreamResult result = new StreamResult(new FileOutputStream(new File(xmlFilePath), fileExists));
+            StreamResult result = new StreamResult(new FileOutputStream(new File(xmlFilePath), false));
 
+            fileExists = internalStorage.isFileExist(xmlFilePath);
 //            StreamResult result = new StreamResult(System.out);
             transformer.transform(source, result);
 //

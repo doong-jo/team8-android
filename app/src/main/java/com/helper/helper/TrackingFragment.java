@@ -64,6 +64,7 @@ public class TrackingFragment extends Fragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "Tracking onActivityCreated!");
     }
 
     @Override
@@ -94,6 +95,12 @@ public class TrackingFragment extends Fragment
         Log.d(TAG, "Tracking onCreateView!");
         Log.d(TAG, "Tracking onCreateView! List? " + mRecordedItemList);
         if( mRecordedItemList == null ) {
+            Log.d(TAG, "~~~ mRecordedItemList == null ~~~");
+
+            /* Read XML Map data start */
+
+            /* Read XML Map data end */
+
             mRecordedItemList = new ArrayList<TrackingRecordedListItem>();
             initData();
         }
