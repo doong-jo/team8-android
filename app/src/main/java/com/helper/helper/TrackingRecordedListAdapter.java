@@ -1,12 +1,17 @@
 package com.helper.helper;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -15,17 +20,19 @@ import java.util.List;
 
 public class TrackingRecordedListAdapter extends RecyclerView.Adapter<TrackingRecordedListAdapter.ViewHolder> {
 
+    private static final int TAB_TRACKING = 2;
+
     private List<TrackingRecordedListItem> recordList;
     private int itemLayout;
-    private RecyclerView.OnItemTouchListener onItemTouchListener;
+    Context mContext;
 
     /**
      * 생성자
      * @param items
      * @param itemLayout
      */
-    public TrackingRecordedListAdapter(List<TrackingRecordedListItem> items , int itemLayout){
-
+    public TrackingRecordedListAdapter(List<TrackingRecordedListItem> items , int itemLayout, Context c){
+        this.mContext = c;
         this.recordList = items;
         this.itemLayout = itemLayout;
     }
@@ -53,12 +60,29 @@ public class TrackingRecordedListAdapter extends RecyclerView.Adapter<TrackingRe
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
 
-        TrackingRecordedListItem item = recordList.get(position);
+        final TrackingRecordedListItem item = recordList.get(position);
         viewHolder.cardView.setCardBackgroundColor(item.getColor());
         viewHolder.dateTextView.setText(item.getDate());
         viewHolder.startTimeTextView.setText(item.getStartTime());
         viewHolder.endTimeTextView.setText(item.getEndTime());
         viewHolder.distanceTextView.setText(item.getDistance());
+
+        viewHolder.cardView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                ViewPager viewPager = ((ScrollingActivity)mContext).getViewPager();
+
+                TrackingFragment trackingFragment = (TrackingFragment)viewPager
+                        .getAdapter()
+                        .instantiateItem(viewPager, TAB_TRACKING);
+
+                trackingFragment.setSelectedMapLoad(item.getDate().split("#")[1].split(" ")[0]);
+
+                Toast.makeText(mContext, item.getDate(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

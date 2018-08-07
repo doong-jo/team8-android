@@ -113,8 +113,6 @@ public class InfoFragment extends Fragment
                     mCurrLocationMarker.remove();
                 }
 
-
-
                 if (mMap != null) {
                     //Place current location marker
                     setCurrentLocation(location, "Current Position", "GPS Position");

@@ -96,6 +96,7 @@ public class ScrollingActivity extends AppCompatActivity {
     private BluetoothLeService mBluetoothLeService;
     private BluetoothGattCharacteristic characteristicTX;
     private BluetoothGattCharacteristic characteristicRX;
+    private List<TrackingData> mCardSummaryList;
 
     private InfoFragment infoFrag;
 
@@ -120,6 +121,10 @@ public class ScrollingActivity extends AppCompatActivity {
     private static final int TAB_LED = 1;
     private static final int TAB_TRACKING = 2;
     private static final int REQUEST_ENABLE_BT = 2001;
+
+    public ViewPager getViewPager() {
+        return mViewPager;
+    }
 
     public void setmHasRecordData(boolean mHasRecordData) {
         this.mHasRecordData = mHasRecordData;
@@ -169,26 +174,19 @@ public class ScrollingActivity extends AppCompatActivity {
                     initilizeDataForInfoFragment();
                 }
                 else if( tab.getPosition() == TAB_TRACKING ) {
-                    TrackingFragment trackingFragment = (TrackingFragment)mViewPager
-                            .getAdapter()
-                            .instantiateItem(mViewPager, mViewPager.getCurrentItem());
+//                    TrackingFragment trackingFragment = (TrackingFragment)mViewPager
+//                            .getAdapter()
+//                            .instantiateItem(mViewPager, mViewPager.getCurrentItem());
                     infoFrag = (InfoFragment) mViewPager.getAdapter().instantiateItem(mViewPager, TAB_STATUS);
 
                     if( mHasRecordData ) {
-                        trackingFragment.makeRecordedCard(
-                                mRecordDate,
-                                mRecordStartTime,
-                                mRecordEndTime,
-                                String.format("%.2f", infoFrag.getmCurTrackingDistance()),
-                                infoFrag.getmCurrRecordedLocationList());
-
-                        infoFrag.recordStopAndEraseLocationList();
-
-                        try {
-                            writeTrackingDataInternalStorage();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+//                        trackingFragment.updateCardSignal();
+//                        trackingFragment.makeRecordedCard(
+//                                mRecordDate,
+//                                mRecordStartTime,
+//                                mRecordEndTime,
+//                                String.format("%.2f", infoFrag.getmCurTrackingDistance()),
+//                                infoFrag.getmCurrRecordedLocationList());
                     }
 
                 }
@@ -233,12 +231,13 @@ public class ScrollingActivity extends AppCompatActivity {
 
         // new dir
         String newDir = path + File.separator + "user_data";
-        storage.createDirectory(newDir);
 
         boolean dirExists = storage.isDirectoryExists(path);
 
         if( dirExists ) {
             Toast.makeText(this, newDir + " is exist", Toast.LENGTH_SHORT).show();
+        } else {
+            storage.createDirectory(newDir);
         }
 
         /* Internal File Storage setup end */
@@ -484,6 +483,14 @@ public class ScrollingActivity extends AppCompatActivity {
 
             SimpleDateFormat endTimeFormat = new SimpleDateFormat("hh:mm");
             mRecordEndTime = endTimeFormat.format(date);
+
+            try {
+                writeTrackingDataInternalStorage();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            infoFrag.recordStopAndEraseLocationList();
         }
     }
 
@@ -504,11 +511,8 @@ public class ScrollingActivity extends AppCompatActivity {
 
             Element rootElement;
             if( fileExists ) {
-//                FileInputStream is = new FileInputStream(xmlFilePath);
                 doc = docBuilder.parse(new File(xmlFilePath));
-//                rootElement = (Element) existDom.getDocumentElement().getElementsByTagName("tracking").item(0);
                 rootElement = (Element) doc.getDocumentElement();
-//                rootElement = (Element) existDom.getFirstChild();
             } else {
                 rootElement = doc.createElement("tracking");
             }
@@ -518,11 +522,12 @@ public class ScrollingActivity extends AppCompatActivity {
             Element mapElement = doc.createElement("map");
             /* Make elements end */
 
+            String distance = String.format("%.2f", infoFrag.getmCurTrackingDistance());
             /* Define attributes start */
             mapElement.setAttribute("date", mRecordDate);
             mapElement.setAttribute("start_time", mRecordStartTime);
             mapElement.setAttribute("end_time", mRecordEndTime);
-            mapElement.setAttribute("distance", String.format("%.2f", infoFrag.getmCurTrackingDistance()));
+            mapElement.setAttribute("distance", distance);
             /* Define attributes end */
 
             for(LatLng currentLat : infoFrag.getmCurrRecordedLocationList()) {
@@ -565,6 +570,8 @@ public class ScrollingActivity extends AppCompatActivity {
 //            StreamResult result = new StreamResult(System.out);
             transformer.transform(source, result);
 //
+
+
             Log.d(TAG, "File saved!");
         }
         catch (ParserConfigurationException pce)

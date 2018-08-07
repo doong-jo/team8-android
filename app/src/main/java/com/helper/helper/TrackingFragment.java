@@ -20,20 +20,39 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.snatik.storage.Storage;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 public class TrackingFragment extends Fragment
         implements OnMapReadyCallback,
@@ -48,6 +67,9 @@ public class TrackingFragment extends Fragment
     private GoogleMap mMap;
     private int mTrackingIndex;
     private TrackingRecordedListAdapter mAdapter;
+    private Map cardTrackingLocationDic = new HashMap();
+    private List<Polyline> polylines;
+
 
 
 //    private CardViewAdapter mAdapter;
@@ -94,6 +116,7 @@ public class TrackingFragment extends Fragment
 //        }
         Log.d(TAG, "Tracking onCreateView!");
         Log.d(TAG, "Tracking onCreateView! List? " + mRecordedItemList);
+
         if( mRecordedItemList == null ) {
             Log.d(TAG, "~~~ mRecordedItemList == null ~~~");
 
@@ -102,7 +125,18 @@ public class TrackingFragment extends Fragment
             /* Read XML Map data end */
 
             mRecordedItemList = new ArrayList<TrackingRecordedListItem>();
-            initData();
+            cardTrackingLocationDic = new HashMap();
+            polylines = new ArrayList<Polyline>();
+//            initData();
+        }
+
+        mRecordedItemList.clear();
+        mTrackingIndex = 0;
+
+        try {
+            readMapDataXML();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         initLayout(view);
@@ -115,7 +149,7 @@ public class TrackingFragment extends Fragment
         adjustMapVerticalTouch(view);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new TrackingRecordedListAdapter(mRecordedItemList, R.layout.cardview_recorded_tracking);
+        mAdapter = new TrackingRecordedListAdapter(mRecordedItemList, R.layout.cardview_recorded_tracking, getContext());
         recyclerView.setAdapter(mAdapter);
 //        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -205,6 +239,127 @@ public class TrackingFragment extends Fragment
 
             mTrackingIndex = i;
         }
+    }
+
+    private void readMapDataXML () throws IOException {
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            Storage internalStorage = new Storage(getContext());
+
+            String path = internalStorage.getInternalFilesDirectory();
+            String dir = path + File.separator + "user_data";
+            String xmlFilePath = dir + File.separator + "tracking.xml";
+
+            boolean fileExists = internalStorage.isFileExist(xmlFilePath);
+
+            Document doc = docBuilder.newDocument();
+
+            Element rootElement;
+            if (fileExists) {
+                doc = docBuilder.parse(new File(xmlFilePath));
+                rootElement = (Element) doc.getDocumentElement();
+            } else {
+                rootElement = doc.createElement("tracking");
+            }
+
+            NodeList maps = doc.getElementsByTagName("map");
+
+            int length = maps.getLength();
+            Log.d(TAG, "readMapDataXML maps size : " + maps.getLength());
+
+            String date = "";
+            String startTime = "";
+            String endTime = "";
+            String distance = "";
+            List<LatLng> locations = new ArrayList<LatLng>();
+
+            for (int i = 0; i < maps.getLength(); i++) {
+                Node map = maps.item(i);
+
+                date = map.getAttributes().getNamedItem("date").getNodeValue();
+                startTime = map.getAttributes().getNamedItem("start_time").getNodeValue();
+                endTime = map.getAttributes().getNamedItem("end_time").getNodeValue();
+                distance = map.getAttributes().getNamedItem("distance").getNodeValue();
+
+                NodeList locationList = map.getChildNodes();
+
+                int locationInd = 1;
+                String lat = "";
+                String log = "";
+
+                Node location;
+
+                for (int j = 1; j < locationList.getLength(); j+=2) {
+                    location = locationList.item(j);
+
+                    lat = location.getChildNodes().item(1).getChildNodes().item(0).getNodeValue();
+                    log = location.getChildNodes().item(3).getChildNodes().item(0).getNodeValue();
+                }
+
+                locations.add(new LatLng(Double.parseDouble(lat), Double.parseDouble(log)));
+                int a = 1;
+                //            for (int j = 0; j < location.getLength(); j++) {
+                //                Node loc = location.item(i);
+                //                String latitude = loc.getChildNodes().item(1).getNodeValue();
+                //                String logitude = loc.getChildNodes().item(2).getNodeValue();
+                //            }
+
+                makeRecordedCard(date, startTime, endTime, distance, locations);
+            }
+
+
+            int a = 1;
+        }
+
+        catch (ParserConfigurationException pce)
+        {
+            pce.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setSelectedMapLoad (String itemPosition) {
+        Toast.makeText(getContext(), "setSelectedMapLoad itemPosition : " + itemPosition, Toast.LENGTH_LONG).show();
+
+
+
+        List<LatLng> locationList = (List<LatLng>) cardTrackingLocationDic.get(Integer.parseInt(itemPosition)-1);
+
+        this.mMap.clear();
+
+        this.mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationList.get(0), 20));
+        this.mMap.animateCamera(CameraUpdateFactory.zoomTo(20));
+
+        for(Polyline line : polylines)
+        {
+            line.remove();
+        }
+
+        polylines.clear();
+
+        for (int i = 1; i < locationList.size(); i++) {
+            polylines
+                    .add(this.mMap.addPolyline(new PolylineOptions().add(
+                            locationList.get(i-1),
+                            locationList.get(i)
+                    ).width(12).color(Color.BLUE)
+                            .geodesic(true)));
+        }
+
+
+
+//        for (int i = 1; i < locationList.size(); i++) {
+//            mMap.addPolyline((new PolylineOptions())
+//                    .add(
+//                            locationList.get(i-1),
+//                            locationList.get(i)
+//                    ).width(12).color(Color.BLUE)
+//                    .geodesic(true));
+//        }
+
     }
 //    public static String hsvToRgb(float hue, float saturation, float value) {
 //
@@ -307,8 +462,6 @@ public class TrackingFragment extends Fragment
 
     public void makeRecordedCard(String date, String startTime, String endTime, String Distance, List<LatLng> latLngs) {
 
-        Log.d(TAG, "onLocationChanged location list : " + latLngs.toString());
-
         Random rnd = new Random();
         int r = rnd.nextInt(128) + 90; // 128 ... 255
         int g = rnd.nextInt(128) + 90; // 128 ... 255
@@ -316,12 +469,13 @@ public class TrackingFragment extends Fragment
 
         TrackingRecordedListItem recordedItem = new TrackingRecordedListItem(
                 Color.rgb(r, g, b),
-                "Tracking#" + String.format("%d", (++mTrackingIndex)+1) + " " + date,
+                "Tracking#" + String.format("%d", (++mTrackingIndex)) + " " + date,
                 "start time. " + startTime,
                 "end time. " + endTime,
                 "Distance. " + Distance + "km");
 
         mRecordedItemList.add(recordedItem);
+        cardTrackingLocationDic.put(mTrackingIndex-1, latLngs);
 
         ((ScrollingActivity) getActivity()).setmHasRecordData(false);
 
