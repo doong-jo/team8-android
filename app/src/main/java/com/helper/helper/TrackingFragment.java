@@ -298,8 +298,9 @@ public class TrackingFragment extends Fragment
                     log = location.getChildNodes().item(3).getChildNodes().item(0).getNodeValue();
                 }
 
-                locations.add(new LatLng(Double.parseDouble(lat), Double.parseDouble(log)));
-                int a = 1;
+                if( locationList.getLength() > 0 ) {
+                    locations.add(new LatLng(Double.parseDouble(lat), Double.parseDouble(log)));
+                }
                 //            for (int j = 0; j < location.getLength(); j++) {
                 //                Node loc = location.item(i);
                 //                String latitude = loc.getChildNodes().item(1).getNodeValue();

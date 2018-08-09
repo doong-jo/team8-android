@@ -20,4 +20,5 @@
     <!--Map Fragment-->
     <string name="cardTitleRecordedList">Recorded List</string>
     <string name="cardTitleRecordedTracking">Recorded Tracking</string>
+    <string name="no_recorded_tracking_list">No Recorded Tracking</string>
 </resources>

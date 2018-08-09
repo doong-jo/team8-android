@@ -179,16 +179,6 @@ public class ScrollingActivity extends AppCompatActivity {
 //                            .instantiateItem(mViewPager, mViewPager.getCurrentItem());
                     infoFrag = (InfoFragment) mViewPager.getAdapter().instantiateItem(mViewPager, TAB_STATUS);
 
-                    if( mHasRecordData ) {
-//                        trackingFragment.updateCardSignal();
-//                        trackingFragment.makeRecordedCard(
-//                                mRecordDate,
-//                                mRecordStartTime,
-//                                mRecordEndTime,
-//                                String.format("%.2f", infoFrag.getmCurTrackingDistance()),
-//                                infoFrag.getmCurrRecordedLocationList());
-                    }
-
                 }
             }
 
@@ -518,7 +508,6 @@ public class ScrollingActivity extends AppCompatActivity {
             }
 
             /* Make elements start */
-
             Element mapElement = doc.createElement("map");
             /* Make elements end */
 
@@ -529,6 +518,10 @@ public class ScrollingActivity extends AppCompatActivity {
             mapElement.setAttribute("end_time", mRecordEndTime);
             mapElement.setAttribute("distance", distance);
             /* Define attributes end */
+
+            if( infoFrag.getmCurrRecordedLocationList().size() <= 0 ) {
+                return;
+            }
 
             for(LatLng currentLat : infoFrag.getmCurrRecordedLocationList()) {
                 Element locationElement = doc.createElement("location");
