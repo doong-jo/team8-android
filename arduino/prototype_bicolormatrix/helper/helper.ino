@@ -9,7 +9,17 @@
 SoftwareSerial BTSerial(2,3); // SoftwareSerial(TX, RX)
 Adafruit_BicolorMatrix matrix = Adafruit_BicolorMatrix();
 
-int led_set = 0;
+/*
+ * PORT CONNECTION
+ * 
+ * A4 - Bicolormatrix SDA
+ * A5 - Bicolormatrix SCL
+ * 2 - Bluetooth TX
+ * 3 - Bluetooth RX
+ * 
+ */
+
+
 ///////////// DEFINE LED MATRIX START /////////////
 static const uint8_t PROGMEM
   love_bmp[]=
@@ -83,14 +93,13 @@ static const uint8_t PROGMEM
 ///////////// DEFINE LED MATRIX END /////////////
 
 void setup() {
-  // put your setup code here, to run once:
   BTSerial.begin(9600);
   Serial.begin(9600);
-  matrix.begin(0x70);  // pass in the address
+  matrix.begin(0x70);
 
-  // Blink LED
   matrix.clear();
-  
+
+  // BLINK LED
   matrix.drawRect(0,0, 8,8, 1);
   matrix.drawRect(1,1, 6,6, 2);
   matrix.fillRect(2,2, 4,4, 3);
@@ -99,56 +108,51 @@ void setup() {
   matrix.drawRect(1,1, 6,6, 2);
   matrix.fillRect(2,2, 4,4, 3);
   matrix.writeDisplay();
-
-//  matrix.drawPixel(0, 0, 1);matrix.writeDisplay();
-  
-//  matrix.drawPixel(0, 0, 1);matrix.writeDisplay();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   int signal = BTSerial.read();
 
   switch(signal) {
-    case '%':
+    case '%': // LED -> LOVE
       matrix.clear();
       matrix.drawBitmap(0, 0, love_bmp, 8, 8, 1);matrix.writeDisplay();
       break;
 
-    case '^':
+    case '^': // LED -> SMILE
       matrix.clear();
       matrix.drawBitmap(0, 0, smile_bmp, 8, 8, 1);matrix.writeDisplay();
       break;
 
-    case '&':
+    case '&': // LED -> NEUTRAL
       matrix.clear();
       matrix.drawBitmap(0, 0, neutral_bmp, 8, 8, 1);matrix.writeDisplay();
       break;
 
-    case '*':
+    case '*': // LED -> FROWN
       matrix.clear();
       matrix.drawBitmap(0, 0, frown_bmp, 8, 8, 1);matrix.writeDisplay();
       break;
 
-    case '(':
+    case '(': // LED -> CROSSBIG
       matrix.clear();
       matrix.drawBitmap(0, 0, crossBig_bmp, 8, 8, 1);matrix.writeDisplay();
       break;
 
-    case ')':
+    case ')': // LED -> RESET
       matrix.clear();
       matrix.drawBitmap(0, 0, reset_bmp, 8, 8, 1);matrix.writeDisplay();
       break;
 
-    case 'b':
+    case 'b': // LED -> BLINK STOP
       matrix.blinkRate(0);
       break;
 
-    case 'B':
+    case 'B': // LED -> BLINK START
       matrix.blinkRate(1);
       break;
 
-    case'~':
+    case'~': // LED -> RECT BLINK
       matrix.clear();
       matrix.blinkRate(1);
       matrix.drawRect(0,0, 8,8, 1);
