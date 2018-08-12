@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothServerSocket;
@@ -24,6 +25,7 @@ import android.content.pm.PackageManager;
 import android.icu.util.Output;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -46,59 +48,87 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.snatik.storage.Storage;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Text;
+import org.xml.sax.SAXException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 public class ScrollingActivity extends AppCompatActivity {
     private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
+    private static final String FILENAME_TRACKINGDATA = "tracking.txt";
 
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
+    private TabLayout mTabLayout;
+    private ViewPager mViewPager;
 
-    private boolean IsSupportedBTDevice = false;
+    private boolean mIsSupportedBTDevice = false;
     private boolean IsPairingDevice = false;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeService mBluetoothLeService;
-    private BluetoothSocket mConnectSocket;
-    private BluetoothGatt mBluetoothGatt;
-    private String mBluetoothDeviceAddress;
     private BluetoothGattCharacteristic characteristicTX;
     private BluetoothGattCharacteristic characteristicRX;
-    private String mDeviceName;
-    private String mDeviceAddress;
+    private List<TrackingData> mCardSummaryList;
+
+    private InfoFragment infoFrag;
+
+    public boolean ismIsRecorded() {
+        return mIsRecorded;
+    }
 
     private boolean mIsRecorded = false;
 
-    private static final int STATE_DISCONNECTED = 0;
-    private static final int STATE_CONNECTING = 1;
-    private static final int STATE_CONNECTED = 2;
+    public boolean ismHasRecordData() {
+        return mHasRecordData;
+    }
 
-    public final static String ACTION_GATT_CONNECTED =
-            "com.helper.helper.ACTION_GATT_CONNECTED";
-    public final static String ACTION_GATT_DISCONNECTED =
-            "com.helper.helper.ACTION_GATT_DISCONNECTED";
-    public final static String ACTION_GATT_SERVICES_DISCOVERED =
-            "com.helper.helper.ACTION_GATT_SERVICES_DISCOVERED";
-    public final static String ACTION_DATA_AVAILABLE =
-            "com.helper.helper.ACTION_DATA_AVAILABLE";
-    public final static String EXTRA_DATA =
-            "com.helper.helper.EXTRA_DATA";
-    public final static UUID UUID_HM_RX_TX =
-            UUID.fromString(BluetoothAttributes.HM_RX_TX);
+    private boolean mHasRecordData = false;
+    private String mRecordDate;
+    private String mRecordStartTime;
+    private String mRecordEndTime;
+    private float mRecordDistance;
+
 
     private static final int TAB_STATUS = 0;
     private static final int TAB_LED = 1;
     private static final int TAB_TRACKING = 2;
     private static final int REQUEST_ENABLE_BT = 2001;
+
+    public ViewPager getViewPager() {
+        return mViewPager;
+    }
+
+    public void setmHasRecordData(boolean mHasRecordData) {
+        this.mHasRecordData = mHasRecordData;
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -112,23 +142,44 @@ public class ScrollingActivity extends AppCompatActivity {
         /* ToolBar UI end */
 
         /* Tab start */
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        tabLayout.addTab(tabLayout.newTab().setText("Status"));
-        tabLayout.addTab(tabLayout.newTab().setText("LED"));
-        tabLayout.addTab(tabLayout.newTab().setText("Tracking"));
+        mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        mTabLayout.addTab(mTabLayout.newTab().setText("Status"));
+        mTabLayout.addTab(mTabLayout.newTab().setText("LED"));
+        mTabLayout.addTab(mTabLayout.newTab().setText("Tracking"));
 
-        viewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = (ViewPager) findViewById(R.id.pager);
 
-        TabPagerAdapter pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(pagerAdapter);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        TabPagerAdapter pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), mTabLayout.getTabCount());
+        mViewPager.setAdapter(pagerAdapter);
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
 
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 Log.d("DEV", "onTabSelected called! posistion : " + tab.getPosition());
-                viewPager.setCurrentItem(tab.getPosition());
-                //                view
+                mViewPager.setCurrentItem(tab.getPosition());
+
+                if( tab.getPosition() == TAB_STATUS ) {
+                    infoFrag = (InfoFragment)mViewPager
+                            .getAdapter()
+                            .instantiateItem(mViewPager, mViewPager.getCurrentItem());
+
+                    if( mIsRecorded ) {
+                        ((FloatingActionButton) infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_solid, getApplicationContext().getTheme()));
+                    }
+                    else {
+                        ((FloatingActionButton) infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_circle_solid, getApplicationContext().getTheme()));
+                    }
+
+                    initilizeDataForInfoFragment();
+                }
+                else if( tab.getPosition() == TAB_TRACKING ) {
+//                    TrackingFragment trackingFragment = (TrackingFragment)mViewPager
+//                            .getAdapter()
+//                            .instantiateItem(mViewPager, mViewPager.getCurrentItem());
+                    infoFrag = (InfoFragment) mViewPager.getAdapter().instantiateItem(mViewPager, TAB_STATUS);
+
+                }
             }
 
             @Override
@@ -141,19 +192,45 @@ public class ScrollingActivity extends AppCompatActivity {
 
             }
         });
-        /* Tab end /*
+        /* Tab end */
+
+        /* Fragment initialize start */
+//        infoFrag = (InfoFragment)mViewPager
+//                    .getAdapter()
+//                    .instantiateItem(mViewPager, mViewPager.getCurrentItem());
+        /* Fragment initialize end */
 
         /* Valid Bluetooth supports start */
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
-            Toast.makeText(this, "Device does not support Bluetooth", Toast.LENGTH_LONG).show();
-            IsSupportedBTDevice = false;
+            Toast.makeText(this, "Device does not support Bluetooth", Toast.LENGTH_SHORT).show();
+            mIsSupportedBTDevice = false;
         } else {
-            Toast.makeText(this, "Device support Bluetooth", Toast.LENGTH_LONG).show();
-            IsSupportedBTDevice = true;
+            Toast.makeText(this, "Device support Bluetooth", Toast.LENGTH_SHORT).show();
+            mIsSupportedBTDevice = true;
         }
         /* Valid Bluetooth supports end */
 
+        /* Internal File Storage setup start */
+
+        // init
+        Storage storage = new Storage(getApplicationContext());
+
+        // get external storage
+        String path = storage.getInternalFilesDirectory();
+
+        // new dir
+        String newDir = path + File.separator + "user_data";
+
+        boolean dirExists = storage.isDirectoryExists(path);
+
+        if( dirExists ) {
+            Toast.makeText(this, newDir + " is exist", Toast.LENGTH_SHORT).show();
+        } else {
+            storage.createDirectory(newDir);
+        }
+
+        /* Internal File Storage setup end */
 
 
         /* Set GATT Interface start */
@@ -162,13 +239,16 @@ public class ScrollingActivity extends AppCompatActivity {
         /* Set GATT Interface end */
     }
 
+    public void initilizeDataForInfoFragment() {
+        mHasRecordData = false;
+    }
     /* Tab Move Start */
     public void moveToLEDDash(View v) {
-        viewPager.setCurrentItem(TAB_LED);
+        mViewPager.setCurrentItem(TAB_LED);
     }
 
     public void moveToTrackingDash(View v) {
-        viewPager.setCurrentItem(TAB_TRACKING);
+        mViewPager.setCurrentItem(TAB_TRACKING);
     }
     /* Tab Move End */
 
@@ -183,12 +263,14 @@ public class ScrollingActivity extends AppCompatActivity {
                 finish();
             }
 
+            mBluetoothLeService.setInfoFragment(infoFrag);
+
             /* Connect Bluetooth Device Start
                (Automatically connects to the device upon successful start-up initialization.) */
             if (!mBluetoothAdapter.isEnabled()) {
-                Toast.makeText(getApplicationContext(), "disable bluetooth", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "disable bluetooth", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getApplicationContext(), "Already enable bluetooth", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Already enable bluetooth", Toast.LENGTH_SHORT).show();
                 connectDevice();
             }
             /* Connect Bluetooth Device End */
@@ -201,7 +283,7 @@ public class ScrollingActivity extends AppCompatActivity {
     };
 
     public void enableBluetooth(View v) {
-        if (!IsSupportedBTDevice) {
+        if (!mIsSupportedBTDevice) {
             return;
         }
 
@@ -210,7 +292,7 @@ public class ScrollingActivity extends AppCompatActivity {
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             //call onActivityResult
         } else {
-            Toast.makeText(this, "Already enable bluetooth", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Already enable bluetooth", Toast.LENGTH_SHORT).show();
             connectDevice();
         }
     }
@@ -246,8 +328,8 @@ public class ScrollingActivity extends AppCompatActivity {
         for (int i = 0; i < deviceLabels.length; ++i) {
             if (devices.get(i).getName() == getString(R.string.device_bluetooth_name) &&
                     mBluetoothLeService.connect(devices.get(i).getAddress())) {
-                Toast.makeText(this, "connected paired device HELPER!", Toast.LENGTH_LONG).show();
-                updateConnectionLayout(true);
+                Toast.makeText(this, "connected paired device HELPER!", Toast.LENGTH_SHORT).show();
+                InitializeSignal();
                 break;
             }
         }
@@ -272,8 +354,8 @@ public class ScrollingActivity extends AppCompatActivity {
                         // HELPER
                         if (searchedDevice.getName().toString().equals(getString(R.string.device_bluetooth_name)) &&
                                 mBluetoothLeService.connect(searchedDevice.getAddress())) {
-                            Toast.makeText(getApplicationContext(), "connected device HELPER!", Toast.LENGTH_LONG).show();
-                            updateConnectionLayout(true);
+                            Toast.makeText(getApplicationContext(), "connected device HELPER!", Toast.LENGTH_SHORT).show();
+                            InitializeSignal();
                         }
                     }
                 }
@@ -293,10 +375,34 @@ public class ScrollingActivity extends AppCompatActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     connectDevice();
                 } else {
-                    Toast.makeText(this, "You can't use interaction helper device", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "You can't use interaction helper device", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
+    }
+
+    public void InitializeSignal() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                List<BluetoothGattService> gattServices = mBluetoothLeService.getSupportedGattServices();
+
+                for (BluetoothGattService gattService : gattServices) {
+                    // get characteristic when UUID matches RX/TX UUID
+                    characteristicTX = gattService.getCharacteristic(BluetoothLeService.UUID_HM_RX_TX);
+                    characteristicRX = gattService.getCharacteristic(BluetoothLeService.UUID_HM_RX_TX);
+                }
+
+                mBluetoothLeService.setCharacteristicNotification(characteristicRX, true);
+
+                updateConnectionLayout(true);
+
+                Toast.makeText(getApplicationContext(), "InitializeSignal called!", Toast.LENGTH_SHORT).show();
+            }
+        }, 3000);
+
+
     }
 
     public void sendSignal(View v) {
@@ -328,33 +434,148 @@ public class ScrollingActivity extends AppCompatActivity {
 
         final byte[] tx = str.getBytes();
 
-        List<BluetoothGattService> gattServices = mBluetoothLeService.getSupportedGattServices();
 
-        for (BluetoothGattService gattService : gattServices) {
-            // get characteristic when UUID matches RX/TX UUID
-            characteristicTX = gattService.getCharacteristic(BluetoothLeService.UUID_HM_RX_TX);
-            characteristicRX = gattService.getCharacteristic(BluetoothLeService.UUID_HM_RX_TX);
-        }
 
         characteristicTX.setValue(tx);
-        Log.d("DEV", "sendSignal called! tx : " + tx);
+
         mBluetoothLeService.writeCharacteristic(characteristicTX);
+        mBluetoothLeService.readCharacteristic(characteristicRX);
+
+        Log.d("DEV", "sendSignal called! TX : " + new String(characteristicTX.getValue()));
+        Log.d("DEV", "sendSignal called! RX : " + new String(characteristicRX.getValue()));
     }
 
     public void toggleRecord(View v) {
         mIsRecorded = !mIsRecorded;
 
-        InfoFragment infoFrag = (InfoFragment)viewPager
-                .getAdapter()
-                .instantiateItem(viewPager, viewPager.getCurrentItem());
-        infoFrag.stopRecordLocation(mIsRecorded);
+        Toast.makeText(this, "IsRecorded : " + mIsRecorded, Toast.LENGTH_SHORT).show();
 
-        Toast.makeText(this, "IsRecorded : " + mIsRecorded, Toast.LENGTH_LONG).show();
+        infoFrag = (InfoFragment)mViewPager
+                .getAdapter()
+                .instantiateItem(mViewPager, mViewPager.getCurrentItem());
+        infoFrag.toggleRecordLocation(mIsRecorded);
 
         if( mIsRecorded ) {
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            mRecordDate = dateFormat.format(date);
+
+            SimpleDateFormat startTimeFormat = new SimpleDateFormat("hh:mm");
+            mRecordStartTime = startTimeFormat.format(date);
+
             ((FloatingActionButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_solid, getApplicationContext().getTheme()));
         } else {
             ((FloatingActionButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_circle_solid, getApplicationContext().getTheme()));
+
+            mHasRecordData = true;
+
+            Date date = new Date();
+
+            SimpleDateFormat endTimeFormat = new SimpleDateFormat("hh:mm");
+            mRecordEndTime = endTimeFormat.format(date);
+
+            try {
+                writeTrackingDataInternalStorage();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            infoFrag.recordStopAndEraseLocationList();
+        }
+    }
+
+    private void writeTrackingDataInternalStorage() throws IOException {
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            Storage internalStorage = new Storage(getApplicationContext());
+
+            String path = internalStorage.getInternalFilesDirectory();
+            String dir = path + File.separator + "user_data";
+            String xmlFilePath =  dir + File.separator + "tracking.xml";
+
+            boolean fileExists = internalStorage.isFileExist(xmlFilePath);
+
+            Document doc = docBuilder.newDocument();
+
+            Element rootElement;
+            if( fileExists ) {
+                doc = docBuilder.parse(new File(xmlFilePath));
+                rootElement = (Element) doc.getDocumentElement();
+            } else {
+                rootElement = doc.createElement("tracking");
+            }
+
+            /* Make elements start */
+            Element mapElement = doc.createElement("map");
+            /* Make elements end */
+
+            String distance = String.format("%.2f", infoFrag.getmCurTrackingDistance());
+            /* Define attributes start */
+            mapElement.setAttribute("date", mRecordDate);
+            mapElement.setAttribute("start_time", mRecordStartTime);
+            mapElement.setAttribute("end_time", mRecordEndTime);
+            mapElement.setAttribute("distance", distance);
+            /* Define attributes end */
+
+            if( infoFrag.getmCurrRecordedLocationList().size() <= 0 ) {
+                return;
+            }
+
+            for(LatLng currentLat : infoFrag.getmCurrRecordedLocationList()) {
+                Element locationElement = doc.createElement("location");
+
+                    Element latitudeElement = doc.createElement("latitude");
+                    latitudeElement.appendChild(doc.createTextNode(String.format("%f", currentLat.latitude)));
+
+                    Element longitudeElement = doc.createElement("logitude");
+                    longitudeElement.appendChild(doc.createTextNode(String.format("%f", currentLat.longitude)));
+
+                locationElement.appendChild(latitudeElement);
+                locationElement.appendChild(longitudeElement);
+
+                mapElement.appendChild(locationElement);
+            }
+
+            rootElement.appendChild(mapElement);
+
+            if( !fileExists ) {
+                doc.appendChild(rootElement);
+            }
+
+            // XML 파일로 쓰기
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            DOMSource source = new DOMSource(doc);
+
+            boolean dirExists = internalStorage.isDirectoryExists(dir);
+            if( !dirExists ) {
+                internalStorage.createDirectory(dir);
+            }
+
+            StreamResult result = new StreamResult(new FileOutputStream(new File(xmlFilePath), false));
+
+            fileExists = internalStorage.isFileExist(xmlFilePath);
+//            StreamResult result = new StreamResult(System.out);
+            transformer.transform(source, result);
+//
+
+
+            Log.d(TAG, "File saved!");
+        }
+        catch (ParserConfigurationException pce)
+        {
+            pce.printStackTrace();
+        }
+        catch (TransformerException tfe)
+        {
+            tfe.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
         }
     }
 
@@ -378,10 +599,11 @@ public class ScrollingActivity extends AppCompatActivity {
                     return;
                 }
 
-                InfoFragment frag1 = (InfoFragment)viewPager
+                infoFrag = (InfoFragment)mViewPager
                         .getAdapter()
-                        .instantiateItem(viewPager, viewPager.getCurrentItem());
-                frag1.requsetLocation();
+                        .instantiateItem(mViewPager, mViewPager.getCurrentItem());
+                infoFrag.requsetLocation();
+
             } else {
                 Log.d(TAG, "verifyPermission fail : " + permissinos[0]);
 //                showRequestAgainDialog();
