@@ -52,24 +52,22 @@ public class InfoFragment extends Fragment
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
     private final static String TAG = InfoFragment.class.getSimpleName() + "/DEV";
+    private static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
+    private static final int GPS_ENABLE_REQUEST_CODE = 2002;
+    private static final int UPDATE_INTERVAL_MS = 15000;
+    private static final int FASTEST_UPDATE_INTERVAL_MS = 15000;
 
     private BatteryView m_batView;
     private MapView m_mapView;
-
     private GoogleApiClient m_googleApiClient;
     private GoogleMap m_googleMap;
     private LocationRequest m_locationReq;
     private Location m_curLocation;
     private Marker m_curLocationMarker;
-    private static LatLng beforeLatlng = null;
+    private static LatLng m_beforeLatlng = null;
 
     private double m_fCurDistance = 0.0;
     private List<LatLng> m_lCurRecordedLocation;
-
-    private static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
-    private static final int GPS_ENABLE_REQUEST_CODE = 2002;
-    private static final int UPDATE_INTERVAL_MS = 15000;
-    private static final int FASTEST_UPDATE_INTERVAL_MS = 15000;
 
     public double getCurTrackingDistance() {
         return m_fCurDistance;
@@ -105,16 +103,16 @@ public class InfoFragment extends Fragment
                     if (((ScrollingActivity) getActivity()).getIsRecorded()) {
                         m_lCurRecordedLocation.add(new LatLng(m_curLocation.getLatitude(), m_curLocation.getLongitude()));
 
-                        if (beforeLatlng != null) {
+                        if (m_beforeLatlng != null) {
                             m_googleMap.addPolyline((new PolylineOptions())
-                                    .add(beforeLatlng, latLng)
+                                    .add(m_beforeLatlng, latLng)
                                     .width(R.dimen.google_polyline_width).color(Color.BLUE)
                                     .geodesic(true));
 
-                            m_fCurDistance += CalculationByDistance(beforeLatlng, latLng);
+                            m_fCurDistance += CalculationByDistance(m_beforeLatlng, latLng);
                         }
                     }
-                    beforeLatlng = latLng;
+                    m_beforeLatlng = latLng;
                 }
             }
         };
@@ -272,7 +270,11 @@ public class InfoFragment extends Fragment
         setCurrentLocation(null, "Unknown GPS signal", "Check your GPS permission");
 
         m_googleMap.getUiSettings().setCompassEnabled(true);
+        m_googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        m_googleMap.setMyLocationEnabled(true);
+
         m_googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+
         if( m_curLocation == null) {
             m_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15));
         } else {

@@ -20,19 +20,19 @@ public class TrackingRecordedListAdapter extends RecyclerView.Adapter<TrackingRe
 
     private static final int TAB_TRACKING = 2;
 
-    private List<TrackingRecordedListItem> recordList;
-    private int itemLayout;
-    Context mContext;
+    private List<TrackingRecordedListItem> m_recordList;
+    private int m_itemLayout;
+    private Context m_context;
 
     /**
      * 생성자
      * @param items
-     * @param itemLayout
+     * @param m_itemLayout
      */
-    public TrackingRecordedListAdapter(List<TrackingRecordedListItem> items , int itemLayout, Context c){
-        this.mContext = c;
-        this.recordList = items;
-        this.itemLayout = itemLayout;
+    public TrackingRecordedListAdapter(List<TrackingRecordedListItem> items , int m_itemLayout, Context c){
+        this.m_context = c;
+        this.m_recordList = items;
+        this.m_itemLayout = m_itemLayout;
     }
 
     /**
@@ -44,7 +44,7 @@ public class TrackingRecordedListAdapter extends RecyclerView.Adapter<TrackingRe
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(itemLayout,viewGroup,false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(m_itemLayout,viewGroup,false);
         return new ViewHolder(view);
     }
 
@@ -58,7 +58,7 @@ public class TrackingRecordedListAdapter extends RecyclerView.Adapter<TrackingRe
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
 
-        final TrackingRecordedListItem item = recordList.get(position);
+        final TrackingRecordedListItem item = m_recordList.get(position);
         viewHolder.cardView.setCardBackgroundColor(item.getColor());
         viewHolder.dateTextView.setText(item.getDate());
         viewHolder.startTimeTextView.setText(item.getStartTime());
@@ -70,7 +70,7 @@ public class TrackingRecordedListAdapter extends RecyclerView.Adapter<TrackingRe
             @Override
             public void onClick(View v)
             {
-                ViewPager viewPager = ((ScrollingActivity)mContext).getViewPager();
+                ViewPager viewPager = ((ScrollingActivity)m_context).getViewPager();
 
                 TrackingFragment trackingFragment = (TrackingFragment)viewPager
                         .getAdapter()
@@ -78,14 +78,14 @@ public class TrackingRecordedListAdapter extends RecyclerView.Adapter<TrackingRe
 
                 trackingFragment.setSelectedMapLoad(item.getDate().split("#")[1].split(" ")[0]);
 
-                Toast.makeText(mContext, item.getDate(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(m_context, item.getDate(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return recordList.size();
+        return m_recordList.size();
     }
 
     /**

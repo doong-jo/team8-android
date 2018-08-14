@@ -40,7 +40,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.helper.helper.R;
-import com.helper.helper.ScrollingActivity;
+import com.helper.helper.util.FileManagerUtil;
 import com.snatik.storage.Storage;
 
 import org.w3c.dom.Document;
@@ -61,15 +61,14 @@ public class TrackingFragment extends Fragment
     private final static String TAG = TrackingFragment.class.getSimpleName() + "/DEV";
     private static final float MIN_BRIGHTNESS = 0.8f;
 
-    private MapView mapView;
-    private GoogleApiClient mGoogleApiClient;
-    private GoogleMap mMap;
-    private int mTrackingIndex;
-    private TrackingRecordedListAdapter mAdapter;
-    private Map cardTrackingLocationDic = new HashMap();
-    private List<Polyline> polylines;
-    private RecyclerView recyclerView;
-    private List<TrackingRecordedListItem> mRecordedItemList;
+    private MapView m_mapView;
+    private GoogleApiClient m_googleApiClient;
+    private GoogleMap m_map;
+    private int m_nTrackingIndex;
+    private TrackingRecordedListAdapter m_recordedListAdapter;
+    private Map m_cardLocationListDic = new HashMap();
+    private RecyclerView m_recyclerView;
+    private List<TrackingRecordedListItem> m_recordedItemList;
 
 
     public TrackingFragment() {
@@ -79,75 +78,52 @@ public class TrackingFragment extends Fragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "Tracking onActivityCreated!");
     }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
         View view = inflater.inflate( R.layout.fragment_tracking, container, false );
 
-//        mItems = new ArrayList<>(30);
-//        for (int i = 0; i < 30; i++) {
-//            mItems.add(String.format("Card number %02d", i));
-//        }
-//
-//        mAdapter = new CardViewAdapter(mItems, itemTouchListener);
-//
-//        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recordedRecyclerView);
-//
-//        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//        recyclerView.setAdapter(mAdapter);
-//
-
-//
-//        recyclerView.addOnItemTouchListener(swipeTouchListener);
-
-//        if( ((ScrollingActivity)getActivity()).ismHasRecordData() ) {
-//            ((ScrollingActivity)getActivity()).setmHasRecordData(false);
-//
-//            Toast.makeText(getContext(), "Has Record Data!", Toast.LENGTH_LONG).show();
-//        }
-        Log.d(TAG, "Tracking onCreateView!");
-        Log.d(TAG, "Tracking onCreateView! List? " + mRecordedItemList);
-
-        if( mRecordedItemList == null ) {
-            Log.d(TAG, "~~~ mRecordedItemList == null ~~~");
-
-            /* Read XML Map data start */
-
-            /* Read XML Map data end */
-
-            mRecordedItemList = new ArrayList<TrackingRecordedListItem>();
-            cardTrackingLocationDic = new HashMap();
-            polylines = new ArrayList<Polyline>();
-//            initData();
+        if( m_recordedItemList == null ) {
+            m_recordedItemList = new ArrayList<>();
+            m_cardLocationListDic = new HashMap();
         }
 
-        mRecordedItemList.clear();
-        mTrackingIndex = 0;
+        m_recordedItemList.clear();
+        m_nTrackingIndex = 0;
 
         try {
-            readMapDataXML();
+            List<TrackingData> lReadTrackigData = FileManagerUtil.readMapDataXML(getContext());
+            if( lReadTrackigData != null ) {
+                for (TrackingData trackingData:
+                        lReadTrackigData) {
+                    makeRecordedCard(
+                            trackingData.getDate(),
+                            trackingData.getStartTime(),
+                            trackingData.getEndTime(),
+                            trackingData.getDistance(),
+                            trackingData.getLocationData());
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         initLayout(view);
 
-        //MapView 초기화 작업
-        mapView.onCreate(savedInstanceState);
-        mapView.onResume();
-        mapView.getMapAsync(this);
+        m_mapView.onCreate(savedInstanceState);
+        m_mapView.onResume();
+        m_mapView.getMapAsync(this);
 
         adjustMapVerticalTouch(view);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new TrackingRecordedListAdapter(mRecordedItemList, R.layout.cardview_recorded_tracking, getContext());
-        recyclerView.setAdapter(mAdapter);
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        m_recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        m_recordedListAdapter = new TrackingRecordedListAdapter(m_recordedItemList, R.layout.cardview_recorded_tracking, getContext());
+        m_recyclerView.setAdapter(m_recordedListAdapter);
+//        m_recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         SwipeableRecyclerViewTouchListener swipeTouchListener =
-                new SwipeableRecyclerViewTouchListener(recyclerView,
+                new SwipeableRecyclerViewTouchListener(m_recyclerView,
                         new SwipeableRecyclerViewTouchListener.SwipeListener() {
                             @Override
                             public boolean canSwipeLeft(int position) {
@@ -160,34 +136,32 @@ public class TrackingFragment extends Fragment
                             }
 
                             @Override
-                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                            public void onDismissedBySwipeLeft(RecyclerView m_recyclerView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
-                                    Toast.makeText(getContext(), mRecordedItemList.get(position) + " swiped left", Toast.LENGTH_SHORT).show();
-                                    mRecordedItemList.remove(position);
-                                    mAdapter.notifyItemRemoved(position);
+                                    m_recordedItemList.remove(position);
+                                    m_recordedListAdapter.notifyItemRemoved(position);
                                 }
-                                mAdapter.notifyDataSetChanged();
+                                m_recordedListAdapter.notifyDataSetChanged();
                             }
 
                             @Override
-                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                            public void onDismissedBySwipeRight(RecyclerView m_recyclerView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
-                                    Toast.makeText(getContext(), mRecordedItemList.get(position) + " swiped right", Toast.LENGTH_SHORT).show();
-                                    mRecordedItemList.remove(position);
-                                    mAdapter.notifyItemRemoved(position);
+                                    m_recordedItemList.remove(position);
+                                    m_recordedListAdapter.notifyItemRemoved(position);
                                 }
-                                mAdapter.notifyDataSetChanged();
+                                m_recordedListAdapter.notifyDataSetChanged();
                             }
                         });
 
-        recyclerView.addOnItemTouchListener(swipeTouchListener);
+        m_recyclerView.addOnItemTouchListener(swipeTouchListener);
 
         return view;
     }
 
     private void initLayout(View view) {
-        recyclerView = (RecyclerView) view.findViewById(R.id.recordedRecyclerView);
-        mapView = (MapView) view.findViewById(R.id.recordedMap);
+        m_recyclerView = view.findViewById(R.id.recordedRecyclerView);
+        m_mapView = view.findViewById(R.id.recordedMap);
     }
 
     private void initData() {
@@ -203,23 +177,10 @@ public class TrackingFragment extends Fragment
             SimpleDateFormat endTimeFormat = new SimpleDateFormat("hh:mm");
             String endTimeString = "end time. " + endTimeFormat.format(date);
 
-//            Random random = new Random();
-//            float h = MIN_BRIGHTNESS + ((1f - MIN_BRIGHTNESS) * random.nextFloat());
-//            float s = random.nextFloat();
-//            float b = random.nextFloat();
-//
-//            float[] hsb = new float[3]; hsb[0] = h; hsb[1] = s; hsb[2] = b;
-//
-//            Log.d(TAG, "h : " + h);
-//            Log.d(TAG, "s : " + s);
-//            Log.d(TAG, "b : " + b);
-
             Random rnd = new Random();
             int r = rnd.nextInt(128) + 90; // 128 ... 255
             int g = rnd.nextInt(128) + 90; // 128 ... 255
             int b = rnd.nextInt(128) + 90; // 128 ... 255
-
-//            Color clr = ;
 
             TrackingRecordedListItem recordedItem = new TrackingRecordedListItem(
                     Color.rgb(r, g, b),
@@ -228,131 +189,33 @@ public class TrackingFragment extends Fragment
                     endTimeString,
                     "Distance. " + String.format("%.2f", rnd.nextFloat() * 10) + "km");
 
-            mRecordedItemList.add(recordedItem);
+            m_recordedItemList.add(recordedItem);
 
-            mTrackingIndex = i;
-        }
-    }
-
-    private void readMapDataXML () throws IOException {
-        try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-            Storage internalStorage = new Storage(getContext());
-
-            String path = internalStorage.getInternalFilesDirectory();
-            String dir = path + File.separator + "user_data";
-            String xmlFilePath = dir + File.separator + "tracking.xml";
-
-            boolean fileExists = internalStorage.isFileExist(xmlFilePath);
-
-            Document doc = docBuilder.newDocument();
-
-            Element rootElement;
-            if (fileExists) {
-                doc = docBuilder.parse(new File(xmlFilePath));
-                rootElement = (Element) doc.getDocumentElement();
-            } else {
-                rootElement = doc.createElement("tracking");
-            }
-
-            NodeList maps = doc.getElementsByTagName("map");
-
-            int length = maps.getLength();
-            Log.d(TAG, "readMapDataXML maps size : " + maps.getLength());
-
-            String date = "";
-            String startTime = "";
-            String endTime = "";
-            String distance = "";
-            List<LatLng> locations = new ArrayList<LatLng>();
-
-            for (int i = 0; i < maps.getLength(); i++) {
-                Node map = maps.item(i);
-
-                date = map.getAttributes().getNamedItem("date").getNodeValue();
-                startTime = map.getAttributes().getNamedItem("start_time").getNodeValue();
-                endTime = map.getAttributes().getNamedItem("end_time").getNodeValue();
-                distance = map.getAttributes().getNamedItem("distance").getNodeValue();
-
-                NodeList locationList = map.getChildNodes();
-
-                int locationInd = 1;
-                String lat = "";
-                String log = "";
-
-                Node location;
-
-                for (int j = 1; j < locationList.getLength(); j+=2) {
-                    location = locationList.item(j);
-
-                    lat = location.getChildNodes().item(1).getChildNodes().item(0).getNodeValue();
-                    log = location.getChildNodes().item(3).getChildNodes().item(0).getNodeValue();
-                }
-
-                if( locationList.getLength() > 0 ) {
-                    locations.add(new LatLng(Double.parseDouble(lat), Double.parseDouble(log)));
-                }
-                //            for (int j = 0; j < location.getLength(); j++) {
-                //                Node loc = location.item(i);
-                //                String latitude = loc.getChildNodes().item(1).getNodeValue();
-                //                String logitude = loc.getChildNodes().item(2).getNodeValue();
-                //            }
-
-                makeRecordedCard(date, startTime, endTime, distance, locations);
-            }
-
-
-            int a = 1;
-        }
-
-        catch (ParserConfigurationException pce)
-        {
-            pce.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
+            m_nTrackingIndex = i;
         }
     }
 
     public void setSelectedMapLoad (String itemPosition) {
-        Toast.makeText(getContext(), "setSelectedMapLoad itemPosition : " + itemPosition, Toast.LENGTH_LONG).show();
+        List<LatLng> locationList = (List<LatLng>) m_cardLocationListDic.get(Integer.parseInt(itemPosition)-1);
 
+        this.m_map.clear();
 
+        this.m_map.moveCamera(CameraUpdateFactory.newLatLngZoom(locationList.get(0), 20));
+        this.m_map.animateCamera(CameraUpdateFactory.zoomTo(20));
 
-        List<LatLng> locationList = (List<LatLng>) cardTrackingLocationDic.get(Integer.parseInt(itemPosition)-1);
-
-        this.mMap.clear();
-
-        this.mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationList.get(0), 20));
-        this.mMap.animateCamera(CameraUpdateFactory.zoomTo(20));
-
-        for(Polyline line : polylines)
-        {
-            line.remove();
-        }
+        List<Polyline> polylines = new ArrayList<>();
 
         polylines.clear();
 
         for (int i = 1; i < locationList.size(); i++) {
             polylines
-                    .add(this.mMap.addPolyline(new PolylineOptions().add(
+                    .add(this.m_map.addPolyline(new PolylineOptions().add(
                             locationList.get(i-1),
                             locationList.get(i)
                     ).width(12).color(Color.BLUE)
                             .geodesic(true)));
         }
-
-
-
-//        for (int i = 1; i < locationList.size(); i++) {
-//            mMap.addPolyline((new PolylineOptions())
-//                    .add(
-//                            locationList.get(i-1),
-//                            locationList.get(i)
-//                    ).width(12).color(Color.BLUE)
-//                    .geodesic(true));
-//        }
+        
 
     }
 //    public static String hsvToRgb(float hue, float saturation, float value) {
@@ -436,21 +299,20 @@ public class TrackingFragment extends Fragment
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        m_map = googleMap;
 
         //buildGoogleApiClient();
     }
 
     protected synchronized  void buildGoogleApiClient() {
-        Log.d(TAG, "buildGoogleApiClient called!");
-        if(mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+        if(m_googleApiClient == null) {
+            m_googleApiClient = new GoogleApiClient.Builder(getActivity())
                     .enableAutoManage((FragmentActivity) getActivity(), this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
-            mGoogleApiClient.connect();
+            m_googleApiClient.connect();
         }
     }
 
@@ -463,12 +325,12 @@ public class TrackingFragment extends Fragment
 
         TrackingRecordedListItem recordedItem = new TrackingRecordedListItem(
                 Color.rgb(r, g, b),
-                "Tracking#" + String.format("%d", (++mTrackingIndex)) + " " + date,
+                "Tracking#" + String.format("%d", (++m_nTrackingIndex)) + " " + date,
                 "start time. " + startTime,
                 "end time. " + endTime,
                 "Distance. " + Distance + "km");
 
-        mRecordedItemList.add(recordedItem);
-        cardTrackingLocationDic.put(mTrackingIndex-1, latLngs);
+        m_recordedItemList.add(recordedItem);
+        m_cardLocationListDic.put(m_nTrackingIndex-1, latLngs);
     }
 }

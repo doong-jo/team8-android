@@ -5,35 +5,35 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.List;
 
 public class TrackingData {
-    private String date;
-    private String startTime;
-    private String endTime;
-    private String distance;
+    private String m_sDate;
+    private String m_sStartTime;
+    private String m_sEndTime;
+    private String m_sDistance;
 
     private List<LatLng> locationData;
 
     public TrackingData(String date, String startTime, String endTime, String distance, List<LatLng> locationData) {
-        this.date = date;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.distance = distance;
+        this.m_sDate = m_sDate;
+        this.m_sStartTime = m_sStartTime;
+        this.m_sEndTime = m_sEndTime;
+        this.m_sDistance = m_sDistance;
         this.locationData = locationData;
     }
 
     public String getDate() {
-        return date;
+        return m_sDate;
     }
 
     public String getStartTime() {
-        return startTime;
+        return m_sStartTime;
     }
 
     public String getEndTime() {
-        return endTime;
+        return m_sEndTime;
     }
 
     public String getDistance() {
-        return distance;
+        return m_sDistance;
     }
 
     public List<LatLng> getLocationData() {

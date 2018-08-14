@@ -36,6 +36,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.Info.InfoFragment;
 import com.helper.helper.ble.BluetoothLeService;
 import com.helper.helper.tracking.TrackingData;
+import com.helper.helper.util.FileManagerUtil;
 import com.helper.helper.util.PermissionUtil;
 import com.snatik.storage.Storage;
 
@@ -408,7 +409,14 @@ public class ScrollingActivity extends AppCompatActivity {
             m_recordEndTime = endTimeFormat.format(date);
 
             try {
-                writeTrackingDataInternalStorage();
+                TrackingData trackingData = new TrackingData(
+                        m_recordStartDate,
+                        m_recordStartTime,
+                        m_recordEndTime,
+                        String.format("%f", m_infoFrag.getCurTrackingDistance()),
+                        m_infoFrag.getCurrRecordedLocationList());
+
+                FileManagerUtil.writeTrackingDataInternalStorage(getApplicationContext(), trackingData);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -421,99 +429,7 @@ public class ScrollingActivity extends AppCompatActivity {
         }
     }
 
-    private void writeTrackingDataInternalStorage() throws IOException {
-        try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
-            Storage internalStorage = new Storage(getApplicationContext());
-
-            String path = internalStorage.getInternalFilesDirectory();
-            String dir = path + File.separator + R.string.internal_directory;
-            String xmlFilePath =  dir + File.separator + R.string.file_name_tracking_data;
-
-            final String fDistance = String.format("%.2f", m_infoFrag.getCurTrackingDistance());
-            String elemTracking = String.format("%s", R.string.tracking_xml_elem_root);
-            String elemMap = String.format("%s", R.string.tracking_xml_elem_map);
-            String elemLocation = String.format("%s", R.string.tracking_xml_elem_location);
-            String elemLatitude = String.format("%s", R.string.tracking_xml_elem_latitude);
-            String elemLongitude = String.format("%s", R.string.tracking_xml_elem_longitude);
-            String attrDate = String.format("%s", R.string.tracking_xml_elem_attr_date);
-            String attrStartTime = String.format("%s", R.string.tracking_xml_elem_attr_start_time);
-            String attrEndTime = String.format("%s", R.string.tracking_xml_elem_attr_end_time);
-            String attrDistance = String.format("%s", R.string.tracking_xml_elem_attr_distance);
-
-            boolean fileExists = internalStorage.isFileExist(xmlFilePath);
-
-            Document doc = docBuilder.newDocument();
-
-            Element rootElement;
-            if( fileExists ) {
-                doc = docBuilder.parse(new File(xmlFilePath));
-                rootElement = (Element) doc.getDocumentElement();
-            } else {
-                rootElement = doc.createElement(elemTracking);
-            }
-
-            /* Make elements start */
-            Element mapElement = doc.createElement(elemMap);
-            /* Make elements end */
-
-            /* Define attributes start */
-            mapElement.setAttribute(attrDate, m_recordStartDate);
-            mapElement.setAttribute(attrStartTime, m_recordStartTime);
-            mapElement.setAttribute(attrEndTime, m_recordEndTime);
-            mapElement.setAttribute(attrDistance, fDistance);
-            /* Define attributes end */
-
-            if( m_infoFrag.getCurrRecordedLocationList().size() <= 0 ) {
-                return;
-            }
-
-            for(LatLng currentLat : m_infoFrag.getCurrRecordedLocationList()) {
-                Element locationElement = doc.createElement(elemLocation);
-
-                    Element latitudeElement = doc.createElement(elemLatitude);
-                    latitudeElement.appendChild(doc.createTextNode(String.format("%f", currentLat.latitude)));
-
-                    Element longitudeElement = doc.createElement(elemLongitude);
-                    longitudeElement.appendChild(doc.createTextNode(String.format("%f", currentLat.longitude)));
-
-                locationElement.appendChild(latitudeElement);
-                locationElement.appendChild(longitudeElement);
-
-                mapElement.appendChild(locationElement);
-            }
-
-            rootElement.appendChild(mapElement);
-
-            if( !fileExists ) {
-                doc.appendChild(rootElement);
-            }
-
-            // XML 파일로 쓰기
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-
-            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            DOMSource source = new DOMSource(doc);
-
-            final boolean dirExists = internalStorage.isDirectoryExists(dir);
-
-            if( !dirExists ) {
-                internalStorage.createDirectory(dir);
-            }
-
-            StreamResult result = new StreamResult(new FileOutputStream(new File(xmlFilePath), false));
-
-            transformer.transform(source, result);
-        }
-        catch (ParserConfigurationException | TransformerException | SAXException pce)
-        {
-            pce.printStackTrace();
-        }
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,

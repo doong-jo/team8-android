@@ -12,11 +12,11 @@ import com.helper.helper.tracking.TrackingFragment;
 public class TabPagerAdapter extends FragmentPagerAdapter {
 
     // Count number of tabs
-    private int tabCount;
+    private int m_tabCount;
 
     public TabPagerAdapter(FragmentManager fm, int tabCount) {
         super(fm);
-        this.tabCount = tabCount;
+        this.m_tabCount = tabCount;
     }
 
     @Override
@@ -41,6 +41,6 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return tabCount;
+        return m_tabCount;
     }
 }

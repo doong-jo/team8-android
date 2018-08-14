@@ -15,43 +15,43 @@ import java.util.Date;
 public class TrackingRecordedListItem {
 
 
-    private int color;
-    private String date;
-    private String startTime;
-    private String endTime;
-    private String distance;
+    private int m_color;
+    private String m_date;
+    private String m_startTime;
+    private String m_endTime;
+    private String m_distance;
 
     public TrackingRecordedListItem(int color, String date, String startTime, String endTime, String distance) {
-        this.color = color;
-        this.date = date;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.distance = distance;
+        this.m_color = color;
+        this.m_date = date;
+        this.m_startTime = startTime;
+        this.m_endTime = endTime;
+        this.m_distance = distance;
     }
 
 
     public String getDate() {
-        return date;
+        return m_date;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setDate(String m_date) {
+        this.m_date = m_date;
     }
 
     public int getColor() {
-        return color;
+        return m_color;
     }
 
     public String getStartTime() {
-        return startTime;
+        return m_startTime;
     }
 
     public String getEndTime() {
 
-        return endTime;
+        return m_endTime;
     }
 
     public String getDistance() {
-        return distance;
+        return m_distance;
     }
 }
