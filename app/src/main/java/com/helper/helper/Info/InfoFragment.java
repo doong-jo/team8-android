@@ -13,14 +13,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.NestedScrollView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -95,7 +93,6 @@ public class InfoFragment extends Fragment
                 if (locationList.size() > 0) {
                     //The last location in the list is the newest
                     Location location = locationList.get(locationList.size() - 1);
-                    Toast.makeText(getActivity(), "new position : " + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT).show();
                     m_curLocation = location;
 
                     if (m_curLocationMarker != null) {
@@ -142,11 +139,6 @@ public class InfoFragment extends Fragment
         int kmInDec = Integer.valueOf(newFormat.format(km));
         double meter = valueResult % 1000;
         int meterInDec = Integer.valueOf(newFormat.format(meter));
-        Log.i("Radius Value", "" + valueResult + "   KM  " + kmInDec
-                + " Meter   " + meterInDec);
-
-        Toast.makeText(getContext(), "Meter : " + meter, Toast.LENGTH_LONG).show();
-        Toast.makeText(getContext(), "Meter desc : " + meterInDec, Toast.LENGTH_LONG).show();
 
         return meter;
     }
@@ -155,7 +147,6 @@ public class InfoFragment extends Fragment
         if (m_curLocationMarker != null) m_curLocationMarker.remove();
 
         if (location != null) {
-            //현재위치의 위도 경도 가져옴
             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
             MarkerOptions markerOptions = new MarkerOptions();
@@ -195,13 +186,11 @@ public class InfoFragment extends Fragment
         m_batView = (BatteryView) view.findViewById(R.id.batView);
         m_batView.setPower(78);
 
-        //MapView 초기화 작업
         m_mapView = (MapView) view.findViewById(R.id.map);
         m_mapView.onCreate(savedInstanceState);
         m_mapView.onResume();
         m_mapView.getMapAsync(this);
 
-        //MapView
         adjustMapVerticalTouch(view);
         return view;
     }
@@ -209,8 +198,6 @@ public class InfoFragment extends Fragment
     @Override
     public void onAttachFragment(Fragment childFragment) {
         super.onAttachFragment(childFragment);
-
-        Toast.makeText(getContext(), "onAttachFragment InfoFragment", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -332,13 +319,11 @@ public class InfoFragment extends Fragment
         location.setLatitude(DEFAULT_LOCATION.latitude);
         location.setLongitude((DEFAULT_LOCATION.longitude));
 
-        setCurrentLocation(location, "위치정보 가져올 수 없음",
-                "위치 퍼미션과 GPS활성 여부 확인");
+        setCurrentLocation(null, "Unknown GPS signal", "Check your GPS permission");
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(getActivity(), "onLocationChanged!", Toast.LENGTH_LONG).show();
         m_curLocation = location;
         setCurrentLocation(m_curLocation, "내 위치", "GPS Position");
     }

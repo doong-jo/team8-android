@@ -21,6 +21,7 @@ public class LEDFragment extends Fragment {
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
         View view = inflater.inflate( R.layout.fragment_led, container, false );
 
+        // TODO: 2018. 8. 14. 아래는 임시코드로써 서버에서 LED 리스트를 불러와 그려줘야함.
 
         ImageView img1 = (ImageView) view.findViewById(R.id.img1);
         GlideDrawableImageViewTarget gifImage1 = new GlideDrawableImageViewTarget(img1);
