@@ -1,4 +1,4 @@
-package com.helper.helper;
+package com.helper.helper.ble;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -15,15 +15,14 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.helper.helper.Info.InfoFragment;
 
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Service for managing connection and data communication with a GATT server hosted on a
- * given Bluetooth LE device.
- */
+
+
 public class BluetoothLeService extends Service {
     private final static String TAG = BluetoothLeService.class.getSimpleName() + "/DEV";
 
@@ -133,7 +132,7 @@ public class BluetoothLeService extends Service {
     }
 
     public class LocalBinder extends Binder {
-        BluetoothLeService getService() {
+        public BluetoothLeService getService() {
             return BluetoothLeService.this;
         }
     }

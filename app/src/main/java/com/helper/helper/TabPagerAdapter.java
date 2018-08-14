@@ -3,8 +3,11 @@ package com.helper.helper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;         // 이전 Fragment로 돌아갈 수 있음 (삭제X)
-import android.support.v4.app.FragmentStatePagerAdapter;    // 이전 Fragment 메모리 삭제
 import android.util.Log;
+
+import com.helper.helper.Info.InfoFragment;
+import com.helper.helper.led.LEDFragment;
+import com.helper.helper.tracking.TrackingFragment;
 
 public class TabPagerAdapter extends FragmentPagerAdapter {
 

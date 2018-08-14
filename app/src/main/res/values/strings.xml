@@ -21,4 +21,20 @@
     <string name="cardTitleRecordedList">Recorded List</string>
     <string name="cardTitleRecordedTracking">Recorded Tracking</string>
     <string name="no_recorded_tracking_list">No Recorded Tracking</string>
+
+    <!--File Names-->
+    <string name="internal_directory">user_data</string>
+    <string name="file_name_tracking_data">tracking.xml</string>
+
+    <!--Tracking Xml Data-->
+    <string name="tracking_xml_elem_root">tracking</string>
+    <string name="tracking_xml_elem_map">map</string>
+    <string name="tracking_xml_elem_attr_date">date</string>
+    <string name="tracking_xml_elem_attr_start_time">start_time</string>
+    <string name="tracking_xml_elem_attr_end_time">end_time</string>
+    <string name="tracking_xml_elem_attr_distance">distance</string>
+    <string name="tracking_xml_elem_location">location</string>
+    <string name="tracking_xml_elem_longitude">longitude</string>
+    <string name="tracking_xml_elem_latitude">latitude</string>
+    <!---->
 </resources>

@@ -1,14 +1,14 @@
-package com.helper.helper;
+package com.helper.helper.ble;
 
 import java.util.HashMap;
 
-/**
- * This class includes a small subset of standard GATT attributes for demonstration purposes.
- */
+///////////////////////////////////////////////////////////////////////////
+// UUID 정의 클래스
+///////////////////////////////////////////////////////////////////////////
+
 public class BluetoothAttributes {
     private static HashMap<String, String> attributes = new HashMap();
     public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
-    public static String HM_10_CONF = "0000ffe0-0000-1000-8000-00805f9b34fb";
     public static String HM_RX_TX = "0000ffe1-0000-1000-8000-00805f9b34fb";
     static {
         // Sample Services.

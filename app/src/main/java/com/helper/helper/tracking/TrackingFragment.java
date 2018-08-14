@@ -1,4 +1,4 @@
-package com.helper.helper;
+package com.helper.helper.tracking;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,7 +16,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -41,6 +39,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.helper.helper.R;
+import com.helper.helper.ScrollingActivity;
 import com.snatik.storage.Storage;
 
 import org.w3c.dom.Document;
@@ -52,7 +52,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 public class TrackingFragment extends Fragment
         implements OnMapReadyCallback,
@@ -69,12 +68,6 @@ public class TrackingFragment extends Fragment
     private TrackingRecordedListAdapter mAdapter;
     private Map cardTrackingLocationDic = new HashMap();
     private List<Polyline> polylines;
-
-
-
-//    private CardViewAdapter mAdapter;
-//    private ArrayList<String> mItems;
-
     private RecyclerView recyclerView;
     private List<TrackingRecordedListItem> mRecordedItemList;
 
@@ -477,11 +470,5 @@ public class TrackingFragment extends Fragment
 
         mRecordedItemList.add(recordedItem);
         cardTrackingLocationDic.put(mTrackingIndex-1, latLngs);
-
-        ((ScrollingActivity) getActivity()).setmHasRecordData(false);
-
-        Log.d(TAG, "Add Card!");
-        Log.d(TAG, "mRecordedItemList size : " + mRecordedItemList.size());
-        Log.d(TAG, "mTrackingIndex : " + mTrackingIndex);
     }
 }

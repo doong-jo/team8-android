@@ -2,11 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.helper.helper">
 
+    <!--Wi-Fi를 이용한 GPS 신호 확인 권한-->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!--기지국 정보를 이용한 GPS 신호 확인 권한-->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!--커넥션 요구, 커넥션 수락, 데이터 전송 등의 Bluetooth 통신을 하기 위해 필요한 권한-->
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <!--디바이스 검색 시작, Bluetooth 설정을 조작하기 위해 필요한 권한-->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -16,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-
+        <!--Google API 추가-->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k" />
@@ -32,7 +35,8 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".BluetoothLeService" android:enabled="true"/>
+        <!--BLE service class 추가-->
+        <service android:name=".ble.BluetoothLeService" android:enabled="true"/>
     </application>
 
 </manifest>

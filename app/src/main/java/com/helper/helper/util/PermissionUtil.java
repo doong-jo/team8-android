@@ -1,4 +1,4 @@
-package com.helper.helper;
+package com.helper.helper.util;
 
 import android.Manifest;
 import android.app.Activity;
@@ -36,14 +36,6 @@ public class PermissionUtil {
         else return false;
     }
 
-    public static void requestLocationsPermissions(Activity activity) {
-        ActivityCompat.requestPermissions(activity, PERMISSIONS_LOCATION, REQUEST_LOCATION);
-    }
-
-    public static void requestExternalPermissions(Activity activity) {
-        ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_STORAGE);
-    }
-
     public static void requestPermissions(final @NonNull Activity activity,
                                           final @NonNull String[] permissions, final int requestCode) {
         if (Build.VERSION.SDK_INT >= 23) {
@@ -64,7 +56,7 @@ public class PermissionUtil {
                                 permissions[i], packageName);
                     }
 
-                    ((ActivityCompat.OnRequestPermissionsResultCallback) activity).onRequestPermissionsResult(
+                    (activity).onRequestPermissionsResult(
                             requestCode, permissions, grantResults);
                 }
             });
