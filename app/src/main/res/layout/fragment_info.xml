@@ -11,6 +11,51 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:orientation="vertical">
 
+        <!--기울기 테스트 UI 시작-->
+        <android.support.v7.widget.CardView
+            android:id="@+id/deviceTilt"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_margin="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:textStyle="bold"
+                    android:text="@string/cardTitleTilt" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_margin="20dp">
+                    <TextView
+                        android:id="@+id/TiltX"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="TiltX"/>
+                    <TextView
+                        android:id="@+id/TiltY"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="TiltY"/>
+                    <TextView
+                        android:id="@+id/TiltZ"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="TiltZ"/>
+                </LinearLayout>
+
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+        <!--기울기 테스트 UI 끝-->
+
         <!--배터리 상태 시작-->
         <android.support.v7.widget.CardView
             android:id="@+id/devicePower"

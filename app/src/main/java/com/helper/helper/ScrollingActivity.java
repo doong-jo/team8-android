@@ -14,6 +14,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -32,37 +36,24 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.Info.InfoFragment;
 import com.helper.helper.ble.BluetoothLeService;
 import com.helper.helper.tracking.TrackingData;
 import com.helper.helper.util.FileManagerUtil;
+import com.helper.helper.util.GyroManagerUtil;
 import com.helper.helper.util.PermissionUtil;
 import com.snatik.storage.Storage;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-public class ScrollingActivity extends AppCompatActivity {
+
+public class ScrollingActivity extends AppCompatActivity implements SensorEventListener{
     private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
     private static final int TAB_STATUS = 0;
     private static final int TAB_LED = 1;
@@ -71,6 +62,7 @@ public class ScrollingActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 2001;
 
     private TabLayout m_tabLayout;
+    private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
     private InfoFragment m_infoFrag;
 
@@ -79,6 +71,12 @@ public class ScrollingActivity extends AppCompatActivity {
     private BluetoothLeService m_bluetoothLeService;
     private BluetoothGattCharacteristic m_characteristicTX;
     private BluetoothGattCharacteristic m_characteristicRX;
+
+    private SensorManager m_sensorManager;
+    private Sensor m_sensorAccel;
+    private Sensor m_sensorMag;
+    private float[] m_fMag;
+    private float[] m_fAccel;
 
     private boolean m_IsRecorded = false;
 
@@ -108,8 +106,8 @@ public class ScrollingActivity extends AppCompatActivity {
 
         m_viewPager = (ViewPager) findViewById(R.id.pager);
 
-        TabPagerAdapter pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), m_tabLayout.getTabCount());
-        m_viewPager.setAdapter(pagerAdapter);
+        m_pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), m_tabLayout.getTabCount());
+        m_viewPager.setAdapter(m_pagerAdapter);
         m_viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(m_tabLayout));
 
         m_tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -119,9 +117,6 @@ public class ScrollingActivity extends AppCompatActivity {
                 m_viewPager.setCurrentItem(tab.getPosition());
 
                 if( tab.getPosition() == TAB_STATUS ) {
-                    m_infoFrag = (InfoFragment)m_viewPager
-                            .getAdapter()
-                            .instantiateItem(m_viewPager, m_viewPager.getCurrentItem());
 
                     if( m_IsRecorded ) {
                         ((FloatingActionButton) m_infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_solid, getApplicationContext().getTheme()));
@@ -151,23 +146,15 @@ public class ScrollingActivity extends AppCompatActivity {
         /* Valid Bluetooth supports start */
         m_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (m_bluetoothAdapter == null) {
-            Toast.makeText(this, "Device does not support Bluetooth", Toast.LENGTH_SHORT).show();
             m_IsSupportedBT = false;
         } else {
-            Toast.makeText(this, "Device support Bluetooth", Toast.LENGTH_SHORT).show();
             m_IsSupportedBT = true;
         }
         /* Valid Bluetooth supports end */
 
         /* Internal File Storage setup start */
-
-        // init
         Storage storage = new Storage(getApplicationContext());
-
-        // get external storage
         String path = storage.getInternalFilesDirectory();
-
-        // new dir
         String newDir = path + File.separator + "user_data";
 
         boolean dirExists = storage.isDirectoryExists(path);
@@ -180,11 +167,16 @@ public class ScrollingActivity extends AppCompatActivity {
 
         /* Internal File Storage setup end */
 
-
         /* Set GATT Interface start */
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
         /* Set GATT Interface end */
+
+        /* Sensor start */
+        m_sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        m_sensorAccel = m_sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        m_sensorMag = m_sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        /* Sensor end */
     }
 
     public void moveToLEDDash(View v) {
@@ -235,7 +227,6 @@ public class ScrollingActivity extends AppCompatActivity {
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             //call onActivityResult
         } else {
-            Toast.makeText(this, "Already enable bluetooth", Toast.LENGTH_SHORT).show();
             connectDevice();
         }
     }
@@ -309,21 +300,6 @@ public class ScrollingActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_ENABLE_BT:
-                // Allow Bluetooth
-
-                if (resultCode == Activity.RESULT_OK) {
-                    connectDevice();
-                } else {
-                    Toast.makeText(this, "You can't use interaction helper device", Toast.LENGTH_SHORT).show();
-                }
-                break;
-        }
-    }
-
     public void InitializeSignal() {
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -389,6 +365,10 @@ public class ScrollingActivity extends AppCompatActivity {
     }
 
     public void toggleRecord(View v) {
+        if( m_viewPager.getCurrentItem() != TAB_STATUS ) {
+            return;
+        }
+
         m_IsRecorded = !m_IsRecorded;
 
         if( m_IsRecorded ) {
@@ -421,15 +401,32 @@ public class ScrollingActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            m_infoFrag = (InfoFragment)m_viewPager
-                    .getAdapter()
-                    .instantiateItem(m_viewPager, m_viewPager.getCurrentItem());
+            if( m_infoFrag == null ) {
+                m_infoFrag = (InfoFragment)m_viewPager
+                        .getAdapter()
+                        .instantiateItem(m_viewPager, TAB_STATUS);
+            }
+
 
             m_infoFrag.recordStopAndEraseLocationList();
         }
     }
 
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_ENABLE_BT:
+                // Allow Bluetooth
+
+                if (resultCode == Activity.RESULT_OK) {
+                    connectDevice();
+                } else {
+                    Toast.makeText(this, "You can't use interaction helper device", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -443,10 +440,16 @@ public class ScrollingActivity extends AppCompatActivity {
                     return;
                 }
 
-                m_infoFrag = (InfoFragment)m_viewPager
-                        .getAdapter()
-                        .instantiateItem(m_viewPager, m_viewPager.getCurrentItem());
-                m_infoFrag.requsetLocation();
+                if( m_viewPager.getCurrentItem() == TAB_STATUS ) {
+                    if( m_infoFrag == null ) {
+                        m_infoFrag = (InfoFragment)m_viewPager
+                                .getAdapter()
+                                .instantiateItem(m_viewPager, m_viewPager.getCurrentItem());
+                    }
+
+                    m_infoFrag.requsetLocation();
+                }
+
 
             } else {
                 for (String permissino : permissinos) {
@@ -471,5 +474,72 @@ public class ScrollingActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        m_sensorManager.registerListener(this, m_sensorAccel, SensorManager.SENSOR_DELAY_NORMAL);
+        m_sensorManager.registerListener(this, m_sensorMag, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        m_sensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+
+        final long curMillis = System.currentTimeMillis();
+        if ( System.currentTimeMillis() - GyroManagerUtil.getTimerStartTime() > 3000 ) {
+            GyroManagerUtil.setTimerStartTime(curMillis);
+        }
+
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            m_fAccel = sensorEvent.values.clone();
+        }
+        else if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            m_fMag = sensorEvent.values.clone();
+        }
+
+        float[] resultValues = GyroManagerUtil.getOrientation(m_fAccel, m_fMag);
+
+        //5
+
+        m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+                "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                        .getItemId(TAB_STATUS));
+
+        if(m_infoFrag != null) { m_infoFrag.setTextTiltXYZ(resultValues); }
+    }
+
+    /**
+
+     *  Get orientation
+
+     *
+
+     * @param gravity
+
+     * @param geomagnetic
+
+     * @return orientation
+
+     *   values[0] : azimuth (axis : Z)
+
+     *   values[1] : pitch (axis : X)
+
+     *   values[2] : roll (axis : Y)
+
+     */
+
+    /** */
+
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
     }
 }

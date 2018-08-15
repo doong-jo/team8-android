@@ -5,6 +5,7 @@
     <string name="title_activity_maps">Map</string>
 
     <!--Info Fragment-->
+    <string name="cardTitleTilt">Angle</string>
     <string name="cardTitleBattery">Battery</string>
     <string name="cardTitleBrightnessAndSpeed">Brightness &amp; Speed</string>
     <string name="cardTitleLED">LED</string>

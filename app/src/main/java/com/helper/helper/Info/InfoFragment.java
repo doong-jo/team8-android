@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -41,6 +42,8 @@ import com.hawk.battery.widget.BatteryView;
 import com.helper.helper.R;
 import com.helper.helper.ScrollingActivity;
 import com.helper.helper.util.PermissionUtil;
+
+import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -68,6 +71,10 @@ public class InfoFragment extends Fragment
 
     private double m_fCurDistance = 0.0;
     private List<LatLng> m_lCurRecordedLocation;
+
+    private TextView m_textViewTiltX;
+    private TextView m_textViewTiltY;
+    private TextView m_textViewTiltZ;
 
     public double getCurTrackingDistance() {
         return m_fCurDistance;
@@ -184,12 +191,19 @@ public class InfoFragment extends Fragment
         m_batView = (BatteryView) view.findViewById(R.id.batView);
         m_batView.setPower(78);
 
-        m_mapView = (MapView) view.findViewById(R.id.map);
-        m_mapView.onCreate(savedInstanceState);
-        m_mapView.onResume();
-        m_mapView.getMapAsync(this);
+        if( m_mapView == null ) {
+            m_mapView = (MapView) view.findViewById(R.id.map);
+            m_mapView.onCreate(savedInstanceState);
+            m_mapView.onResume();
+            m_mapView.getMapAsync(this);
+        }
+
 
         adjustMapVerticalTouch(view);
+
+        m_textViewTiltX = (TextView) view.findViewById(R.id.TiltX);
+        m_textViewTiltY = (TextView) view.findViewById(R.id.TiltY);
+        m_textViewTiltZ = (TextView) view.findViewById(R.id.TiltZ);
         return view;
     }
 
@@ -239,27 +253,23 @@ public class InfoFragment extends Fragment
 
     @SuppressLint("MissingPermission")
     public void requsetLocation() {
-        if (m_googleApiClient == null) {
-            buildGoogleApiClient();
-
-            if( !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) &&
-                    !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) ) {
-                return;
-            }
-
-            LocationServices.getFusedLocationProviderClient(getActivity()).getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        m_curLocation = location;
-
-                        setCurrentLocation(m_curLocation, "GPS Position", "GPS Position");
-                    }
-                }
-            });
-
-            LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(m_locationReq, mLocationCallback, Looper.myLooper());
+        if( !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) &&
+                !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) ) {
+            return;
         }
+
+        LocationServices.getFusedLocationProviderClient(getActivity()).getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    m_curLocation = location;
+
+                    setCurrentLocation(m_curLocation, "GPS Position", "GPS Position");
+                }
+            }
+        });
+
+        LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(m_locationReq, mLocationCallback, Looper.myLooper());
     }
 
     @SuppressLint("MissingPermission")
@@ -290,6 +300,9 @@ public class InfoFragment extends Fragment
                 /* Result about user selection -> onActivityResult in ScrollActivity */
                 PermissionUtil.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, GPS_ENABLE_REQUEST_CODE);
             } else {
+                if ( m_googleApiClient == null) {
+                    buildGoogleApiClient();
+                }
                 requsetLocation();
             }
         } else {
@@ -382,6 +395,8 @@ public class InfoFragment extends Fragment
     public void onPause() {
         super.onPause();
         m_mapView.onPause();
+        m_googleApiClient.stopAutoManage(getActivity());
+        m_googleApiClient.disconnect();
     }
 
     @Override
@@ -394,5 +409,16 @@ public class InfoFragment extends Fragment
     public void onDestroy() {
         super.onDestroy();
         m_mapView.onLowMemory();
+    }
+
+    public void setTextTiltXYZ(float[] values) {
+
+        if( m_textViewTiltX == null || m_textViewTiltY == null || m_textViewTiltZ == null ) {
+            return;
+        }
+
+        m_textViewTiltX.setText("방위 : " + String.format("%f", values[0]));
+        m_textViewTiltY.setText("경사도 : " +String.format("%f", values[1]));
+        m_textViewTiltZ.setText("좌우 회전 : " + String.format("%f", values[2]));
     }
 }

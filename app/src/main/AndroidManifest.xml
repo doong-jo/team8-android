@@ -10,6 +10,8 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <!--디바이스 검색 시작, Bluetooth 설정을 조작하기 위해 필요한 권한-->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-feature android:name="android.hardware.accelerometer"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
