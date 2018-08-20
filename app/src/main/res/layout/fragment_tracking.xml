@@ -21,10 +21,12 @@
             android:textStyle="bold"
             android:text="@string/no_recorded_tracking_list"/>
 
+        <!--List View-->
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/scrollViewTrackingList"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+            <!--List items-->
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recordedRecyclerView"
                 android:layout_width="match_parent"

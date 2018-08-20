@@ -1,11 +1,35 @@
 package com.helper.helper.util;
 
+import android.hardware.Sensor;
 import android.hardware.SensorManager;
 
 public class GyroManagerUtil {
-    private static float m_fTimerStartTime = 0;
+    public static SensorManager m_sensorManager = null;
+    public static Sensor m_sensorAccel = null;
+    public static Sensor m_sensorMag = null;
 
-    public static float getTimerStartTime() {
+    public static float m_fPivotAzimuth = 0.0f;
+    public static float m_fPivotPitch = 0.0f;
+    private static long m_fTimerStartTime = 0;
+
+
+    public static float getPivotAzimuth() {
+        return m_fPivotAzimuth;
+    }
+
+    public static void setPivotAzimuth(float pivotazimuth) {
+        GyroManagerUtil.m_fPivotAzimuth = pivotazimuth;
+    }
+
+    public static float getPivotPitch() {
+        return m_fPivotPitch;
+    }
+
+    public static void setPivotPitch(float pivotPitch) {
+        GyroManagerUtil.m_fPivotPitch = pivotPitch;
+    }
+
+    public static long getTimerStartTime() {
         return m_fTimerStartTime;
     }
 
@@ -33,8 +57,8 @@ public class GyroManagerUtil {
         // Radian 값을 Degree 값으로 변환한다.
         result[0] = (float)Math.toDegrees(result[0]);
 
-        // 0 이하의 값인 경우 360을 더한다.
-        if(result[0] < 0) result[0] += 360;
+        // 0 이하의 값인 경우 360을 더한다.*
+//        if(result[0] < 0) result[0] += 360;
 
         //방위(azimuth) 값
         result[0] = result[0];
