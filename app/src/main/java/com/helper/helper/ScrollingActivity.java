@@ -266,8 +266,10 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                 Toast.makeText(getApplicationContext(), "Already enable bluetooth", Toast.LENGTH_SHORT).show();
                 try {
                     connectDevice();
+                    updateConnectionLayout(true);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    updateConnectionLayout(false);
                 }
             }
             /* Connect Bluetooth Device End */
@@ -291,8 +293,10 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         } else {
             try {
                 connectDevice();
+                updateConnectionLayout(true);
             } catch (IOException e) {
                 e.printStackTrace();
+                updateConnectionLayout(false);
             }
         }
     }
@@ -341,7 +345,6 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
             if (devices.get(i).getName().equals(deviceSSID)
 //                    &&  m_bluetoothLeService.connect(devices.get(i).getAddress()
             ) {
-                updateConnectionLayout(true);
                 m_pairedDevice = devices.get(i);
                 m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BT_UUID));
                 m_bluetoothInput = m_bluetoothSocket.getInputStream();
@@ -382,8 +385,6 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                                 ) {
                             m_pairedDevice = searchedDevice;
                             try {
-
-                                updateConnectionLayout(true);
                                 m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BT_UUID));
                                 m_bluetoothInput = m_bluetoothSocket.getInputStream();
                                 m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
@@ -416,27 +417,36 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         switch (v.getResources().getResourceName(v.getId())) {
             case "com.helper.helper:id/img1":
-                str = "LED1";
+                str = "LED_CHARACTERS";
                 break;
 
             case "com.helper.helper:id/img2":
-                str = "LED2";
+                str = "LED_WINDY";
                 break;
 
             case "com.helper.helper:id/img3":
-                str = "LED3";
+                str = "LED_SNOW";
                 break;
 
             case "com.helper.helper:id/img4":
-                str = "LED4";
+                str = "LED_RAIN";
                 break;
 
-            case "com.helper.helper:id/battery":
-                str = "LED5";
+            case "com.helper.helper:id/img5":
+                str = "LED_CUTE";
                 break;
 
-            default:
-                str = "1";
+            case "com.helper.helper:id/img6":
+                str = "LED_LEFT";
+                break;
+
+            case "com.helper.helper:id/img7":
+                str = "LED_RIGHT";
+                break;
+
+            case "com.helper.helper:id/img8":
+                str = "LED_EMERGENCY";
+                break;
         }
 
         final byte[] tx = str.getBytes();

@@ -3,6 +3,7 @@ package com.helper.helper.Info;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
@@ -79,6 +81,7 @@ public class InfoFragment extends Fragment
     public double getCurTrackingDistance() {
         return m_fCurDistance;
     }
+
     public List<LatLng> getCurrRecordedLocationList() {
         return m_lCurRecordedLocation;
     }
@@ -89,6 +92,7 @@ public class InfoFragment extends Fragment
 
     @SuppressWarnings("MissingPermission")
     private LocationCallback mLocationCallback;
+
     {
         mLocationCallback = new LocationCallback() {
             @Override
@@ -191,7 +195,7 @@ public class InfoFragment extends Fragment
         m_batView = (BatteryView) view.findViewById(R.id.batView);
         m_batView.setPower(78);
 
-        if( m_mapView == null ) {
+        if (m_mapView == null) {
             m_mapView = (MapView) view.findViewById(R.id.map);
             m_mapView.onCreate(savedInstanceState);
             m_mapView.onResume();
@@ -204,6 +208,27 @@ public class InfoFragment extends Fragment
         m_textViewTiltX = (TextView) view.findViewById(R.id.TiltX);
         m_textViewTiltY = (TextView) view.findViewById(R.id.TiltY);
         m_textViewTiltZ = (TextView) view.findViewById(R.id.TiltZ);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            if ( !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ||
+                    !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
+
+                /* Result about user selection -> onActivityResult in ScrollActivity */
+                PermissionUtil.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, GPS_ENABLE_REQUEST_CODE);
+            } else {
+                if ( m_googleApiClient == null) {
+                    buildGoogleApiClient();
+                }
+                requsetLocation();
+            }
+        } else {
+
+            if ( m_googleApiClient == null) {
+                buildGoogleApiClient();
+            }
+        }
+
         return view;
     }
 
@@ -253,8 +278,8 @@ public class InfoFragment extends Fragment
 
     @SuppressLint("MissingPermission")
     public void requsetLocation() {
-        if( !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) &&
-                !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) ) {
+        if (!PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) &&
+                !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
             return;
         }
 
@@ -272,7 +297,6 @@ public class InfoFragment extends Fragment
         LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(m_locationReq, mLocationCallback, Looper.myLooper());
     }
 
-    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         m_googleMap = googleMap;
@@ -281,6 +305,16 @@ public class InfoFragment extends Fragment
 
         m_googleMap.getUiSettings().setCompassEnabled(true);
         m_googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         m_googleMap.setMyLocationEnabled(true);
 
         m_googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
@@ -290,28 +324,6 @@ public class InfoFragment extends Fragment
         } else {
             m_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(m_curLocation.getLatitude(), m_curLocation.getLongitude()), 15));
             setCurrentLocation(m_curLocation, "Current Position", "GPS Position");
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-            if ( !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ||
-                    !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
-
-                /* Result about user selection -> onActivityResult in ScrollActivity */
-                PermissionUtil.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, GPS_ENABLE_REQUEST_CODE);
-            } else {
-                if ( m_googleApiClient == null) {
-                    buildGoogleApiClient();
-                }
-                requsetLocation();
-            }
-        } else {
-
-            if ( m_googleApiClient == null) {
-                buildGoogleApiClient();
-            }
-
-            googleMap.setMyLocationEnabled(true);
         }
     }
 
@@ -395,8 +407,11 @@ public class InfoFragment extends Fragment
     public void onPause() {
         super.onPause();
         m_mapView.onPause();
-        m_googleApiClient.stopAutoManage(getActivity());
-        m_googleApiClient.disconnect();
+        if( m_googleApiClient != null ) {
+            m_googleApiClient.stopAutoManage(getActivity());
+            m_googleApiClient.disconnect();
+        }
+
     }
 
     @Override
