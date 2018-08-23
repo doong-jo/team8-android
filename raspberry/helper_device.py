@@ -12,9 +12,9 @@ import unicornhathd
 
 WIDTH, HEIGHT   = unicornhathd.get_shape()
 
-TYPE_SPRITE     = 1
-TYPE_BLINK      = 2
-TYPE_EFFECT     = 3
+TYPE_SPRITE     = 0
+TYPE_BLINK      = 1
+TYPE_EFFECT     = 2
 
 SIZE_READ_BYTE  = 6
 
@@ -35,8 +35,6 @@ g_Images = {
     7: Image.open('movingArrowRight.png'),
     8: Image.open('emergency_modified_long.png'),
 }
-
-
 
 def blinkLED():
     unicornhathd.show()
@@ -65,7 +63,7 @@ def showLED(imagename, speed, targetImage, type):
             if valid:
                 if eq(type, TYPE_SPRITE):
                     unicornhathd.show()
-                    time.sleep(speed)
+                    time.sleep(DEFAULT_SPEED)
                 elif eq(type, TYPE_BLINK):
                     blinkLED()
 
@@ -83,9 +81,11 @@ def controlLED():
             if not eq(imagename, "noname"):
                 print("current imagename : %d", imagename)
                 print("current speed : %f", speed)
+                print("current type : %d", type)
 
                 try:
-                    targetImage = g_Images[1]
+                    print("try show!")
+                    targetImage = g_Images[imagename]
                     showLED(imagename, speed, targetImage, type)
                 except KeyError:
                     g_curImgName = "noname"
@@ -99,7 +99,7 @@ def controlLED():
             unicornhathd.off()
             print("receiveMsg KeyboardInterrupt")
             break
-        time.sleep(1)
+        time.sleep(0.5)
 
 def receiveMsg():
     uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
@@ -126,10 +126,10 @@ def receiveMsg():
             data = client_sock.recv(SIZE_READ_BYTE)
             print("data : %s", data);
 
-            if eq(data, "LED_RIGHT"):
+            if eq(data, "LED_RI"):
                 continue
 
-            if eq(data, "LED_LEFT"):
+            if eq(data, "LED_LE"):
                 continue
 
             splitData = data.split('-')
@@ -192,7 +192,7 @@ def receiveMsg():
             print("receiveMsg KeyboardInterrupt")
             break
 
-        time.sleep(1)
+        time.sleep(0.5)
 
 def main():
     try:
@@ -203,6 +203,7 @@ def main():
         t2 = threading.Thread(target=controlLED, args=())
         t2.daemon = True
         t2.start()
+
     except KeyboardInterrupt:
         print("disconnected")
         unicornhathd.off()

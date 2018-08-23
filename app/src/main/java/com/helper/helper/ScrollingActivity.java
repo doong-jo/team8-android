@@ -52,6 +52,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -82,6 +83,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private ViewPager m_viewPager;
     private InfoFragment m_infoFrag;
 
+
     private boolean m_IsSupportedBT = false;
     private BluetoothAdapter m_bluetoothAdapter;
     private BluetoothLeService m_bluetoothLeService;
@@ -95,6 +97,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private OutputStream m_bluetoothOutput;
 
     private int m_rotationState;
+    private byte[] m_curSignalStr;
 
     @SuppressLint("HandlerLeak")
     private final Handler m_handle = new Handler() {
@@ -421,36 +424,39 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
 //        write(str.getBytes());
 
-        switch (v.getResources().getResourceName(v.getId())) {
-            case "com.helper.helper:id/img1":
+        String resName = v.getResources().getResourceName(v.getId());
+        String imgName = resName.split(String.format("%s", '/'))[1];
+
+        switch (imgName) {
+            case "img1":
                 str = "0-01-0";
                 break;
 
-            case "com.helper.helper:id/img2":
+            case "img2":
                 str = "0-02-0";
                 break;
 
-            case "com.helper.helper:id/img3":
+            case "img3":
                 str = "0-03-0";
                 break;
 
-            case "com.helper.helper:id/img4":
+            case "img4":
                 str = "0-04-0";
                 break;
 
-            case "com.helper.helper:id/img5":
+            case "img5":
                 str = "0-05-0";
                 break;
 
-            case "com.helper.helper:id/img6":
+            case "img6":
                 str = "0-06-0";
                 break;
 
-            case "com.helper.helper:id/img7":
+            case "img7":
                 str = "0-07-0";
                 break;
 
-            case "com.helper.helper:id/img8":
+            case "img8":
                 str = "0-08-1";
                 break;
         }
@@ -514,7 +520,6 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
             m_infoFrag.recordStopAndEraseLocationList();
         }
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -626,7 +631,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 //            Log.d(TAG, "onSensorChanged: 3000 millis after!");
             GyroManagerUtil.setPivotAzimuth(resultValues[0]);
             m_rotationState = ORIENTATION_NONE;
-            Toast.makeText(this, "Change pivot!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "Change pivot!", Toast.LENGTH_SHORT).show();
         }
 
 
@@ -659,7 +664,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                                 return;
                             }
                             m_rotationState = ORIENTATION_RIGHT;
-                            write(rotationRightStr.getBytes());
+//                            write(rotationRightStr.getBytes());
 
                             Log.d(TAG, "onSensorChanged: 부호가 다르고 현재값 양수 Right!");
 //                            Toast.makeText(this, "onSensorChanged : 부호가 다르고 현재값 양수 Right!", Toast.LENGTH_SHORT).show();
@@ -678,7 +683,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                                 return;
                             }
                             m_rotationState = ORIENTATION_LEFT;
-                            write(rotationLeftStr.getBytes());
+//                            write(rotationLeftStr.getBytes());
                             Log.d(TAG, "onSensorChanged: 부호가 다르고 현재값 음수 Left!");
 //                            Toast.makeText(this, "onSensorChanged : 부호가 다르고 현재값 음수 Left!", Toast.LENGTH_SHORT).show();
 //                            GyroManagerUtil.setPivotAzimuth(resultValues[0]);
@@ -699,7 +704,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                             Log.d(TAG, "onSensorChanged: 부호가 같고 현재값 양수 Right!");
 //                            Toast.makeText(this, "onSensorChanged : 부호가 같고 양수 Left!", Toast.LENGTH_SHORT).show();
                             GyroManagerUtil.setPivotAzimuth(resultValues[0]);
-                            write(rotationRightStr.getBytes());
+//                            write(rotationRightStr.getBytes());
                         }
                         else if( GyroManagerUtil.getPivotAzimuth() - resultValues[0] >= AZIMUTH_PIVOT ) {
                             //좌회전 상태
@@ -711,7 +716,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 //                            Toast.makeText(this, "onSensorChanged : 부호가 같고 양수 Right!", Toast.LENGTH_SHORT).show();
                             GyroManagerUtil.setPivotAzimuth(resultValues[0]);
 
-                            write(rotationLeftStr.getBytes());
+//                            write(rotationLeftStr.getBytes());
                         }
                     }
                     //음수일 때
@@ -726,7 +731,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 //                            Toast.makeText(this, "onSensorChanged : 부호가 같고 음수 Left!", Toast.LENGTH_SHORT).show();
                             GyroManagerUtil.setPivotAzimuth(resultValues[0]);
 
-                            write(rotationLeftStr.getBytes());
+//                            write(rotationLeftStr.getBytes());
                         }
                         else if( GyroManagerUtil.getPivotAzimuth() - resultValues[0] >= AZIMUTH_PIVOT ) {
                             //우회전 상태
@@ -736,7 +741,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                             m_rotationState = ORIENTATION_RIGHT;
                             Log.d(TAG, "onSensorChanged: 부호가 같고 음수 Right!");
 
-                            write(rotationRightStr.getBytes());
+//                            write(rotationRightStr.getBytes());
 //                            Toast.makeText(this, "onSensorChanged : 부호가 같고 음수 Right!", Toast.LENGTH_SHORT).show();
 //                            GyroManagerUtil.setPivotAzimuth(resultValues[0]);
                         }
@@ -798,8 +803,13 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     }
 
     public void write(byte[] bytes) {
+        if(Arrays.equals(m_curSignalStr, bytes)) {
+            return;
+        }
+
         try {
             m_bluetoothOutput.write(bytes);
+            m_curSignalStr = bytes.clone();
         } catch (IOException e) { }
     }
 

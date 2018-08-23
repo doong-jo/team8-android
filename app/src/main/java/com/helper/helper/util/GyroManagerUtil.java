@@ -54,6 +54,8 @@ public class GyroManagerUtil {
         // 회전 매트릭스로 방향 데이터를 얻는다.
         SensorManager.getOrientation(rotation, result);
 
+
+
         // Radian 값을 Degree 값으로 변환한다.
         result[0] = (float)Math.toDegrees(result[0]);
 

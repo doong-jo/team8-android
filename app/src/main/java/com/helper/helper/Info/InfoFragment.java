@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -59,8 +60,9 @@ public class InfoFragment extends Fragment
     private final static String TAG = InfoFragment.class.getSimpleName() + "/DEV";
     private static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
     private static final int GPS_ENABLE_REQUEST_CODE = 2002;
-    private static final int UPDATE_INTERVAL_MS = 15000;
-    private static final int FASTEST_UPDATE_INTERVAL_MS = 15000;
+    private static final int UPDATE_INTERVAL_MS = 1500;
+    private static final int FASTEST_UPDATE_INTERVAL_MS = 1000;
+    private static final float EMENRGENCY_SPPED_PIVOT = 0.5f;
 
     private BatteryView m_batView;
     private MapView m_mapView;
@@ -70,6 +72,7 @@ public class InfoFragment extends Fragment
     private Location m_curLocation;
     private Marker m_curLocationMarker;
     private static LatLng m_beforeLatlng = null;
+    private float m_curSpeed;
 
     private double m_fCurDistance = 0.0;
     private List<LatLng> m_lCurRecordedLocation;
@@ -77,6 +80,9 @@ public class InfoFragment extends Fragment
     private TextView m_textViewTiltX;
     private TextView m_textViewTiltY;
     private TextView m_textViewTiltZ;
+
+    private TextView m_textBeforeSpeed;
+    private TextView m_textCurSpeed;
 
     public double getCurTrackingDistance() {
         return m_fCurDistance;
@@ -103,6 +109,27 @@ public class InfoFragment extends Fragment
                     //The last location in the list is the newest
                     Location location = locationList.get(locationList.size() - 1);
                     m_curLocation = location;
+
+                    String writeStr;
+
+                    m_textCurSpeed.setText("현재 속도 : " + String.format("%f", location.getSpeed()));
+                    m_textBeforeSpeed.setText("이전 속도 : " + String.format("%f", m_curSpeed));
+
+                    if( location.getSpeed() < m_curSpeed ) {
+                        writeStr = "0-08-1";
+                        ((ScrollingActivity)getActivity()).write(writeStr.getBytes());
+                        Toast.makeText(getContext(), "EMENRGENCY_SPPED : " + location.getSpeed(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    if ( location.getSpeed() > m_curSpeed ) {
+                        writeStr = "0-01-0";
+                        ((ScrollingActivity)getActivity()).write(writeStr.getBytes());
+                    }
+
+                    Toast.makeText(getContext(), "C: " + location.getSpeed() + " / B: " + m_curSpeed, Toast.LENGTH_SHORT).show();
+
+                    m_curSpeed = location.getSpeed();
+//                    Toast.makeText(getContext(), "onLocationResult : "+ location.getSpeed(), Toast.LENGTH_SHORT).show();
 
                     if (m_curLocationMarker != null) {
                         m_curLocationMarker.remove();
@@ -208,6 +235,9 @@ public class InfoFragment extends Fragment
         m_textViewTiltX = (TextView) view.findViewById(R.id.TiltX);
         m_textViewTiltY = (TextView) view.findViewById(R.id.TiltY);
         m_textViewTiltZ = (TextView) view.findViewById(R.id.TiltZ);
+
+        m_textCurSpeed = (TextView) view.findViewById(R.id.curSpeed);
+        m_textBeforeSpeed = (TextView) view.findViewById(R.id.beforeSpeed);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -352,6 +382,7 @@ public class InfoFragment extends Fragment
     @Override
     public void onLocationChanged(Location location) {
         m_curLocation = location;
+        Toast.makeText(getContext(), "LocationChaged : " + location.getSpeed(), Toast.LENGTH_SHORT).show();
         setCurrentLocation(m_curLocation, "내 위치", "GPS Position");
     }
 

@@ -27,13 +27,23 @@
                     android:layout_height="wrap_content"
                     android:padding="10dp"
                     android:textStyle="bold"
-                    android:text="@string/cardTitleTilt" />
+                    android:text="@string/cardTitleSensor" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_margin="20dp">
+                    <TextView
+                        android:id="@+id/curSpeed"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="curSpeed"/>
+                    <TextView
+                        android:id="@+id/beforeSpeed"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="beforeSpeed"/>
                     <TextView
                         android:id="@+id/TiltX"
                         android:layout_width="match_parent"
