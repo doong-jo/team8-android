@@ -62,7 +62,7 @@ public class InfoFragment extends Fragment
     private static final int GPS_ENABLE_REQUEST_CODE = 2002;
     private static final int UPDATE_INTERVAL_MS = 1500;
     private static final int FASTEST_UPDATE_INTERVAL_MS = 1000;
-    private static final float EMENRGENCY_SPPED_PIVOT = 0.5f;
+    private static final float EMENRGENCY_SPPED_PIVOT = 0.8f;
 
     private BatteryView m_batView;
     private MapView m_mapView;
@@ -110,23 +110,30 @@ public class InfoFragment extends Fragment
                     Location location = locationList.get(locationList.size() - 1);
                     m_curLocation = location;
 
-                    String writeStr;
+                    String writeStr = "";
 
                     m_textCurSpeed.setText("현재 속도 : " + String.format("%f", location.getSpeed()));
                     m_textBeforeSpeed.setText("이전 속도 : " + String.format("%f", m_curSpeed));
 
+//                    if( location.getSpeed() >= 1 && location.getSpeed() * EMENRGENCY_SPPED_PIVOT < m_curSpeed ) {
                     if( location.getSpeed() < m_curSpeed ) {
                         writeStr = "0-08-1";
-                        ((ScrollingActivity)getActivity()).write(writeStr.getBytes());
                         Toast.makeText(getContext(), "EMENRGENCY_SPPED : " + location.getSpeed(), Toast.LENGTH_SHORT).show();
                     }
 
-                    if ( location.getSpeed() > m_curSpeed ) {
+                    if ( location.getSpeed() >= m_curSpeed ) {
                         writeStr = "0-01-0";
-                        ((ScrollingActivity)getActivity()).write(writeStr.getBytes());
                     }
 
-                    Toast.makeText(getContext(), "C: " + location.getSpeed() + " / B: " + m_curSpeed, Toast.LENGTH_SHORT).show();
+                    try{
+                        ((ScrollingActivity)getActivity()).sendToBluetoothDevice(writeStr.getBytes());
+                    }
+                    catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
+
+
+//                    Toast.makeText(getContext(), "C: " + location.getSpeed() + " / B: " + m_curSpeed, Toast.LENGTH_SHORT).show();
 
                     m_curSpeed = location.getSpeed();
 //                    Toast.makeText(getContext(), "onLocationResult : "+ location.getSpeed(), Toast.LENGTH_SHORT).show();
@@ -138,19 +145,25 @@ public class InfoFragment extends Fragment
                     setCurrentLocation(location, "Current Position", "GPS Position");
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-                    if (((ScrollingActivity) getActivity()).getIsRecorded()) {
-                        m_lCurRecordedLocation.add(new LatLng(m_curLocation.getLatitude(), m_curLocation.getLongitude()));
+                    try{
+                        if (((ScrollingActivity) getActivity()).getIsRecorded()) {
+                            m_lCurRecordedLocation.add(new LatLng(m_curLocation.getLatitude(), m_curLocation.getLongitude()));
 
-                        if (m_beforeLatlng != null) {
-                            m_googleMap.addPolyline((new PolylineOptions())
-                                    .add(m_beforeLatlng, latLng)
-                                    .width(R.dimen.google_polyline_width).color(Color.BLUE)
-                                    .geodesic(true));
+                            if (m_beforeLatlng != null) {
+                                m_googleMap.addPolyline((new PolylineOptions())
+                                        .add(m_beforeLatlng, latLng)
+                                        .width(R.dimen.google_polyline_width).color(Color.BLUE)
+                                        .geodesic(true));
 
-                            m_fCurDistance += CalculationByDistance(m_beforeLatlng, latLng);
+                                m_fCurDistance += CalculationByDistance(m_beforeLatlng, latLng);
+                            }
                         }
+                        m_beforeLatlng = latLng;
                     }
-                    m_beforeLatlng = latLng;
+                    catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             }
         };

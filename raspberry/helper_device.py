@@ -19,10 +19,10 @@ TYPE_EFFECT     = 2
 SIZE_READ_BYTE  = 6
 
 DEFAULT_SPEED   = 0.5
-DEFAULT_BRIGHT  = 1.0
+DEFAULT_BRIGHT  = 0.1
 DEFAULT_ROTATION = 90
 
-g_curImgName      = "noname"
+g_curImgName      = "0-01-0"
 g_curSpeed        = DEFAULT_SPEED
 g_curType         = TYPE_SPRITE
 
@@ -99,100 +99,96 @@ def controlLED():
             unicornhathd.off()
             print("receiveMsg KeyboardInterrupt")
             break
-        time.sleep(0.5)
 
 def receiveMsg():
-    uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
-
-    server_sock=BluetoothSocket( RFCOMM )
-    server_sock.bind(('',PORT_ANY))
-    server_sock.listen(1)
-
-    port = server_sock.getsockname()[1]
-
-    advertise_service( server_sock, "BtLED",
-            service_id = uuid,
-            service_classes = [ uuid, SERIAL_PORT_CLASS ],
-            profiles = [ SERIAL_PORT_PROFILE ] )
-    
-    print("Waiting for connection : channel %d" % port)
-    client_sock, client_info = server_sock.accept()
-    print('accepted')
-
     while True:
-        print("Accepted connection from ", client_info)
-        try:
-            print("Processing running")
-            data = client_sock.recv(SIZE_READ_BYTE)
-            print("data : %s", data);
+        uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
 
-            if eq(data, "LED_RI"):
-                continue
+        server_sock=BluetoothSocket( RFCOMM )
+        server_sock.bind(('',PORT_ANY))
+        server_sock.listen(1)
 
-            if eq(data, "LED_LE"):
-                continue
+        port = server_sock.getsockname()[1]
 
-            splitData = data.split('-')
+        advertise_service( server_sock, "BtLED",
+                service_id = uuid,
+                service_classes = [ uuid, SERIAL_PORT_CLASS ],
+                profiles = [ SERIAL_PORT_PROFILE ] )
 
+        print("Waiting for connection : channel %d" % port)
+        client_sock, client_info = server_sock.accept()
+        print('accepted')
 
+        while True:
+            print("Accepted connection from ", client_info)
             try:
-                signalData = int(splitData[0])
-                valueData = int(splitData[1])
-                optionalData = int(splitData[2])
-            except KeyError:
-                pass
+                print("Processing running")
+                data = client_sock.recv(SIZE_READ_BYTE)
+                print("data : %s", data);
 
-            # DEFINE SIGNAL_INDEX
-            # LED           0
-            # SPEED         1
-            # BRIGHTNESS    2
+                splitData = data.split('-')
 
-            # - : splite word
-            # # : END
+                try:
+                    signalData = int(splitData[0])
+                    valueData = int(splitData[1])
+                    optionalData = int(splitData[2])
+                except KeyError:
+                    pass
 
-            # LED
-            # SIGNAL_INDEX-LED_INDEX-TYPE(SPRITE, BLINK, EFFECT)#
-            # LED example : 0-01-0# (LED-01st-LED-SPRITE => LED 1 sprite)
+                # DEFINE SIGNAL_INDEX
+                # LED           0
+                # SPEED         1
+                # BRIGHTNESS    2
+                # CLOSE         -1
 
-            # SPEED
-            # SIGNAL_INDEX-SPEED#
-            # SPEED example : 1-05-0# (0~10) (SPEED-5 => frame speed = interval 0.5 sec)
+                # - : splite word
+                # # : END
+                # ## : PAUSE
 
-            # BRIGHTNESS
-            # SIGNAL_INDEX-BRIGHTNESS#
-            # BRIGHTNESS example : 2-05-0# (0~10) (BRIGHTNESS-5 => brightness level 5)
+                # LED
+                # SIGNAL_INDEX-LED_INDEX-TYPE(SPRITE, BLINK, EFFECT)#
+                # LED example : 0-01-0# (LED-01st-LED-SPRITE => LED 1 sprite)
 
-            global g_curImgName
-            global g_curSpeed
-            global g_curType
+                # SPEED
+                # SIGNAL_INDEX-SPEED#
+                # SPEED example : 1-05-0# (0~10) (SPEED-5 => frame speed = interval 0.5 sec)
 
-            if signalData == 0:
-                g_curImgName = valueData
-                print("g_curImgName ", g_curImgName)
-                # TypeData
-                g_curType = optionalData
+                # BRIGHTNESS
+                # SIGNAL_INDEX-BRIGHTNESS#
+                # BRIGHTNESS example : 2-05-0# (0~10) (BRIGHTNESS-5 => brightness level 5)
 
-            elif signalData == 1:
-                g_curSpeed = valueData * 0.1
+                global g_curImgName
+                global g_curSpeed
+                global g_curType
 
-            elif signalData == 2:
-                unicornhathd.brightness(valueData * 0.1)
+                if signalData == 0:
+                    g_curImgName = valueData
+                    print("g_curImgName ", g_curImgName)
+                    # TypeData
+                    g_curType = optionalData
 
-        except IOError:
-            print("disconnected")
-            client_sock.close()
-            server_sock.close()
-            unicornhathd.off()
-            print("all done (disconnected)")
-            break
+                elif signalData == 1:
+                    g_curSpeed = valueData * 0.1
 
-        except KeyboardInterrupt:
-            print("disconnected")
-            unicornhathd.off()
-            print("receiveMsg KeyboardInterrupt")
-            break
+                elif signalData == 2:
+                    unicornhathd.brightness(valueData * 0.1)
 
-        time.sleep(0.5)
+            except IOError:
+                print("disconnected")
+                client_sock.close()
+                server_sock.close()
+                unicornhathd.off()
+                print("all done (disconnected)")
+                break
+
+            except KeyboardInterrupt:
+                print("disconnected")
+                unicornhathd.off()
+                print("receiveMsg KeyboardInterrupt")
+                break
+
+            time.sleep(0.1)
+
 
 def main():
     try:

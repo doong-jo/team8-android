@@ -10,15 +10,25 @@ public class GyroManagerUtil {
 
     public static float m_fPivotAzimuth = 0.0f;
     public static float m_fPivotPitch = 0.0f;
+    public static float m_fPivotRoll = 0.0f;
+
     private static long m_fTimerStartTime = 0;
 
+
+    public static float getPivotRoll() {
+        return m_fPivotRoll;
+    }
+
+    public static void setPivotRoll(float pivotRoll) {
+        GyroManagerUtil.m_fPivotRoll = pivotRoll;
+    }
 
     public static float getPivotAzimuth() {
         return m_fPivotAzimuth;
     }
 
-    public static void setPivotAzimuth(float pivotazimuth) {
-        GyroManagerUtil.m_fPivotAzimuth = pivotazimuth;
+    public static void setPivotAzimuth(float pivotAzimuth) {
+        GyroManagerUtil.m_fPivotAzimuth = pivotAzimuth;
     }
 
     public static float getPivotPitch() {

@@ -11,7 +11,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:orientation="vertical">
 
-        <!--기울기 테스트 UI 시작-->
+        <!--테스트 UI 시작-->
         <android.support.v7.widget.CardView
             android:id="@+id/deviceTilt"
             android:layout_width="match_parent"
@@ -38,12 +38,12 @@
                         android:id="@+id/curSpeed"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="curSpeed"/>
+                        android:text="현재 속도 :"/>
                     <TextView
                         android:id="@+id/beforeSpeed"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="beforeSpeed"/>
+                        android:text="이전 속도 :"/>
                     <TextView
                         android:id="@+id/TiltX"
                         android:layout_width="match_parent"
@@ -64,7 +64,7 @@
 
             </LinearLayout>
         </android.support.v7.widget.CardView>
-        <!--기울기 테스트 UI 끝-->
+        <!--테스트 UI 끝-->
 
         <!--배터리 상태 시작-->
         <android.support.v7.widget.CardView
