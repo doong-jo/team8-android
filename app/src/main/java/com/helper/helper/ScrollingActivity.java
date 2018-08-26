@@ -72,15 +72,16 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     public static final int MESSAGE_READ = 3;
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
+
     private static final int ORIENTATION_LEFT = 944;
     private static final int ORIENTATION_RIGHT = 344;
     private static final int ORIENTATION_NONE = 892;
+    private static final int EMERGENCY = 121;
 
     private TabLayout m_tabLayout;
     private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
     private InfoFragment m_infoFrag;
-
 
     private boolean m_IsSupportedBT = false;
     private BluetoothAdapter m_bluetoothAdapter;
@@ -94,6 +95,8 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private OutputStream m_bluetoothOutput;
 
     private byte[] m_curSignalStr;
+
+    private int m_curInterrupt;
 
     @SuppressLint("HandlerLeak")
     private final Handler m_handle = new Handler() {
@@ -146,19 +149,20 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private String m_recordStartTime;
     private String m_recordEndTime;
 
-    private float[] mGravity = new float[3];
-    private float[] mGeomagnetic = new float[3];
-    private float[] mR = new float[9];
-    private float[] mI = new float[9];
-    private float mAzimuth;
-    private float mAzimuthFix;
-
     public ViewPager getViewPager() {
         return m_viewPager;
     }
 
     public boolean getIsRecorded() {
         return m_IsRecorded;
+    }
+
+    public int getcurInterruptState() {
+        return m_curInterrupt;
+    }
+
+    public void setcurInterrupt(int m_curInterrupt) {
+        this.m_curInterrupt = m_curInterrupt;
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -609,7 +613,37 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         }
     }
 
-    public void
+    public void changeLeftOrRightLEDOfRoll(float roll) {
+        String writeStr = "";
+
+        if( m_curInterrupt == EMERGENCY) {
+            return;
+        }
+
+        if ( roll >= ROLL_PIVOT ) {
+            Log.d(TAG, "onSensorChanged: right");
+            writeStr = "0-07-0";
+            sendToBluetoothDevice(writeStr.getBytes());
+
+            m_curInterrupt = ORIENTATION_RIGHT;
+        }
+
+        else if ( roll <=  -ROLL_PIVOT ) {
+            Log.d(TAG, "onSensorChanged: left");
+            writeStr = "0-06-0";
+            sendToBluetoothDevice(writeStr.getBytes());
+
+            m_curInterrupt = ORIENTATION_LEFT;
+        }
+
+        if( Math.abs(GyroManagerUtil.getPivotRoll()) >= 20 &&
+                Math.abs(roll) < 20 ) {
+            writeStr = "0-01-0";
+            sendToBluetoothDevice(writeStr.getBytes());
+
+            m_curInterrupt = ORIENTATION_NONE;
+        }
+    }
 
     public void onSensorChanged(SensorEvent sensorEvent) {
 
@@ -627,41 +661,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         float[] resultValues = GyroManagerUtil.getOrientation(m_fAccel, m_fMag);
 
-        String writeStr = "";
-
-        switch( changeLeftOrRightLEDOfRoll(resultValues[2]) ) {
-            case INTERRUPT_LEFT_STATE:
-                writeStr = "0-06-0";
-                break;
-
-            case INTERRUPT_RIGHT_STATE:
-                writeStr = "0-07-0";
-                break;
-
-            case INTERRUPT_NONE_STATE:
-                writeStr = "0-01-0";
-                break;
-        }
-
-        sendToBluetoothDevice(writeStr.getBytes());
-
-//        if ( resultValues[2] >= ROLL_PIVOT ) {
-//            Log.d(TAG, "onSensorChanged: right");
-//            writeStr = "0-07-0";
-//            sendToBluetoothDevice(writeStr.getBytes());
-//        }
-//
-//        else if ( resultValues[2] <=  -ROLL_PIVOT ) {
-//            Log.d(TAG, "onSensorChanged: left");
-//            writeStr = "0-06-0";
-//            sendToBluetoothDevice(writeStr.getBytes());
-//        }
-//
-//        if( Math.abs(GyroManagerUtil.getPivotRoll()) >= 20 &&
-//                Math.abs(resultValues[2]) < 20 ) {
-//            writeStr = "0-01-0";
-//            sendToBluetoothDevice(writeStr.getBytes());
-//        }
+        changeLeftOrRightLEDOfRoll(resultValues[2]);
 
         GyroManagerUtil.setPivotRoll(resultValues[2]);
 

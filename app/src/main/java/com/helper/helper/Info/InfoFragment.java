@@ -64,6 +64,11 @@ public class InfoFragment extends Fragment
     private static final int FASTEST_UPDATE_INTERVAL_MS = 1000;
     private static final float EMENRGENCY_SPPED_PIVOT = 0.8f;
 
+    private static final int ORIENTATION_LEFT = 944;
+    private static final int ORIENTATION_RIGHT = 344;
+    private static final int ORIENTATION_NONE = 892;
+    private static final int EMERGENCY = 121;
+
     private BatteryView m_batView;
     private MapView m_mapView;
     private GoogleApiClient m_googleApiClient;
@@ -119,10 +124,16 @@ public class InfoFragment extends Fragment
                     if( location.getSpeed() < m_curSpeed ) {
                         writeStr = "0-08-1";
                         Toast.makeText(getContext(), "EMENRGENCY_SPPED : " + location.getSpeed(), Toast.LENGTH_SHORT).show();
+
+                        ((ScrollingActivity)getActivity()).setcurInterrupt(EMERGENCY);
                     }
 
-                    if ( location.getSpeed() >= m_curSpeed ) {
+                    int curInterrutState = ((ScrollingActivity)getActivity()).getcurInterruptState();
+
+                    if ( curInterrutState == EMERGENCY && location.getSpeed() >= m_curSpeed ) {
                         writeStr = "0-01-0";
+
+                        ((ScrollingActivity)getActivity()).setcurInterrupt(ORIENTATION_NONE);
                     }
 
                     try{
