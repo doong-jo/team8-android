@@ -14,19 +14,28 @@ import com.helper.helper.R;
 
 public class LEDFragment extends Fragment {
 
+    private ImageView m_curLEDView;
+
     public LEDFragment() {
 
+    }
+
+    public void setCurLEDView(int gifDrawable) {
+        GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+        Glide.with(this).load(gifDrawable).into(gifimage);
     }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
         View view = inflater.inflate( R.layout.fragment_led, container, false );
 
+        m_curLEDView = (ImageView) view.findViewById(R.id.ledFragment_curLED);
+
         // TODO: 2018. 8. 14. 아래는 임시코드로써 서버에서 LED 리스트를 불러와 그려줘야함.
 
-        ImageView curImg = (ImageView) view.findViewById(R.id.curImg);
-        GlideDrawableImageViewTarget gifImage0 = new GlideDrawableImageViewTarget(curImg);
-        Glide.with(this).load(R.drawable.characters).into(gifImage0);
+//        ImageView curImg = (ImageView) view.findViewById(R.id.curImg);
+//        GlideDrawableImageViewTarget gifImage0 = new GlideDrawableImageViewTarget(curImg);
+//        Glide.with(this).load(R.drawable.characters).into(gifImage0);
 
         ImageView img1 = (ImageView) view.findViewById(R.id.img1);
         GlideDrawableImageViewTarget gifImage1 = new GlideDrawableImageViewTarget(img1);
@@ -50,11 +59,11 @@ public class LEDFragment extends Fragment {
 
         ImageView img6 = (ImageView) view.findViewById(R.id.img6);
         GlideDrawableImageViewTarget gifImage6 = new GlideDrawableImageViewTarget(img6);
-        Glide.with(this).load(R.drawable.moving_arrow_left).into(gifImage6);
+        Glide.with(this).load(R.drawable.moving_arrow_left_blink).into(gifImage6);
 
         ImageView img7 = (ImageView) view.findViewById(R.id.img7);
         GlideDrawableImageViewTarget gifImage7 = new GlideDrawableImageViewTarget(img7);
-        Glide.with(this).load(R.drawable.moving_arrow_right).into(gifImage7);
+        Glide.with(this).load(R.drawable.moving_arrow_right_blink).into(gifImage7);
 
         ImageView img8 = (ImageView) view.findViewById(R.id.img8);
         GlideDrawableImageViewTarget gifImage8 = new GlideDrawableImageViewTarget(img8);

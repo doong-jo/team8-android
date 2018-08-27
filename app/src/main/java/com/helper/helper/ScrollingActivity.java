@@ -3,6 +3,7 @@ package com.helper.helper;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -18,6 +19,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -26,9 +28,11 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.os.ResultReceiver;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +43,9 @@ import android.widget.Toast;
 
 import com.helper.helper.Info.InfoFragment;
 import com.helper.helper.ble.BluetoothLeService;
+import com.helper.helper.led.LEDFragment;
+import com.helper.helper.location.Constants;
+import com.helper.helper.location.FetchAddressIntentService;
 import com.helper.helper.tracking.TrackingData;
 import com.helper.helper.util.FileManagerUtil;
 import com.helper.helper.util.GyroManagerUtil;
@@ -78,10 +85,17 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private static final int ORIENTATION_NONE = 892;
     private static final int EMERGENCY = 121;
 
+    private static final int SHAKE_THRESHOLD = 5000;
+
+    private static final String SENT = "SMS_SENT_ACTION";
+    private static final String DELIVERED = "SMS_DELIVERED_ACTION";
+
     private TabLayout m_tabLayout;
     private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
+
     private InfoFragment m_infoFrag;
+    private LEDFragment m_ledFrag;
 
     private boolean m_IsSupportedBT = false;
     private BluetoothAdapter m_bluetoothAdapter;
@@ -95,8 +109,20 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private OutputStream m_bluetoothOutput;
 
     private byte[] m_curSignalStr;
-
     private int m_curInterrupt;
+
+    //    SMS
+    private long m_shockStateLastTime;
+    private float m_beforeAccelX;
+    private float m_beforeAccelY;
+    private float m_beforeAccelZ;
+    private String m_strAddressOutput;
+    private String m_strLatitude;
+    private String m_strLogitude;
+    private Location m_curLocation;
+    private AddressResultReceiver m_resultAddressReceiver;
+
+    private boolean m_bInitialize = false;
 
     @SuppressLint("HandlerLeak")
     private final Handler m_handle = new Handler() {
@@ -149,6 +175,47 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private String m_recordStartTime;
     private String m_recordEndTime;
 
+    public void setMapPosition(double latitude, double longitude, Location curLocation) {
+        m_strLatitude = String.format("%f", latitude);
+        m_strLogitude = String.format("%f", longitude);
+        m_curLocation = curLocation;
+
+        startAddressIntentService();
+    }
+
+    private void startAddressIntentService() {
+        // Create an intent for passing to the intent service responsible for fetching the address.
+        Intent intent = new Intent(this, FetchAddressIntentService.class);
+
+        // Pass the result receiver as an extra to the service.
+        intent.putExtra(Constants.RECEIVER, m_resultAddressReceiver);
+
+        // Pass the location data as an extra to the service.
+        intent.putExtra(Constants.LOCATION_DATA_EXTRA, m_curLocation);
+
+        // Start the service. If the service isn't already running, it is instantiated and started
+        // (creating a process for it if needed); if it is running then it remains running. The
+        // service kills itself automatically once all intents are processed.
+        startService(intent);
+    }
+
+    private class AddressResultReceiver extends ResultReceiver {
+        AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        /**
+         *  Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
+         */
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string or an error message sent from the intent service.
+            m_strAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            m_strAddressOutput = m_strAddressOutput.replaceAll("대한민국 ", "");
+        }
+    }
+
     public ViewPager getViewPager() {
         return m_viewPager;
     }
@@ -189,6 +256,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         m_viewPager.setAdapter(m_pagerAdapter);
         m_viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(m_tabLayout));
 
+
         m_tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -218,6 +286,9 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
             }
         });
+
+
+
         /* Tab end */
 
         /* Valid Bluetooth supports start */
@@ -254,6 +325,10 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         GyroManagerUtil.m_sensorAccel = GyroManagerUtil.m_sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         GyroManagerUtil.m_sensorMag = GyroManagerUtil.m_sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         /* Sensor end */
+
+        m_resultAddressReceiver = new AddressResultReceiver(new Handler());
+
+        m_bInitialize = true;
     }
 
     public void moveToLEDDash(View v) {
@@ -275,6 +350,11 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                 finish();
             }
 
+            if( m_infoFrag == null ) {
+                m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+                        "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                                .getItemId(TAB_STATUS));
+            }
             m_bluetoothLeService.setInfoFragment(m_infoFrag);
 
             /* Connect Bluetooth Device Start
@@ -422,39 +502,70 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         String resName = v.getResources().getResourceName(v.getId());
         String imgName = resName.split(String.format("%s", '/'))[1];
 
+
+        if( m_infoFrag == null ) {
+            m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+                    "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                            .getItemId(TAB_STATUS));
+        }
+
+        if( m_ledFrag == null ) {
+            m_ledFrag = (LEDFragment) getSupportFragmentManager().findFragmentByTag(
+                    "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                            .getItemId(TAB_LED));
+        }
+
         switch (imgName) {
             case "img1":
                 str = "0-01-0";
+                m_infoFrag.setCurLEDView(R.drawable.characters);
+                m_ledFrag.setCurLEDView(R.drawable.characters);
                 break;
 
             case "img2":
                 str = "0-02-0";
+                m_infoFrag.setCurLEDView(R.drawable.windy);
+                m_ledFrag.setCurLEDView(R.drawable.windy);
                 break;
 
             case "img3":
                 str = "0-03-0";
+                m_infoFrag.setCurLEDView(R.drawable.snow);
+                m_ledFrag.setCurLEDView(R.drawable.snow);
                 break;
 
             case "img4":
                 str = "0-04-0";
+                m_infoFrag.setCurLEDView(R.drawable.rain);
+                m_ledFrag.setCurLEDView(R.drawable.rain);
                 break;
 
             case "img5":
                 str = "0-05-0";
+                m_infoFrag.setCurLEDView(R.drawable.cute);
+                m_ledFrag.setCurLEDView(R.drawable.cute);
                 break;
 
             case "img6":
-                str = "0-06-0";
+                str = "0-06-1";
+                m_infoFrag.setCurLEDView(R.drawable.moving_arrow_left_blink);
+                m_ledFrag.setCurLEDView(R.drawable.moving_arrow_left_blink);
                 break;
 
             case "img7":
-                str = "0-07-0";
+                str = "0-07-1";
+                m_infoFrag.setCurLEDView(R.drawable.moving_arrow_right_blink);
+                m_ledFrag.setCurLEDView(R.drawable.moving_arrow_right_blink);
                 break;
 
             case "img8":
                 str = "0-08-1";
+                m_infoFrag.setCurLEDView(R.drawable.emergency_blink);
+                m_ledFrag.setCurLEDView(R.drawable.emergency_blink);
                 break;
         }
+
+
 
         final byte[] tx = str.getBytes();
 
@@ -493,6 +604,12 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
             SimpleDateFormat endTimeFormat = new SimpleDateFormat("hh:mm");
             m_recordEndTime = endTimeFormat.format(date);
 
+            if( m_infoFrag == null ) {
+                m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+                        "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                                .getItemId(TAB_STATUS));
+            }
+
             try {
                 TrackingData trackingData = new TrackingData(
                         m_recordStartDate,
@@ -504,12 +621,6 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                 FileManagerUtil.writeTrackingDataInternalStorage(getApplicationContext(), trackingData);
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-
-            if (m_infoFrag == null) {
-                m_infoFrag = (InfoFragment) m_viewPager
-                        .getAdapter()
-                        .instantiateItem(m_viewPager, TAB_STATUS);
             }
 
             m_infoFrag.recordStopAndEraseLocationList();
@@ -548,10 +659,10 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                 }
 
                 if (m_viewPager.getCurrentItem() == TAB_STATUS) {
-                    if (m_infoFrag == null) {
-                        m_infoFrag = (InfoFragment) m_viewPager
-                                .getAdapter()
-                                .instantiateItem(m_viewPager, m_viewPager.getCurrentItem());
+                    if( m_infoFrag == null ) {
+                        m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+                                "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                                        .getItemId(TAB_STATUS));
                     }
 
                     m_infoFrag.requsetLocation();
@@ -622,7 +733,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         if ( roll >= ROLL_PIVOT ) {
             Log.d(TAG, "onSensorChanged: right");
-            writeStr = "0-07-0";
+            writeStr = "0-07-1";
             sendToBluetoothDevice(writeStr.getBytes());
 
             m_curInterrupt = ORIENTATION_RIGHT;
@@ -630,7 +741,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         else if ( roll <=  -ROLL_PIVOT ) {
             Log.d(TAG, "onSensorChanged: left");
-            writeStr = "0-06-0";
+            writeStr = "0-06-1";
             sendToBluetoothDevice(writeStr.getBytes());
 
             m_curInterrupt = ORIENTATION_LEFT;
@@ -645,13 +756,86 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         }
     }
 
+    private void sendSMS(String num, String txt) {
+
+        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
+        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+
+        SmsManager sms = SmsManager.getDefault();
+        if(sms == null) {
+            Log.e(TAG, "sms == null");
+            return;
+        }
+        sms.sendTextMessage(num, "ME", txt, sentPI, deliveredPI);
+        //sms.sendTextMessage(num, null, txt, null, null);
+    }
+
+    public void shockStateDetector(float accelX, float accelY, float accelZ) {
+        long currentTime = System.currentTimeMillis();
+        long gabOfTime = (currentTime - m_shockStateLastTime);
+        float speed = 0;
+        if (gabOfTime > 100) {
+            m_shockStateLastTime = currentTime;
+
+            speed = Math.abs(accelX + accelY + accelZ - m_beforeAccelX - m_beforeAccelY - m_beforeAccelZ) / gabOfTime * 10000;
+
+//            if(count++ < 3 ) {
+//                sum_speed += speed;
+//                return;
+//            } else {
+//                count = 0;
+//                speed = sum_speed/3;
+//                sum_speed = 0;
+//            }
+//            if (speed > 700 && speed < SHAKE_THRESHOLD) {
+//                Log.e("speed", "speed : " + speed);
+//                if(bProcessing) {// 사용자 실수시 가볍게 흔들어서 취소
+//                    hanSensor.removeMessages(1);
+//                    hanSensor.sendEmptyMessageDelayed(2, 1000);
+//                    showMsgl("취소 " + speed);
+//                    return;
+//                }
+            if (speed > SHAKE_THRESHOLD) {
+                Log.d(TAG, "shockStateDetector: ");
+                try {
+                    String strSMS1 = getString(R.string.sms_content) + "\n\n" +  m_strAddressOutput;
+                    String strSMS2 = "https://google.com/maps?q=" + m_strLatitude + "," + m_strLogitude;
+
+                    sendSMS("+8201034823161", strSMS1);
+                    sendSMS("+8201034823161", strSMS2);
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                }
+//                if(!bProcessing) {
+//                    bProcessing = true;
+//                    hanSensor.sendEmptyMessage(0);
+//                    showMsgl("충격 발생 " + speed);
+            }
+//                else { // 2차 충격
+//                    bProcessing = true;
+//                    hanSensor.removeMessages(1); // 다이얼로그 연장
+//                    hanSensor.sendEmptyMessageDelayed(1, send_time * 1000);
+//                    showMsgl("2,3차 충격 " + speed);
+//                }
+//            }
+
+
+            m_beforeAccelX = accelX;
+            m_beforeAccelY = accelY;
+            m_beforeAccelZ = accelZ;
+
+        }
+    }
     public void onSensorChanged(SensorEvent sensorEvent) {
+
+        if (!m_bInitialize) { return; }
 
         if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             m_fAccel[0] = sensorEvent.values[0];
             m_fAccel[1] = sensorEvent.values[1];
             m_fAccel[2] = sensorEvent.values[2];
 
+            shockStateDetector(m_fAccel[0], m_fAccel[1], m_fAccel[2]);
         }
         else if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             m_fMag[0] = sensorEvent.values[0];
@@ -665,11 +849,18 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         GyroManagerUtil.setPivotRoll(resultValues[2]);
 
-        m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
-                "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
-                        .getItemId(TAB_STATUS));
+        if( m_infoFrag == null) {
+            m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+                    "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                            .getItemId(TAB_STATUS));
 
-        if(m_infoFrag != null) { m_infoFrag.setTextTiltXYZ(resultValues); }
+//            m_infoFrag = (InfoFragment)m_viewPager
+//                    .getAdapter()
+//                    .instantiateItem(m_viewPager, TAB_STATUS);
+
+        } else {
+            m_infoFrag.setTextTiltXYZ(resultValues);
+        }
     }
 
     @Override

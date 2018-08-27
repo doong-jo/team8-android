@@ -15,15 +15,19 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.NestedScrollView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationCallback;
@@ -60,6 +64,7 @@ public class InfoFragment extends Fragment
     private final static String TAG = InfoFragment.class.getSimpleName() + "/DEV";
     private static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
     private static final int GPS_ENABLE_REQUEST_CODE = 2002;
+    private static final int SEND_SMS_REQUEST_CODE = 947;
     private static final int UPDATE_INTERVAL_MS = 1500;
     private static final int FASTEST_UPDATE_INTERVAL_MS = 1000;
     private static final float EMENRGENCY_SPPED_PIVOT = 0.8f;
@@ -89,12 +94,22 @@ public class InfoFragment extends Fragment
     private TextView m_textBeforeSpeed;
     private TextView m_textCurSpeed;
 
+    private SeekBar m_brightSeekbar;
+    private SeekBar m_speedSeekbar;
+
+    private ImageView m_curLEDView;
+
     public double getCurTrackingDistance() {
         return m_fCurDistance;
     }
 
     public List<LatLng> getCurrRecordedLocationList() {
         return m_lCurRecordedLocation;
+    }
+
+    public void setCurLEDView(int gifDrawable) {
+        GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+        Glide.with(this).load(gifDrawable).into(gifimage);
     }
 
     public InfoFragment() {
@@ -114,6 +129,8 @@ public class InfoFragment extends Fragment
                     //The last location in the list is the newest
                     Location location = locationList.get(locationList.size() - 1);
                     m_curLocation = location;
+
+                    ((ScrollingActivity)getActivity()).setMapPosition(location.getLatitude(), location.getLongitude(), location);
 
                     String writeStr = "";
 
@@ -179,6 +196,43 @@ public class InfoFragment extends Fragment
             }
         };
     }
+
+    private SeekBar.OnSeekBarChangeListener m_seekBarBrightChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            String str = "2-" + String.format("%02d-%d", i/10, i%10);
+            ((ScrollingActivity)getActivity()).sendToBluetoothDevice(str.getBytes());
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
+
+    private SeekBar.OnSeekBarChangeListener m_seekBarSpeedChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            String str = "1-" + String.format("%02d-%d", i/10, i%10);
+            ((ScrollingActivity)getActivity()).sendToBluetoothDevice(str.getBytes());
+        }
+
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
 
     public double CalculationByDistance(LatLng StartP, LatLng EndP) {
         int Radius = 6371;// radius of earth in Km
@@ -276,6 +330,16 @@ public class InfoFragment extends Fragment
                 }
                 requsetLocation();
             }
+
+            if ( !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.SEND_SMS) ) {
+
+                /* Result about user selection -> onActivityResult in ScrollActivity */
+                PermissionUtil.requestPermissions(getActivity(), new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_REQUEST_CODE);
+            } else {
+
+            }
+
+
         } else {
 
             if ( m_googleApiClient == null) {
@@ -283,8 +347,17 @@ public class InfoFragment extends Fragment
             }
         }
 
+        m_brightSeekbar = (SeekBar) view.findViewById(R.id.brightSeek);
+        m_speedSeekbar = (SeekBar) view.findViewById(R.id.speedSeek);
+
+        m_brightSeekbar.setOnSeekBarChangeListener(m_seekBarBrightChangeListener);
+        m_speedSeekbar.setOnSeekBarChangeListener(m_seekBarSpeedChangeListener);
+
+        m_curLEDView = (ImageView) view.findViewById(R.id.InfoFragment_curLED);
+
         return view;
     }
+
 
     @Override
     public void onAttachFragment(Fragment childFragment) {

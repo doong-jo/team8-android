@@ -19,10 +19,10 @@ TYPE_EFFECT     = 2
 SIZE_READ_BYTE  = 6
 
 DEFAULT_SPEED   = 0.5
-DEFAULT_BRIGHT  = 0.1
+DEFAULT_BRIGHT  = 0.5
 DEFAULT_ROTATION = 90
 
-g_curImgName      = "0-01-0"
+g_curImgName      = "noname"
 g_curSpeed        = DEFAULT_SPEED
 g_curType         = TYPE_SPRITE
 
@@ -31,9 +31,9 @@ unicornhathd.brightness(DEFAULT_BRIGHT)
 
 g_Images = {
     1: Image.open('lofi.png'),
-    6: Image.open('movingArrowLeft.png'),
-    7: Image.open('movingArrowRight.png'),
-    8: Image.open('emergency_modified_long.png'),
+    6: Image.open('movingArrowLeft_blink.png'),
+    7: Image.open('movingArrowRight_blink.png'),
+    8: Image.open('emergency.png'),
 }
 
 def blinkLED():
@@ -42,8 +42,9 @@ def blinkLED():
     unicornhathd.off()
     time.sleep(0.3)
 
-def showLED(imagename, speed, targetImage, type):
+def showLED(imagename, targetImage, type):
     global g_curImgName
+    global g_curSpeed
 
     for o_x in range(int(targetImage.size[0] / WIDTH)):
         for o_y in range(int(targetImage.size[1] / HEIGHT)):
@@ -63,7 +64,7 @@ def showLED(imagename, speed, targetImage, type):
             if valid:
                 if eq(type, TYPE_SPRITE):
                     unicornhathd.show()
-                    time.sleep(DEFAULT_SPEED)
+                    time.sleep(g_curSpeed)
                 elif eq(type, TYPE_BLINK):
                     blinkLED()
 
@@ -86,19 +87,20 @@ def controlLED():
                 try:
                     print("try show!")
                     targetImage = g_Images[imagename]
-                    showLED(imagename, speed, targetImage, type)
+                    showLED(imagename, targetImage, type)
                 except KeyError:
                     g_curImgName = "noname"
                     print("not exist image")
 
-            else:
-                print("not set image")
+            # else:
+            #     print("not set image")
 
         except KeyboardInterrupt:
             print("disconnected")
             unicornhathd.off()
             print("receiveMsg KeyboardInterrupt")
             break
+        # time.sleep(0.5)
 
 def receiveMsg():
     while True:
@@ -117,12 +119,11 @@ def receiveMsg():
 
         print("Waiting for connection : channel %d" % port)
         client_sock, client_info = server_sock.accept()
-        print('accepted')
+        print("Accepted connection from ", client_info)
 
         while True:
-            print("Accepted connection from ", client_info)
             try:
-                print("Processing running")
+                print("Wating for recv")
                 data = client_sock.recv(SIZE_READ_BYTE)
                 print("data : %s", data);
 
@@ -142,20 +143,18 @@ def receiveMsg():
                 # CLOSE         -1
 
                 # - : splite word
-                # # : END
-                # ## : PAUSE
 
                 # LED
                 # SIGNAL_INDEX-LED_INDEX-TYPE(SPRITE, BLINK, EFFECT)#
-                # LED example : 0-01-0# (LED-01st-LED-SPRITE => LED 1 sprite)
+                # LED example : 0-01-0 (LED-01st-LED-SPRITE => LED 1 sprite)
 
                 # SPEED
                 # SIGNAL_INDEX-SPEED#
-                # SPEED example : 1-05-0# (0~10) (SPEED-5 => frame speed = interval 0.5 sec)
+                # SPEED example : 1-05-0 (0~10) (SPEED-5 => frame speed = interval 0.5 sec)
 
                 # BRIGHTNESS
                 # SIGNAL_INDEX-BRIGHTNESS#
-                # BRIGHTNESS example : 2-05-0# (0~10) (BRIGHTNESS-5 => brightness level 5)
+                # BRIGHTNESS example : 2-05-0 (0~10) (BRIGHTNESS-5 => brightness level 5)
 
                 global g_curImgName
                 global g_curSpeed
@@ -168,10 +167,10 @@ def receiveMsg():
                     g_curType = optionalData
 
                 elif signalData == 1:
-                    g_curSpeed = valueData * 0.1
+                    g_curSpeed = valueData * 0.1 + optionalData * 0.01
 
                 elif signalData == 2:
-                    unicornhathd.brightness(valueData * 0.1)
+                    unicornhathd.brightness(valueData * 0.1 + optionalData * 0.01)
 
             except IOError:
                 print("disconnected")
@@ -187,7 +186,7 @@ def receiveMsg():
                 print("receiveMsg KeyboardInterrupt")
                 break
 
-            time.sleep(0.1)
+            # time.sleep(0.5)
 
 
 def main():
