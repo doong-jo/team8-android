@@ -130,31 +130,38 @@ public class InfoFragment extends Fragment
                     Location location = locationList.get(locationList.size() - 1);
                     m_curLocation = location;
 
-                    ((ScrollingActivity)getActivity()).setMapPosition(location.getLatitude(), location.getLongitude(), location);
+                    Log.d(TAG, "" + location.getLatitude() + " " + location.getLongitude());
+
+                    try {
+                        ((ScrollingActivity)getActivity()).setMapPosition(location.getLatitude(), location.getLongitude(), location);
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
 
                     String writeStr = "";
 
-                    m_textCurSpeed.setText("현재 속도 : " + String.format("%f", location.getSpeed()));
-                    m_textBeforeSpeed.setText("이전 속도 : " + String.format("%f", m_curSpeed));
+//                    m_textCurSpeed.setText("현재 속도 : " + String.format("%f", location.getSpeed()));
+//                    m_textBeforeSpeed.setText("이전 속도 : " + String.format("%f", m_curSpeed));
 
 //                    if( location.getSpeed() >= 1 && location.getSpeed() * EMENRGENCY_SPPED_PIVOT < m_curSpeed ) {
-                    if( location.getSpeed() < m_curSpeed ) {
-                        writeStr = "0-08-1";
-                        Toast.makeText(getContext(), "EMENRGENCY_SPPED : " + location.getSpeed(), Toast.LENGTH_SHORT).show();
-
-                        ((ScrollingActivity)getActivity()).setcurInterrupt(EMERGENCY);
-                    }
+//                    if( location.getSpeed() < m_curSpeed ) {
+//                        writeStr = "0-08-1";
+//
+//                        ((ScrollingActivity)getActivity()).setcurInterrupt(EMERGENCY);
+//                    }
 
                     int curInterrutState = ((ScrollingActivity)getActivity()).getcurInterruptState();
 
                     if ( curInterrutState == EMERGENCY && location.getSpeed() >= m_curSpeed ) {
-                        writeStr = "0-01-0";
+                        writeStr = ((ScrollingActivity)getActivity()).getCurLED();
 
                         ((ScrollingActivity)getActivity()).setcurInterrupt(ORIENTATION_NONE);
                     }
 
                     try{
-                        ((ScrollingActivity)getActivity()).sendToBluetoothDevice(writeStr.getBytes());
+                        if( writeStr != "" ) {
+                            ((ScrollingActivity)getActivity()).sendToBluetoothDevice(writeStr.getBytes());
+                        }
                     }
                     catch (NullPointerException e) {
                         e.printStackTrace();
@@ -298,24 +305,24 @@ public class InfoFragment extends Fragment
         m_lCurRecordedLocation = new ArrayList<LatLng>();
 
         m_batView = (BatteryView) view.findViewById(R.id.batView);
-        m_batView.setPower(78);
+        m_batView.setPower(100);
 
-        if (m_mapView == null) {
+//        if (m_mapView == null) {
             m_mapView = (MapView) view.findViewById(R.id.map);
             m_mapView.onCreate(savedInstanceState);
             m_mapView.onResume();
             m_mapView.getMapAsync(this);
-        }
+//        }
 
 
         adjustMapVerticalTouch(view);
 
-        m_textViewTiltX = (TextView) view.findViewById(R.id.TiltX);
-        m_textViewTiltY = (TextView) view.findViewById(R.id.TiltY);
-        m_textViewTiltZ = (TextView) view.findViewById(R.id.TiltZ);
+//        m_textViewTiltX = (TextView) view.findViewById(R.id.TiltX);
+//        m_textViewTiltY = (TextView) view.findViewById(R.id.TiltY);
+//        m_textViewTiltZ = (TextView) view.findViewById(R.id.TiltZ);
 
-        m_textCurSpeed = (TextView) view.findViewById(R.id.curSpeed);
-        m_textBeforeSpeed = (TextView) view.findViewById(R.id.beforeSpeed);
+//        m_textCurSpeed = (TextView) view.findViewById(R.id.curSpeed);
+//        m_textBeforeSpeed = (TextView) view.findViewById(R.id.beforeSpeed);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -554,14 +561,14 @@ public class InfoFragment extends Fragment
         m_mapView.onLowMemory();
     }
 
-    public void setTextTiltXYZ(float[] values) {
-
-        if( m_textViewTiltX == null || m_textViewTiltY == null || m_textViewTiltZ == null ) {
-            return;
-        }
-
-        m_textViewTiltX.setText("방위 : " + String.format("%f", values[0]));
-        m_textViewTiltY.setText("경사도 : " +String.format("%f", values[1]));
-        m_textViewTiltZ.setText("좌우 회전 : " + String.format("%f", values[2]));
-    }
+//    public void setTextTiltXYZ(float[] values) {
+//
+//        if( m_textViewTiltX == null || m_textViewTiltY == null || m_textViewTiltZ == null ) {
+//            return;
+//        }
+//
+//        m_textViewTiltX.setText("방위 : " + String.format("%f", values[0]));
+//        m_textViewTiltY.setText("경사도 : " +String.format("%f", values[1]));
+//        m_textViewTiltZ.setText("좌우 회전 : " + String.format("%f", values[2]));
+//    }
 }

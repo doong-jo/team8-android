@@ -201,7 +201,7 @@ public class TrackingFragment extends Fragment
         this.m_map.clear();
 
         this.m_map.moveCamera(CameraUpdateFactory.newLatLngZoom(locationList.get(0), 20));
-        this.m_map.animateCamera(CameraUpdateFactory.zoomTo(20));
+        this.m_map.animateCamera(CameraUpdateFactory.zoomTo(15));
 
         List<Polyline> polylines = new ArrayList<>();
 
@@ -302,6 +302,34 @@ public class TrackingFragment extends Fragment
         m_map = googleMap;
 
         //buildGoogleApiClient();
+    }
+
+    public void onStart() {
+        super.onStart();
+        m_mapView.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        m_mapView.onStop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        m_mapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        m_mapView.onPause();
+        if( m_googleApiClient != null ) {
+            m_googleApiClient.stopAutoManage(getActivity());
+            m_googleApiClient.disconnect();
+        }
+
     }
 
     protected synchronized  void buildGoogleApiClient() {

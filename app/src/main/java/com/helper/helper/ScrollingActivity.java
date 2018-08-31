@@ -108,6 +108,11 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private InputStream m_bluetoothInput;
     private OutputStream m_bluetoothOutput;
 
+    public String getCurLED() {
+        return m_curLED;
+    }
+
+    private String m_curLED;
     private byte[] m_curSignalStr;
     private int m_curInterrupt;
 
@@ -196,7 +201,12 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         // Start the service. If the service isn't already running, it is instantiated and started
         // (creating a process for it if needed); if it is running then it remains running. The
         // service kills itself automatically once all intents are processed.
-        startService(intent);
+        try {
+            startService(intent);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private class AddressResultReceiver extends ResultReceiver {
@@ -502,7 +512,6 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         String resName = v.getResources().getResourceName(v.getId());
         String imgName = resName.split(String.format("%s", '/'))[1];
 
-
         if( m_infoFrag == null ) {
             m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
                     "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
@@ -515,7 +524,15 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                             .getItemId(TAB_LED));
         }
 
+
+
         switch (imgName) {
+            case "img0":
+                str = "0-00-0";
+                m_infoFrag.setCurLEDView(R.drawable.bird);
+                m_ledFrag.setCurLEDView(R.drawable.bird);
+                break;
+
             case "img1":
                 str = "0-01-0";
                 m_infoFrag.setCurLEDView(R.drawable.characters);
@@ -563,7 +580,21 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                 m_infoFrag.setCurLEDView(R.drawable.emergency_blink);
                 m_ledFrag.setCurLEDView(R.drawable.emergency_blink);
                 break;
+
+            case "img9":
+                str = "0-09-0";
+                m_infoFrag.setCurLEDView(R.drawable.mario);
+                m_ledFrag.setCurLEDView(R.drawable.mario);
+                break;
+
+            case "img10":
+                str = "0-10-0";
+                m_infoFrag.setCurLEDView(R.drawable.boy);
+                m_ledFrag.setCurLEDView(R.drawable.boy);
+                break;
         }
+
+        m_curLED = str;
 
 
 
@@ -620,6 +651,8 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
                 FileManagerUtil.writeTrackingDataInternalStorage(getApplicationContext(), trackingData);
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (IllegalStateException e) {
                 e.printStackTrace();
             }
 
@@ -749,7 +782,13 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         if( Math.abs(GyroManagerUtil.getPivotRoll()) >= 20 &&
                 Math.abs(roll) < 20 ) {
-            writeStr = "0-01-0";
+            writeStr = m_curLED;
+
+            if ( writeStr == null) {
+                return;
+            }
+
+
             sendToBluetoothDevice(writeStr.getBytes());
 
             m_curInterrupt = ORIENTATION_NONE;
@@ -859,7 +898,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 //                    .instantiateItem(m_viewPager, TAB_STATUS);
 
         } else {
-            m_infoFrag.setTextTiltXYZ(resultValues);
+//            m_infoFrag.setTextTiltXYZ(resultValues);
         }
     }
 

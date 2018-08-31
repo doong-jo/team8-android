@@ -69,11 +69,24 @@
                     android:text="@string/cardTitleLEDList" />
 
                 <GridLayout
+                    android:id="@+id/ledGridLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:orientation="horizontal"
                     android:columnCount="3">
+                    <ImageView
+                        android:id="@+id/img0"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:scaleType="fitCenter"
+                        android:adjustViewBounds="true"
+
+                        android:layout_columnWeight="1"
+                        android:layout_rowWeight="1"
+                        android:onClick="ledImageListener"/>
+
                     <ImageView
                         android:id="@+id/img1"
                         android:layout_width="0dp"
@@ -157,6 +170,30 @@
 
                     <ImageView
                         android:id="@+id/img8"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:scaleType="fitCenter"
+                        android:adjustViewBounds="true"
+
+                        android:layout_columnWeight="1"
+                        android:layout_rowWeight="1"
+                        android:onClick="ledImageListener"/>
+
+                    <ImageView
+                        android:id="@+id/img9"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:scaleType="fitCenter"
+                        android:adjustViewBounds="true"
+
+                        android:layout_columnWeight="1"
+                        android:layout_rowWeight="1"
+                        android:onClick="ledImageListener"/>
+
+                    <ImageView
+                        android:id="@+id/img10"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
 

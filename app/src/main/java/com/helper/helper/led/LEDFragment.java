@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -36,6 +37,10 @@ public class LEDFragment extends Fragment {
 //        ImageView curImg = (ImageView) view.findViewById(R.id.curImg);
 //        GlideDrawableImageViewTarget gifImage0 = new GlideDrawableImageViewTarget(curImg);
 //        Glide.with(this).load(R.drawable.characters).into(gifImage0);
+
+        ImageView img0 = (ImageView) view.findViewById(R.id.img0);
+        GlideDrawableImageViewTarget gifImage0 = new GlideDrawableImageViewTarget(img0);
+        Glide.with(this).load(R.drawable.bird).into(gifImage0);
 
         ImageView img1 = (ImageView) view.findViewById(R.id.img1);
         GlideDrawableImageViewTarget gifImage1 = new GlideDrawableImageViewTarget(img1);
@@ -69,6 +74,13 @@ public class LEDFragment extends Fragment {
         GlideDrawableImageViewTarget gifImage8 = new GlideDrawableImageViewTarget(img8);
         Glide.with(this).load(R.drawable.emergency_blink).into(gifImage8);
 
+        ImageView img9 = (ImageView) view.findViewById(R.id.img9);
+        GlideDrawableImageViewTarget gifImage9 = new GlideDrawableImageViewTarget(img9);
+        Glide.with(this).load(R.drawable.mario).into(gifImage9);
+
+        ImageView img10 = (ImageView) view.findViewById(R.id.img10);
+        GlideDrawableImageViewTarget gifImage10 = new GlideDrawableImageViewTarget(img10);
+        Glide.with(this).load(R.drawable.boy).into(gifImage10);
 
         return view;
     }

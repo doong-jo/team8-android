@@ -10,6 +10,25 @@ except ImportError:
 
 import unicornhathd
 
+class Sw420(object):
+    def __init__(self, pin):
+        GPIO.setmode(GPIO.BCM)
+        self.pin = pin
+        GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+        GPIO.add_event_detect(self.pin, GPIO.RISING, callback=self.callback, bouncetime=1)
+        self.count = 0
+
+    def callback(self, pin):
+        self.count += 1
+
+import RPi.GPIO as GPIO
+# GPIO.setmode(GPIO.BCM)
+# GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+time.sleep(1)
+
+from subprocess import call
+
 WIDTH, HEIGHT   = unicornhathd.get_shape()
 
 TYPE_SPRITE     = 0
@@ -30,11 +49,23 @@ unicornhathd.rotation(DEFAULT_ROTATION)
 unicornhathd.brightness(DEFAULT_BRIGHT)
 
 g_Images = {
+    0: Image.open('bird.png'),
     1: Image.open('lofi.png'),
+    2: Image.open('windy.png'),
+    3: Image.open('snow.png'),
+    4: Image.open('rain.png'),
+    5: Image.open('cute.png'),
     6: Image.open('movingArrowLeft_blink.png'),
     7: Image.open('movingArrowRight_blink.png'),
     8: Image.open('emergency.png'),
+    9: Image.open('mario.png'),
+    10: Image.open('boy.png'),
 }
+
+EMERGENCY_LED_IND = 8
+LEFT_LED_IND = 6
+RIGHT_LED_IND = 7
+
 
 def blinkLED():
     unicornhathd.show()
@@ -101,6 +132,39 @@ def controlLED():
             print("receiveMsg KeyboardInterrupt")
             break
         # time.sleep(0.5)
+
+
+def vibrateSensor():
+    sensor = Sw420(23)
+
+    global g_curImgName
+    global  g_curType
+
+    try:
+        while True:
+            time.sleep(1)
+            if sensor.count >= 10:
+                g_curImgName = EMERGENCY_LED_IND
+                g_curType = TYPE_BLINK
+                print("Detect vibrate")
+                # detect vibrate
+            else:
+                print("Not detect vibrate")
+                # not detect vibrate
+            sensor.count = 0
+    except KeyboardInterrupt:
+        GPIO.cleanup()
+
+
+# while True:
+    #     result = GPIO.input(23)
+    #     if result == 1:
+    #         print("detect vibrate.")
+    #         time.sleep(0.05)
+    #
+    #     else:
+    #         print("not detect vibrate.")
+    #         time.sleep(0.05)
 
 def receiveMsg():
     while True:
@@ -198,6 +262,10 @@ def main():
         t2 = threading.Thread(target=controlLED, args=())
         t2.daemon = True
         t2.start()
+
+        t3 = threading.Thread(target=vibrateSensor, args=())
+        t3.daemon = True
+        t3.start()
 
     except KeyboardInterrupt:
         print("disconnected")
