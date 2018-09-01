@@ -1,9 +1,11 @@
 package com.helper.helper.util;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.R;
+import com.helper.helper.ScrollingActivity;
 import com.helper.helper.tracking.TrackingData;
 import com.snatik.storage.Storage;
 
@@ -31,6 +33,20 @@ import javax.xml.transform.stream.StreamResult;
 
 public class FileManagerUtil {
 
+    private static final String DIR_NAME = "user_data";
+    private static final String XML_NAME = "tracking.xml";
+
+    private static final String XML_ELEM_ROOT = "tracking";
+    private static final String XML_ELEM_MAP = "map";
+    private static final String XML_ELEM_ATTR_DATE = "date";
+    private static final String XML_ELEM_ATTR_START_TIME = "start_time";
+    private static final String XML_ELEM_ATTR_END_TIME = "end_time";
+    private static final String XML_ELEM_ATTR_DISTANCE = "distance";
+    private static final String XML_ELEM_LOCATION = "location";
+    private static final String XML_ELEM_LATITUDE = "latitude";
+    private static final String XML_ELEM_LONGITUDE = "longitude";
+    private static final String TAG = FileManagerUtil.class.getSimpleName() + "/DEV";
+
     public static void writeTrackingDataInternalStorage(Context context, TrackingData trackingData) throws IOException {
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -39,18 +55,8 @@ public class FileManagerUtil {
             Storage internalStorage = new Storage(context);
 
             String path = internalStorage.getInternalFilesDirectory();
-            String dir = path + File.separator + R.string.internal_directory;
-            String xmlFilePath =  dir + File.separator + R.string.file_name_tracking_data;
-
-            String elemTracking = String.format("%s", R.string.tracking_xml_elem_root);
-            String elemMap = String.format("%s", R.string.tracking_xml_elem_map);
-            String elemLocation = String.format("%s", R.string.tracking_xml_elem_location);
-            String elemLatitude = String.format("%s", R.string.tracking_xml_elem_latitude);
-            String elemLongitude = String.format("%s", R.string.tracking_xml_elem_longitude);
-            String attrDate = String.format("%s", R.string.tracking_xml_elem_attr_date);
-            String attrStartTime = String.format("%s", R.string.tracking_xml_elem_attr_start_time);
-            String attrEndTime = String.format("%s", R.string.tracking_xml_elem_attr_end_time);
-            String attrDistance = String.format("%s", R.string.tracking_xml_elem_attr_distance);
+            String dir = path + File.separator + DIR_NAME;
+            String xmlFilePath =  dir + File.separator + XML_NAME;
 
             boolean fileExists = internalStorage.isFileExist(xmlFilePath);
 
@@ -61,38 +67,52 @@ public class FileManagerUtil {
                 doc = docBuilder.parse(new File(xmlFilePath));
                 rootElement = (Element) doc.getDocumentElement();
             } else {
-                rootElement = doc.createElement(elemTracking);
+                rootElement = doc.createElement(XML_ELEM_ROOT);
             }
 
             /* Make elements start */
-            Element mapElement = doc.createElement(elemMap);
+            Element mapElement = doc.createElement(XML_ELEM_MAP);
             /* Make elements end */
 
             /* Define attributes start */
-            mapElement.setAttribute(attrDate, trackingData.getDate());
-            mapElement.setAttribute(attrStartTime, trackingData.getStartTime());
-            mapElement.setAttribute(attrEndTime, trackingData.getEndTime());
-            mapElement.setAttribute(attrDistance, trackingData.getDistance());
+            mapElement.setAttribute(XML_ELEM_ATTR_DATE, trackingData.getDate());
+            mapElement.setAttribute(XML_ELEM_ATTR_START_TIME, trackingData.getStartTime());
+            mapElement.setAttribute(XML_ELEM_ATTR_END_TIME, trackingData.getEndTime());
+            mapElement.setAttribute(XML_ELEM_ATTR_DISTANCE, trackingData.getDistance());
             /* Define attributes end */
 
             if( trackingData.getLocationData().size() <= 0 ) {
-                return;
-            }
+                Element locationElement = doc.createElement(XML_ELEM_LOCATION);
 
-            for(LatLng currentLat : trackingData.getLocationData()) {
-                Element locationElement = doc.createElement(elemLocation);
+                Element latitudeElement = doc.createElement(XML_ELEM_LATITUDE);
+                latitudeElement.appendChild(doc.createTextNode(String.format("%f", 36.500881)));
 
-                Element latitudeElement = doc.createElement(elemLatitude);
-                latitudeElement.appendChild(doc.createTextNode(String.format("%f", currentLat.latitude)));
-
-                Element longitudeElement = doc.createElement(elemLongitude);
-                longitudeElement.appendChild(doc.createTextNode(String.format("%f", currentLat.longitude)));
+                Element longitudeElement = doc.createElement(XML_ELEM_LATITUDE);
+                longitudeElement.appendChild(doc.createTextNode(String.format("%f", 127.269924)));
 
                 locationElement.appendChild(latitudeElement);
                 locationElement.appendChild(longitudeElement);
 
                 mapElement.appendChild(locationElement);
             }
+            else {
+                for(LatLng currentLat : trackingData.getLocationData()) {
+                    Element locationElement = doc.createElement(XML_ELEM_LOCATION);
+
+                    Element latitudeElement = doc.createElement(XML_ELEM_LATITUDE);
+                    latitudeElement.appendChild(doc.createTextNode(String.format("%f", currentLat.latitude)));
+
+                    Element longitudeElement = doc.createElement(XML_ELEM_LATITUDE);
+                    longitudeElement.appendChild(doc.createTextNode(String.format("%f", currentLat.longitude)));
+
+                    locationElement.appendChild(latitudeElement);
+                    locationElement.appendChild(longitudeElement);
+
+                    mapElement.appendChild(locationElement);
+                }
+            }
+
+
 
             rootElement.appendChild(mapElement);
 
@@ -117,6 +137,7 @@ public class FileManagerUtil {
             StreamResult result = new StreamResult(new FileOutputStream(new File(xmlFilePath), false));
 
             transformer.transform(source, result);
+            Log.d(TAG, "writeTrackingDataInternalStorage: \n" + source.getNode().getTextContent());
         }
         catch (ParserConfigurationException | TransformerException | SAXException pce)
         {

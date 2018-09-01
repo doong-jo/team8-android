@@ -3,10 +3,10 @@ package com.helper.helper;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -19,6 +19,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -27,9 +28,11 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.os.ResultReceiver;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +43,9 @@ import android.widget.Toast;
 
 import com.helper.helper.Info.InfoFragment;
 import com.helper.helper.ble.BluetoothLeService;
+import com.helper.helper.led.LEDFragment;
+import com.helper.helper.location.Constants;
+import com.helper.helper.location.FetchAddressIntentService;
 import com.helper.helper.tracking.TrackingData;
 import com.helper.helper.util.FileManagerUtil;
 import com.helper.helper.util.GyroManagerUtil;
@@ -52,14 +58,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static java.lang.Math.abs;
 
-
-public class ScrollingActivity extends AppCompatActivity implements SensorEventListener{
+public class ScrollingActivity extends AppCompatActivity implements SensorEventListener {
     private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
     private static final int TAB_STATUS = 0;
     private static final int TAB_LED = 1;
@@ -67,6 +72,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private static final int REQUEST_ENABLE_BT = 2001;
     private static final int AZIMUTH_PIVOT = 20;
     private static final int PITCH_PIVOT = 5;
+    private static final int ROLL_PIVOT = 20;
     private static final String BT_UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee";
     private static final int MESSAGE_STATE_CHANGE = 1;
     public static final int MESSAGE_WRITE = 2;
@@ -74,10 +80,22 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
 
+    private static final int ORIENTATION_LEFT = 944;
+    private static final int ORIENTATION_RIGHT = 344;
+    private static final int ORIENTATION_NONE = 892;
+    private static final int EMERGENCY = 121;
+
+    private static final int SHAKE_THRESHOLD = 5000;
+
+    private static final String SENT = "SMS_SENT_ACTION";
+    private static final String DELIVERED = "SMS_DELIVERED_ACTION";
+
     private TabLayout m_tabLayout;
     private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
+
     private InfoFragment m_infoFrag;
+    private LEDFragment m_ledFrag;
 
     private boolean m_IsSupportedBT = false;
     private BluetoothAdapter m_bluetoothAdapter;
@@ -85,11 +103,32 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private BluetoothGattCharacteristic m_characteristicTX;
     private BluetoothGattCharacteristic m_characteristicRX;
     private BluetoothDevice m_pairedDevice;
-    private ConnectedThread m_btThread;
 
     private BluetoothSocket m_bluetoothSocket;
     private InputStream m_bluetoothInput;
     private OutputStream m_bluetoothOutput;
+
+    public String getCurLED() {
+        return m_curLED;
+    }
+
+    private String m_curLED;
+    private byte[] m_curSignalStr;
+    private int m_curInterrupt;
+
+    //    SMS
+    private long m_shockStateLastTime;
+    private float m_beforeAccelX;
+    private float m_beforeAccelY;
+    private float m_beforeAccelZ;
+    private String m_strAddressOutput;
+    private String m_strLatitude;
+    private String m_strLogitude;
+    private Location m_curLocation;
+    private AddressResultReceiver m_resultAddressReceiver;
+
+    private boolean m_bInitialize = false;
+
     @SuppressLint("HandlerLeak")
     private final Handler m_handle = new Handler() {
 
@@ -141,13 +180,73 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private String m_recordStartTime;
     private String m_recordEndTime;
 
-    public ViewPager getViewPager() { return m_viewPager; }
-    public boolean getIsRecorded() { return m_IsRecorded; }
+    public void setMapPosition(double latitude, double longitude, Location curLocation) {
+        m_strLatitude = String.format("%f", latitude);
+        m_strLogitude = String.format("%f", longitude);
+        m_curLocation = curLocation;
+
+        startAddressIntentService();
+    }
+
+    private void startAddressIntentService() {
+        // Create an intent for passing to the intent service responsible for fetching the address.
+        Intent intent = new Intent(this, FetchAddressIntentService.class);
+
+        // Pass the result receiver as an extra to the service.
+        intent.putExtra(Constants.RECEIVER, m_resultAddressReceiver);
+
+        // Pass the location data as an extra to the service.
+        intent.putExtra(Constants.LOCATION_DATA_EXTRA, m_curLocation);
+
+        // Start the service. If the service isn't already running, it is instantiated and started
+        // (creating a process for it if needed); if it is running then it remains running. The
+        // service kills itself automatically once all intents are processed.
+        try {
+            startService(intent);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private class AddressResultReceiver extends ResultReceiver {
+        AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        /**
+         *  Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
+         */
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string or an error message sent from the intent service.
+            m_strAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            m_strAddressOutput = m_strAddressOutput.replaceAll("대한민국 ", "");
+        }
+    }
+
+    public ViewPager getViewPager() {
+        return m_viewPager;
+    }
+
+    public boolean getIsRecorded() {
+        return m_IsRecorded;
+    }
+
+    public int getcurInterruptState() {
+        return m_curInterrupt;
+    }
+
+    public void setcurInterrupt(int m_curInterrupt) {
+        this.m_curInterrupt = m_curInterrupt;
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_scrolling);
 
         /* ToolBar UI start */
@@ -167,22 +266,21 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         m_viewPager.setAdapter(m_pagerAdapter);
         m_viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(m_tabLayout));
 
+
         m_tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 Log.d("DEV", "onTabSelected called! posistion : " + tab.getPosition());
                 m_viewPager.setCurrentItem(tab.getPosition());
 
-                if( tab.getPosition() == TAB_STATUS ) {
+                if (tab.getPosition() == TAB_STATUS) {
 
-                    if( m_IsRecorded ) {
+                    if (m_IsRecorded) {
                         ((FloatingActionButton) m_infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_solid, getApplicationContext().getTheme()));
-                    }
-                    else {
+                    } else {
                         ((FloatingActionButton) m_infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_circle_solid, getApplicationContext().getTheme()));
                     }
-                }
-                else if( tab.getPosition() == TAB_TRACKING ) {
+                } else if (tab.getPosition() == TAB_TRACKING) {
 
 
                 }
@@ -198,6 +296,9 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
             }
         });
+
+
+
         /* Tab end */
 
         /* Valid Bluetooth supports start */
@@ -216,7 +317,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         boolean dirExists = storage.isDirectoryExists(path);
 
-        if( dirExists ) {
+        if (dirExists) {
             Toast.makeText(this, newDir + " is exist", Toast.LENGTH_SHORT).show();
         } else {
             storage.createDirectory(newDir);
@@ -227,14 +328,17 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         /* Set Bluetooth start */
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-
         /* Set Bluetooth end */
 
         /* Sensor start */
-        GyroManagerUtil.m_sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        GyroManagerUtil.m_sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         GyroManagerUtil.m_sensorAccel = GyroManagerUtil.m_sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         GyroManagerUtil.m_sensorMag = GyroManagerUtil.m_sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         /* Sensor end */
+
+        m_resultAddressReceiver = new AddressResultReceiver(new Handler());
+
+        m_bInitialize = true;
     }
 
     public void moveToLEDDash(View v) {
@@ -256,6 +360,11 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                 finish();
             }
 
+            if( m_infoFrag == null ) {
+                m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+                        "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                                .getItemId(TAB_STATUS));
+            }
             m_bluetoothLeService.setInfoFragment(m_infoFrag);
 
             /* Connect Bluetooth Device Start
@@ -266,8 +375,10 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                 Toast.makeText(getApplicationContext(), "Already enable bluetooth", Toast.LENGTH_SHORT).show();
                 try {
                     connectDevice();
+                    updateConnectionLayout(true);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    updateConnectionLayout(false);
                 }
             }
             /* Connect Bluetooth Device End */
@@ -291,15 +402,15 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         } else {
             try {
                 connectDevice();
+                updateConnectionLayout(true);
             } catch (IOException e) {
                 e.printStackTrace();
+                updateConnectionLayout(false);
             }
         }
     }
 
     public void updateConnectionLayout(boolean IsConnected) {
-        Toast.makeText(this, "connected paired device HELPER!", Toast.LENGTH_SHORT).show();
-
         LinearLayout connectLayout = (LinearLayout) findViewById(R.id.connect_layout);
         TextView connectDiscription = (TextView) findViewById(R.id.connect_desc_text);
         TextView connectToggle = (TextView) findViewById(R.id.connect_toggle_text);
@@ -328,20 +439,17 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         String[] deviceLabels = new String[devices.size()];
         for (int i = 0; i < deviceLabels.length; ++i) {
-            Log.d(TAG, "connectDevice: "+ devices.get(i).getName());
-            Log.d(TAG, "connectDevice: "+ getString(R.string.device_bluetooth_name));
+            Log.d(TAG, "connectDevice: " + devices.get(i).getName());
+            Log.d(TAG, "connectDevice: " + getString(R.string.device_bluetooth_name));
             String deviceSSID = new String(getString(R.string.device_bluetooth_name));
 
-            if( devices.get(i).getName().equals(deviceSSID) ) {
+            if (devices.get(i).getName().equals(deviceSSID)) {
                 Log.d(TAG, "connectDevice: equal");
             } else {
                 Log.d(TAG, "connectDevice: not equal");
             }
 
-            if (devices.get(i).getName().equals(deviceSSID)
-//                    &&  m_bluetoothLeService.connect(devices.get(i).getAddress()
-            ) {
-                updateConnectionLayout(true);
+            if ( devices.get(i).getName().equals(deviceSSID) ) {
                 m_pairedDevice = devices.get(i);
                 m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BT_UUID));
                 m_bluetoothInput = m_bluetoothSocket.getInputStream();
@@ -349,10 +457,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
                 m_bluetoothSocket.connect();
 
-                m_btThread = new ConnectedThread(m_bluetoothSocket);
-                m_btThread.run();
-
-//                InitializeBLESignal();
+                Toast.makeText(this, "connected paired device HELPER!", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -365,7 +470,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
                 public void onReceive(Context context, Intent intent) {
 
-                    if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
+                    if ( BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
 
                         BluetoothDevice searchedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                         if (searchedDevice.getName() == null) {
@@ -376,27 +481,20 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
                         String deviceSSID = new String(getString(R.string.device_bluetooth_name));
 
-                        // HELPER
                         if (searchedDevice.getName().equals(deviceSSID)
-//                                && m_bluetoothLeService.connect(searchedDevice.getAddress()
                                 ) {
                             m_pairedDevice = searchedDevice;
                             try {
-
-                                updateConnectionLayout(true);
                                 m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BT_UUID));
                                 m_bluetoothInput = m_bluetoothSocket.getInputStream();
                                 m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
 
                                 m_bluetoothSocket.connect();
 
-                                m_btThread = new ConnectedThread(m_bluetoothSocket);
-                                m_btThread.run();
+                                Toast.makeText(getApplicationContext(), "connected device HELPER!", Toast.LENGTH_SHORT).show();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            Toast.makeText(getApplicationContext(), "connected device HELPER!", Toast.LENGTH_SHORT).show();
-//                            InitializeBLESignal();
                         }
                     }
                 }
@@ -407,41 +505,102 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         }
     }
 
-    public void sendSignal(View v) {
-//        if( m_characteristicTX == null ) { return; }
+    public void ledImageListener(View v) {
 
         String str = "helper";
 
-//        write(str.getBytes());
+        String resName = v.getResources().getResourceName(v.getId());
+        String imgName = resName.split(String.format("%s", '/'))[1];
 
-        switch (v.getResources().getResourceName(v.getId())) {
-            case "com.helper.helper:id/img1":
-                str = "LED1";
-                break;
-
-            case "com.helper.helper:id/img2":
-                str = "LED2";
-                break;
-
-            case "com.helper.helper:id/img3":
-                str = "LED3";
-                break;
-
-            case "com.helper.helper:id/img4":
-                str = "LED4";
-                break;
-
-            case "com.helper.helper:id/battery":
-                str = "LED5";
-                break;
-
-            default:
-                str = "1";
+        if( m_infoFrag == null ) {
+            m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+                    "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                            .getItemId(TAB_STATUS));
         }
+
+        if( m_ledFrag == null ) {
+            m_ledFrag = (LEDFragment) getSupportFragmentManager().findFragmentByTag(
+                    "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                            .getItemId(TAB_LED));
+        }
+
+
+
+        switch (imgName) {
+            case "img0":
+                str = "0-00-0";
+                m_infoFrag.setCurLEDView(R.drawable.bird);
+                m_ledFrag.setCurLEDView(R.drawable.bird);
+                break;
+
+            case "img1":
+                str = "0-01-0";
+                m_infoFrag.setCurLEDView(R.drawable.characters);
+                m_ledFrag.setCurLEDView(R.drawable.characters);
+                break;
+
+            case "img2":
+                str = "0-02-0";
+                m_infoFrag.setCurLEDView(R.drawable.windy);
+                m_ledFrag.setCurLEDView(R.drawable.windy);
+                break;
+
+            case "img3":
+                str = "0-03-0";
+                m_infoFrag.setCurLEDView(R.drawable.snow);
+                m_ledFrag.setCurLEDView(R.drawable.snow);
+                break;
+
+            case "img4":
+                str = "0-04-0";
+                m_infoFrag.setCurLEDView(R.drawable.rain);
+                m_ledFrag.setCurLEDView(R.drawable.rain);
+                break;
+
+            case "img5":
+                str = "0-05-0";
+                m_infoFrag.setCurLEDView(R.drawable.cute);
+                m_ledFrag.setCurLEDView(R.drawable.cute);
+                break;
+
+            case "img6":
+                str = "0-06-1";
+                m_infoFrag.setCurLEDView(R.drawable.moving_arrow_left_blink);
+                m_ledFrag.setCurLEDView(R.drawable.moving_arrow_left_blink);
+                break;
+
+            case "img7":
+                str = "0-07-1";
+                m_infoFrag.setCurLEDView(R.drawable.moving_arrow_right_blink);
+                m_ledFrag.setCurLEDView(R.drawable.moving_arrow_right_blink);
+                break;
+
+            case "img8":
+                str = "0-08-1";
+                m_infoFrag.setCurLEDView(R.drawable.emergency_blink);
+                m_ledFrag.setCurLEDView(R.drawable.emergency_blink);
+                break;
+
+            case "img9":
+                str = "0-09-0";
+                m_infoFrag.setCurLEDView(R.drawable.mario);
+                m_ledFrag.setCurLEDView(R.drawable.mario);
+                break;
+
+            case "img10":
+                str = "0-10-0";
+                m_infoFrag.setCurLEDView(R.drawable.boy);
+                m_ledFrag.setCurLEDView(R.drawable.boy);
+                break;
+        }
+
+        m_curLED = str;
+
+
 
         final byte[] tx = str.getBytes();
 
-        write(str.getBytes());
+        sendToBluetoothDevice(str.getBytes());
 
 //        m_characteristicTX.setValue(tx);
 //
@@ -453,13 +612,13 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     }
 
     public void toggleRecord(View v) {
-        if( m_viewPager.getCurrentItem() != TAB_STATUS ) {
+        if (m_viewPager.getCurrentItem() != TAB_STATUS) {
             return;
         }
 
         m_IsRecorded = !m_IsRecorded;
 
-        if( m_IsRecorded ) {
+        if (m_IsRecorded) {
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             m_recordStartDate = dateFormat.format(date);
@@ -476,6 +635,12 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
             SimpleDateFormat endTimeFormat = new SimpleDateFormat("hh:mm");
             m_recordEndTime = endTimeFormat.format(date);
 
+            if( m_infoFrag == null ) {
+                m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+                        "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                                .getItemId(TAB_STATUS));
+            }
+
             try {
                 TrackingData trackingData = new TrackingData(
                         m_recordStartDate,
@@ -487,18 +652,13 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                 FileManagerUtil.writeTrackingDataInternalStorage(getApplicationContext(), trackingData);
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-
-            if( m_infoFrag == null ) {
-                m_infoFrag = (InfoFragment)m_viewPager
-                        .getAdapter()
-                        .instantiateItem(m_viewPager, TAB_STATUS);
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
             }
 
             m_infoFrag.recordStopAndEraseLocationList();
         }
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -531,11 +691,11 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                     return;
                 }
 
-                if( m_viewPager.getCurrentItem() == TAB_STATUS ) {
+                if (m_viewPager.getCurrentItem() == TAB_STATUS) {
                     if( m_infoFrag == null ) {
-                        m_infoFrag = (InfoFragment)m_viewPager
-                                .getAdapter()
-                                .instantiateItem(m_viewPager, m_viewPager.getCurrentItem());
+                        m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+                                "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                                        .getItemId(TAB_STATUS));
                     }
 
                     m_infoFrag.requsetLocation();
@@ -575,19 +735,146 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         GyroManagerUtil.m_sensorManager.unregisterListener(this);
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        String writeStr = "-1";
+//        sendToBluetoothDevice(writeStr.getBytes());
+        try {
+            m_bluetoothSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void changeLeftOrRightLEDOfRoll(float roll) {
+        String writeStr = "";
+
+        if( m_curInterrupt == EMERGENCY) {
+            return;
+        }
+
+        if ( roll >= ROLL_PIVOT ) {
+            Log.d(TAG, "onSensorChanged: right");
+            writeStr = "0-07-1";
+            sendToBluetoothDevice(writeStr.getBytes());
+
+            m_curInterrupt = ORIENTATION_RIGHT;
+        }
+
+        else if ( roll <=  -ROLL_PIVOT ) {
+            Log.d(TAG, "onSensorChanged: left");
+            writeStr = "0-06-1";
+            sendToBluetoothDevice(writeStr.getBytes());
+
+            m_curInterrupt = ORIENTATION_LEFT;
+        }
+
+        if( Math.abs(GyroManagerUtil.getPivotRoll()) >= 20 &&
+                Math.abs(roll) < 20 ) {
+            writeStr = m_curLED;
+
+            if ( writeStr == null) {
+                return;
+            }
+
+
+            sendToBluetoothDevice(writeStr.getBytes());
+
+            m_curInterrupt = ORIENTATION_NONE;
+        }
+    }
+
+    private void sendSMS(String num, String txt) {
+
+        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
+        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+
+        SmsManager sms = SmsManager.getDefault();
+        if(sms == null) {
+            Log.e(TAG, "sms == null");
+            return;
+        }
+        sms.sendTextMessage(num, "ME", txt, sentPI, deliveredPI);
+        //sms.sendTextMessage(num, null, txt, null, null);
+    }
+
+    public void shockStateDetector(float accelX, float accelY, float accelZ) {
+        long currentTime = System.currentTimeMillis();
+        long gabOfTime = (currentTime - m_shockStateLastTime);
+        float speed = 0;
+        if (gabOfTime > 100) {
+            m_shockStateLastTime = currentTime;
+
+            speed = Math.abs(accelX + accelY + accelZ - m_beforeAccelX - m_beforeAccelY - m_beforeAccelZ) / gabOfTime * 10000;
+
+//            if(count++ < 3 ) {
+//                sum_speed += speed;
+//                return;
+//            } else {
+//                count = 0;
+//                speed = sum_speed/3;
+//                sum_speed = 0;
+//            }
+//            if (speed > 700 && speed < SHAKE_THRESHOLD) {
+//                Log.e("speed", "speed : " + speed);
+//                if(bProcessing) {// 사용자 실수시 가볍게 흔들어서 취소
+//                    hanSensor.removeMessages(1);
+//                    hanSensor.sendEmptyMessageDelayed(2, 1000);
+//                    showMsgl("취소 " + speed);
+//                    return;
+//                }
+            if (speed > SHAKE_THRESHOLD) {
+                Log.d(TAG, "shockStateDetector: ");
+                try {
+                    String strSMS1 = getString(R.string.sms_content) + "\n\n" +  m_strAddressOutput;
+                    String strSMS2 = "https://google.com/maps?q=" + m_strLatitude + "," + m_strLogitude;
+
+                    sendSMS("+8201034823161", strSMS1);
+                    sendSMS("+8201034823161", strSMS2);
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                }
+//                if(!bProcessing) {
+//                    bProcessing = true;
+//                    hanSensor.sendEmptyMessage(0);
+//                    showMsgl("충격 발생 " + speed);
+            }
+//                else { // 2차 충격
+//                    bProcessing = true;
+//                    hanSensor.removeMessages(1); // 다이얼로그 연장
+//                    hanSensor.sendEmptyMessageDelayed(1, send_time * 1000);
+//                    showMsgl("2,3차 충격 " + speed);
+//                }
+//            }
+
+
+            m_beforeAccelX = accelX;
+            m_beforeAccelY = accelY;
+            m_beforeAccelZ = accelZ;
+
+        }
+    }
     public void onSensorChanged(SensorEvent sensorEvent) {
+
+        if (!m_bInitialize) { return; }
 
         if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             m_fAccel[0] = sensorEvent.values[0];
             m_fAccel[1] = sensorEvent.values[1];
             m_fAccel[2] = sensorEvent.values[2];
 
+            shockStateDetector(m_fAccel[0], m_fAccel[1], m_fAccel[2]);
         }
         else if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             m_fMag[0] = sensorEvent.values[0];
@@ -597,107 +884,22 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         float[] resultValues = GyroManagerUtil.getOrientation(m_fAccel, m_fMag);
 
-        long curMillis = System.currentTimeMillis();
-//        Log.d(TAG, "onSensorChanged: diff milles -> " + String.format("%d", curMillis - GyroManagerUtil.getTimerStartTime()));
-//        Log.d(TAG, "onSensorChanged: cur milles -> " + String.format("%d", curMillis));
-//        Log.d(TAG, "onSensorChanged: start milles -> " + String.format("%d", GyroManagerUtil.getTimerStartTime()));
+        changeLeftOrRightLEDOfRoll(resultValues[2]);
 
-        if(GyroManagerUtil.getPivotPitch() == 0.0f) {
-            GyroManagerUtil.setPivotPitch(resultValues[1]);
+        GyroManagerUtil.setPivotRoll(resultValues[2]);
+
+        if( m_infoFrag == null) {
+            m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+                    "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+                            .getItemId(TAB_STATUS));
+
+//            m_infoFrag = (InfoFragment)m_viewPager
+//                    .getAdapter()
+//                    .instantiateItem(m_viewPager, TAB_STATUS);
+
+        } else {
+//            m_infoFrag.setTextTiltXYZ(resultValues);
         }
-        if ( curMillis - GyroManagerUtil.getTimerStartTime() > 5000 ) {
-            GyroManagerUtil.setTimerStartTime(curMillis);
-//            Log.d(TAG, "onSensorChanged: 3000 millis after!");
-            GyroManagerUtil.setPivotAzimuth(resultValues[0]);
-            Toast.makeText(this, "Change pivot!", Toast.LENGTH_SHORT).show();
-        }
-
-
-        else {
-            if( /*직진상태다*/ resultValues[1] - GyroManagerUtil.getPivotPitch() < 5 )  {
-//                Log.d(TAG, "onSensorChanged: 직진상태다");
-//                Toast.makeText(this, "직진상태다", Toast.LENGTH_SHORT).show();
-            }
-            /*회전상태다*/
-            else  {
-//                Log.d(TAG, "onSensorChanged: 회전상태다");
-
-                // 방위 값으로 좌우 방향 검사
-                // 서로의 부호가 다를 때.
-                if( resultValues[0] * GyroManagerUtil.getPivotAzimuth() < 0 ) {
-                    //현재 값이 양수
-                    float convertPivot;
-                    float convertAfeter;
-
-                    if (resultValues[0] > 0 && GyroManagerUtil.getPivotAzimuth() < 0) {
-                        convertPivot = 180 - resultValues[0];
-                        convertAfeter = 180 - abs(GyroManagerUtil.getPivotAzimuth());
-
-                        if (convertPivot + convertAfeter >= AZIMUTH_PIVOT) {
-                            //우회전상태
-                            Log.d(TAG, "onSensorChanged: 부호가 다르고 현재값 양수 Right!");
-//                            Toast.makeText(this, "onSensorChanged : 부호가 다르고 현재값 양수 Right!", Toast.LENGTH_SHORT).show();
-//                            GyroManagerUtil.setPivotAzimuth(resultValues[0]);
-                        }
-                    }
-                    //현재 값이 음수
-                    else if (resultValues[0] < 0 && GyroManagerUtil.getPivotAzimuth() > 0) {
-                        convertPivot = 180 - abs(resultValues[0]);
-                        convertAfeter = 180 - abs(GyroManagerUtil.getPivotAzimuth());
-
-                        if (convertPivot + convertAfeter >= AZIMUTH_PIVOT) {
-                            //좌회전상태
-                            Log.d(TAG, "onSensorChanged: 부호가 다르고 현재값 음수 Left!");
-//                            Toast.makeText(this, "onSensorChanged : 부호가 다르고 현재값 음수 Left!", Toast.LENGTH_SHORT).show();
-//                            GyroManagerUtil.setPivotAzimuth(resultValues[0]);
-                        }
-                    }
-                }
-
-                //서로의 부호가 같을 때
-                else if( resultValues[0] * GyroManagerUtil.getPivotAzimuth() > 0 ) {
-                    //양수일 때
-                    if (resultValues[0] > 0 ) {
-                        if( resultValues[0] - GyroManagerUtil.getPivotAzimuth() >= AZIMUTH_PIVOT ) {
-                            //우회전 상태
-                            Log.d(TAG, "onSensorChanged: 부호가 같고 현재값 양수 Right!");
-//                            Toast.makeText(this, "onSensorChanged : 부호가 같고 양수 Left!", Toast.LENGTH_SHORT).show();
-                            GyroManagerUtil.setPivotAzimuth(resultValues[0]);
-                        }
-                        else if( GyroManagerUtil.getPivotAzimuth() - resultValues[0] >= AZIMUTH_PIVOT ) {
-                            //좌회전 상태
-                            Log.d(TAG, "onSensorChanged: 부호가 같고 현재값 양수 Left!");
-//                            Toast.makeText(this, "onSensorChanged : 부호가 같고 양수 Right!", Toast.LENGTH_SHORT).show();
-                            GyroManagerUtil.setPivotAzimuth(resultValues[0]);
-                        }
-                    }
-                    //음수일 때
-                    else if ( resultValues[0] < 0 ) {
-                        if( resultValues[0] - GyroManagerUtil.getPivotAzimuth() >= AZIMUTH_PIVOT ) {
-                            //좌회전 상태
-                            Log.d(TAG, "onSensorChanged: 부호가 같고 음수 Left!");
-//                            Toast.makeText(this, "onSensorChanged : 부호가 같고 음수 Left!", Toast.LENGTH_SHORT).show();
-                            GyroManagerUtil.setPivotAzimuth(resultValues[0]);
-                        }
-                        else if( GyroManagerUtil.getPivotAzimuth() - resultValues[0] >= AZIMUTH_PIVOT ) {
-                            //우회전 상태
-                            Log.d(TAG, "onSensorChanged: 부호가 같고 음수 Right!");
-//                            Toast.makeText(this, "onSensorChanged : 부호가 같고 음수 Right!", Toast.LENGTH_SHORT).show();
-//                            GyroManagerUtil.setPivotAzimuth(resultValues[0]);
-                        }
-                    }
-                }
-
-            }
-        }
-
-//        resultValues[0] = resultValues[0] - GyroManagerUtil.getPivotAzimuth();
-//        resultValues[1] = resultValues[1] - GyroManagerUtil.getPivotPitch();
-        m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
-                "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
-                        .getItemId(TAB_STATUS));
-
-        if(m_infoFrag != null) { m_infoFrag.setTextTiltXYZ(resultValues); }
     }
 
     @Override
@@ -705,47 +907,21 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
     }
 
-    private class ConnectedThread extends Thread {
-        private final BluetoothSocket m_socket;
-        private final InputStream m_input;
-        private final OutputStream m_output;
-
-        public ConnectedThread(BluetoothSocket socket) {
-            m_socket = socket;
-            InputStream tmpIn = null;
-            OutputStream tmpOut = null;
-
-            try {
-                tmpIn = socket.getInputStream();
-                tmpOut = socket.getOutputStream();
-            } catch (IOException e) {
-
-            }
-
-            m_input = tmpIn;
-            m_output = tmpOut;
+    public void sendToBluetoothDevice(byte[] bytes) {
+        if(Arrays.equals(m_curSignalStr, bytes) || m_bluetoothOutput == null) {
+            return;
         }
 
-        public void run() {
-            byte[] buffer = new byte[1024];
-            int bytes;
-
-//            while(true) {
-////                try {
-//////                    bytes = m_input.read(buffer);
-//////                    m_handle.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-//////                            .sendToTarget();
-////                } catch (IOException e){
-////                    break;
-////                }
-//            }
-        }
-    }
-
-    public void write(byte[] bytes) {
-        try {
+        try{
             m_bluetoothOutput.write(bytes);
-        } catch (IOException e) { }
+            m_curSignalStr = bytes.clone();
+        } catch (NullPointerException e ) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            updateConnectionLayout(false);
+            e.printStackTrace();
+        }
     }
 
     public void cancel() {

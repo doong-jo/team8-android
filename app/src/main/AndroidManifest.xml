@@ -13,6 +13,15 @@
     <uses-feature android:name="android.hardware.accelerometer" android:required="true" />
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--SMS-->
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -25,6 +34,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k" />
+
 
         <activity
             android:name=".ScrollingActivity"
@@ -39,6 +49,11 @@
 
         <!--BLE service class 추가-->
         <service android:name=".ble.BluetoothLeService" android:enabled="true"/>
+
+        <service
+            android:name=".location.FetchAddressIntentService"
+            android:exported="false"/>
+
     </application>
 
 </manifest>
