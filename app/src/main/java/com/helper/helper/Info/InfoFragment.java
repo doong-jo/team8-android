@@ -3,6 +3,7 @@ package com.helper.helper.Info;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -11,16 +12,22 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.NestedScrollView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationCallback;
@@ -57,8 +64,15 @@ public class InfoFragment extends Fragment
     private final static String TAG = InfoFragment.class.getSimpleName() + "/DEV";
     private static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
     private static final int GPS_ENABLE_REQUEST_CODE = 2002;
-    private static final int UPDATE_INTERVAL_MS = 15000;
-    private static final int FASTEST_UPDATE_INTERVAL_MS = 15000;
+    private static final int SEND_SMS_REQUEST_CODE = 947;
+    private static final int UPDATE_INTERVAL_MS = 1500;
+    private static final int FASTEST_UPDATE_INTERVAL_MS = 1000;
+    private static final float EMENRGENCY_SPPED_PIVOT = 0.8f;
+
+    private static final int ORIENTATION_LEFT = 944;
+    private static final int ORIENTATION_RIGHT = 344;
+    private static final int ORIENTATION_NONE = 892;
+    private static final int EMERGENCY = 121;
 
     private BatteryView m_batView;
     private MapView m_mapView;
@@ -68,6 +82,7 @@ public class InfoFragment extends Fragment
     private Location m_curLocation;
     private Marker m_curLocationMarker;
     private static LatLng m_beforeLatlng = null;
+    private float m_curSpeed;
 
     private double m_fCurDistance = 0.0;
     private List<LatLng> m_lCurRecordedLocation;
@@ -76,11 +91,25 @@ public class InfoFragment extends Fragment
     private TextView m_textViewTiltY;
     private TextView m_textViewTiltZ;
 
+    private TextView m_textBeforeSpeed;
+    private TextView m_textCurSpeed;
+
+    private SeekBar m_brightSeekbar;
+    private SeekBar m_speedSeekbar;
+
+    private ImageView m_curLEDView;
+
     public double getCurTrackingDistance() {
         return m_fCurDistance;
     }
+
     public List<LatLng> getCurrRecordedLocationList() {
         return m_lCurRecordedLocation;
+    }
+
+    public void setCurLEDView(int gifDrawable) {
+        GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+        Glide.with(this).load(gifDrawable).into(gifimage);
     }
 
     public InfoFragment() {
@@ -89,6 +118,7 @@ public class InfoFragment extends Fragment
 
     @SuppressWarnings("MissingPermission")
     private LocationCallback mLocationCallback;
+
     {
         mLocationCallback = new LocationCallback() {
             @Override
@@ -100,6 +130,49 @@ public class InfoFragment extends Fragment
                     Location location = locationList.get(locationList.size() - 1);
                     m_curLocation = location;
 
+                    Log.d(TAG, "" + location.getLatitude() + " " + location.getLongitude());
+
+                    try {
+                        ((ScrollingActivity)getActivity()).setMapPosition(location.getLatitude(), location.getLongitude(), location);
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
+
+                    String writeStr = "";
+
+//                    m_textCurSpeed.setText("현재 속도 : " + String.format("%f", location.getSpeed()));
+//                    m_textBeforeSpeed.setText("이전 속도 : " + String.format("%f", m_curSpeed));
+
+//                    if( location.getSpeed() >= 1 && location.getSpeed() * EMENRGENCY_SPPED_PIVOT < m_curSpeed ) {
+//                    if( location.getSpeed() < m_curSpeed ) {
+//                        writeStr = "0-08-1";
+//
+//                        ((ScrollingActivity)getActivity()).setcurInterrupt(EMERGENCY);
+//                    }
+
+                    int curInterrutState = ((ScrollingActivity)getActivity()).getcurInterruptState();
+
+                    if ( curInterrutState == EMERGENCY && location.getSpeed() >= m_curSpeed ) {
+                        writeStr = ((ScrollingActivity)getActivity()).getCurLED();
+
+                        ((ScrollingActivity)getActivity()).setcurInterrupt(ORIENTATION_NONE);
+                    }
+
+                    try{
+                        if( writeStr != "" ) {
+                            ((ScrollingActivity)getActivity()).sendToBluetoothDevice(writeStr.getBytes());
+                        }
+                    }
+                    catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
+
+
+//                    Toast.makeText(getContext(), "C: " + location.getSpeed() + " / B: " + m_curSpeed, Toast.LENGTH_SHORT).show();
+
+                    m_curSpeed = location.getSpeed();
+//                    Toast.makeText(getContext(), "onLocationResult : "+ location.getSpeed(), Toast.LENGTH_SHORT).show();
+
                     if (m_curLocationMarker != null) {
                         m_curLocationMarker.remove();
                     }
@@ -107,23 +180,66 @@ public class InfoFragment extends Fragment
                     setCurrentLocation(location, "Current Position", "GPS Position");
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-                    if (((ScrollingActivity) getActivity()).getIsRecorded()) {
-                        m_lCurRecordedLocation.add(new LatLng(m_curLocation.getLatitude(), m_curLocation.getLongitude()));
+                    try{
+                        if (((ScrollingActivity) getActivity()).getIsRecorded()) {
+                            m_lCurRecordedLocation.add(new LatLng(m_curLocation.getLatitude(), m_curLocation.getLongitude()));
 
-                        if (m_beforeLatlng != null) {
-                            m_googleMap.addPolyline((new PolylineOptions())
-                                    .add(m_beforeLatlng, latLng)
-                                    .width(R.dimen.google_polyline_width).color(Color.BLUE)
-                                    .geodesic(true));
+                            if (m_beforeLatlng != null) {
+                                m_googleMap.addPolyline((new PolylineOptions())
+                                        .add(m_beforeLatlng, latLng)
+                                        .width(R.dimen.google_polyline_width).color(Color.BLUE)
+                                        .geodesic(true));
 
-                            m_fCurDistance += CalculationByDistance(m_beforeLatlng, latLng);
+                                m_fCurDistance += CalculationByDistance(m_beforeLatlng, latLng);
+                            }
                         }
+                        m_beforeLatlng = latLng;
                     }
-                    m_beforeLatlng = latLng;
+                    catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             }
         };
     }
+
+    private SeekBar.OnSeekBarChangeListener m_seekBarBrightChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            String str = "2-" + String.format("%02d-%d", i/10, i%10);
+            ((ScrollingActivity)getActivity()).sendToBluetoothDevice(str.getBytes());
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
+
+    private SeekBar.OnSeekBarChangeListener m_seekBarSpeedChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            String str = "1-" + String.format("%02d-%d", i/10, i%10);
+            ((ScrollingActivity)getActivity()).sendToBluetoothDevice(str.getBytes());
+        }
+
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
 
     public double CalculationByDistance(LatLng StartP, LatLng EndP) {
         int Radius = 6371;// radius of earth in Km
@@ -189,23 +305,66 @@ public class InfoFragment extends Fragment
         m_lCurRecordedLocation = new ArrayList<LatLng>();
 
         m_batView = (BatteryView) view.findViewById(R.id.batView);
-        m_batView.setPower(78);
+        m_batView.setPower(100);
 
-        if( m_mapView == null ) {
+//        if (m_mapView == null) {
             m_mapView = (MapView) view.findViewById(R.id.map);
             m_mapView.onCreate(savedInstanceState);
             m_mapView.onResume();
             m_mapView.getMapAsync(this);
-        }
+//        }
 
 
         adjustMapVerticalTouch(view);
 
-        m_textViewTiltX = (TextView) view.findViewById(R.id.TiltX);
-        m_textViewTiltY = (TextView) view.findViewById(R.id.TiltY);
-        m_textViewTiltZ = (TextView) view.findViewById(R.id.TiltZ);
+//        m_textViewTiltX = (TextView) view.findViewById(R.id.TiltX);
+//        m_textViewTiltY = (TextView) view.findViewById(R.id.TiltY);
+//        m_textViewTiltZ = (TextView) view.findViewById(R.id.TiltZ);
+
+//        m_textCurSpeed = (TextView) view.findViewById(R.id.curSpeed);
+//        m_textBeforeSpeed = (TextView) view.findViewById(R.id.beforeSpeed);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            if ( !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ||
+                    !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
+
+                /* Result about user selection -> onActivityResult in ScrollActivity */
+                PermissionUtil.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, GPS_ENABLE_REQUEST_CODE);
+            } else {
+                if ( m_googleApiClient == null) {
+                    buildGoogleApiClient();
+                }
+                requsetLocation();
+            }
+
+            if ( !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.SEND_SMS) ) {
+
+                /* Result about user selection -> onActivityResult in ScrollActivity */
+                PermissionUtil.requestPermissions(getActivity(), new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_REQUEST_CODE);
+            } else {
+
+            }
+
+
+        } else {
+
+            if ( m_googleApiClient == null) {
+                buildGoogleApiClient();
+            }
+        }
+
+        m_brightSeekbar = (SeekBar) view.findViewById(R.id.brightSeek);
+        m_speedSeekbar = (SeekBar) view.findViewById(R.id.speedSeek);
+
+        m_brightSeekbar.setOnSeekBarChangeListener(m_seekBarBrightChangeListener);
+        m_speedSeekbar.setOnSeekBarChangeListener(m_seekBarSpeedChangeListener);
+
+        m_curLEDView = (ImageView) view.findViewById(R.id.InfoFragment_curLED);
+
         return view;
     }
+
 
     @Override
     public void onAttachFragment(Fragment childFragment) {
@@ -253,8 +412,8 @@ public class InfoFragment extends Fragment
 
     @SuppressLint("MissingPermission")
     public void requsetLocation() {
-        if( !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) &&
-                !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) ) {
+        if (!PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) &&
+                !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
             return;
         }
 
@@ -272,7 +431,6 @@ public class InfoFragment extends Fragment
         LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(m_locationReq, mLocationCallback, Looper.myLooper());
     }
 
-    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         m_googleMap = googleMap;
@@ -281,6 +439,16 @@ public class InfoFragment extends Fragment
 
         m_googleMap.getUiSettings().setCompassEnabled(true);
         m_googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         m_googleMap.setMyLocationEnabled(true);
 
         m_googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
@@ -290,28 +458,6 @@ public class InfoFragment extends Fragment
         } else {
             m_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(m_curLocation.getLatitude(), m_curLocation.getLongitude()), 15));
             setCurrentLocation(m_curLocation, "Current Position", "GPS Position");
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-            if ( !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ||
-                    !PermissionUtil.checkPermissions(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
-
-                /* Result about user selection -> onActivityResult in ScrollActivity */
-                PermissionUtil.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, GPS_ENABLE_REQUEST_CODE);
-            } else {
-                if ( m_googleApiClient == null) {
-                    buildGoogleApiClient();
-                }
-                requsetLocation();
-            }
-        } else {
-
-            if ( m_googleApiClient == null) {
-                buildGoogleApiClient();
-            }
-
-            googleMap.setMyLocationEnabled(true);
         }
     }
 
@@ -340,6 +486,7 @@ public class InfoFragment extends Fragment
     @Override
     public void onLocationChanged(Location location) {
         m_curLocation = location;
+        Toast.makeText(getContext(), "LocationChaged : " + location.getSpeed(), Toast.LENGTH_SHORT).show();
         setCurrentLocation(m_curLocation, "내 위치", "GPS Position");
     }
 
@@ -395,8 +542,11 @@ public class InfoFragment extends Fragment
     public void onPause() {
         super.onPause();
         m_mapView.onPause();
-        m_googleApiClient.stopAutoManage(getActivity());
-        m_googleApiClient.disconnect();
+        if( m_googleApiClient != null ) {
+            m_googleApiClient.stopAutoManage(getActivity());
+            m_googleApiClient.disconnect();
+        }
+
     }
 
     @Override
@@ -411,14 +561,14 @@ public class InfoFragment extends Fragment
         m_mapView.onLowMemory();
     }
 
-    public void setTextTiltXYZ(float[] values) {
-
-        if( m_textViewTiltX == null || m_textViewTiltY == null || m_textViewTiltZ == null ) {
-            return;
-        }
-
-        m_textViewTiltX.setText("방위 : " + String.format("%f", values[0]));
-        m_textViewTiltY.setText("경사도 : " +String.format("%f", values[1]));
-        m_textViewTiltZ.setText("좌우 회전 : " + String.format("%f", values[2]));
-    }
+//    public void setTextTiltXYZ(float[] values) {
+//
+//        if( m_textViewTiltX == null || m_textViewTiltY == null || m_textViewTiltZ == null ) {
+//            return;
+//        }
+//
+//        m_textViewTiltX.setText("방위 : " + String.format("%f", values[0]));
+//        m_textViewTiltY.setText("경사도 : " +String.format("%f", values[1]));
+//        m_textViewTiltZ.setText("좌우 회전 : " + String.format("%f", values[2]));
+//    }
 }

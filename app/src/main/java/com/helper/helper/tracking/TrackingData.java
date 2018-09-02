@@ -13,10 +13,10 @@ public class TrackingData {
     private List<LatLng> locationData;
 
     public TrackingData(String date, String startTime, String endTime, String distance, List<LatLng> locationData) {
-        this.m_sDate = m_sDate;
-        this.m_sStartTime = m_sStartTime;
-        this.m_sEndTime = m_sEndTime;
-        this.m_sDistance = m_sDistance;
+        this.m_sDate = date;
+        this.m_sStartTime = startTime;
+        this.m_sEndTime = endTime;
+        this.m_sDistance = distance;
         this.locationData = locationData;
     }
 
