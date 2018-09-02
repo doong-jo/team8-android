@@ -216,9 +216,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         boolean dirExists = storage.isDirectoryExists(path);
 
-        if( dirExists ) {
-            Toast.makeText(this, newDir + " is exist", Toast.LENGTH_SHORT).show();
-        } else {
+        if (!dirExists) {
             storage.createDirectory(newDir);
         }
 
@@ -348,11 +346,8 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                 m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
 
                 m_bluetoothSocket.connect();
-
                 m_btThread = new ConnectedThread(m_bluetoothSocket);
                 m_btThread.run();
-
-//                InitializeBLESignal();
                 return;
             }
         }
