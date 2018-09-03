@@ -1,8 +1,10 @@
 import RPi.GPIO as GPIO
-
 import time
+import threading
 
-class Sw420(object):
+
+class vibrateSW(object):
+
     def __init__(self, pin):
         GPIO.setmode(GPIO.BCM)
         self.pin = pin
@@ -11,11 +13,10 @@ class Sw420(object):
         GPIO.add_event_detect(self.pin, GPIO.RISING, callback=self.callback, bouncetime=1)
         self.count = 0
 
-    def callback(self, pin):
+    def callback(self):
         self.count += 1
 
     def vibrate_sensor(self, callback):
-
         try:
             while True:
                 time.sleep(1)
@@ -27,17 +28,27 @@ class Sw420(object):
                 else:
                     print("Not detect vibrate")
 
-                sensor.count = 0
+                time.sleep(5)
+                self.count = 0
+
+            # while True:
+            #     result = GPIO.input(23)
+            #     if result == 1:
+            #         print("detect vibrate.")
+            #         time.sleep(0.05)
+            #
+            #     else:
+            #         print("not detect vibrate.")
+            #         time.sleep(0.05)
+
 
         except KeyboardInterrupt:
             GPIO.cleanup()
 
-        # while True:
-        #     result = GPIO.input(23)
-        #     if result == 1:
-        #         print("detect vibrate.")
-        #         time.sleep(0.05)
-        #
-        #     else:
-        #         print("not detect vibrate.")
-        #         time.sleep(0.05)
+    def run(self, ledcb):
+        t1 = threading.Thread(target=self.vibrate_sensor, args=(ledcb, ))
+        t1.daemon = True
+        t1.start()
+
+# END
+

@@ -207,6 +207,8 @@ public class TrackingFragment extends Fragment
 
         polylines.clear();
 
+        m_map.clear();
+
         for (int i = 1; i < locationList.size(); i++) {
             polylines
                     .add(this.m_map.addPolyline(new PolylineOptions().add(

@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Helper</string>
     <string name="device_bluetooth_name">raspberrypi</string>
-    <string name="action_settings">Guideline</string>
+    <string name="menu_guideline">Guideline</string>
+    <string name="menu_emergency_contacts">Emergency contacts</string>
     <string name="title_activity_maps">Map</string>
 
     <!--Info Fragment-->
@@ -16,7 +17,7 @@
 
     <!--LED Fragment-->
     <string name="cardTitleLEDDetail">Current LED</string>
-    <string name="cardTitleLEDList">LED List</string>
+    <string name="cardTitleLEDList">Emergency Contact List</string>
 
     <!--Map Fragment-->
     <string name="cardTitleRecordedList">Recorded List</string>

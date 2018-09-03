@@ -3,8 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.helper.helper.ScrollingActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/menu_item_guideline"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/menu_guideline"
         app:showAsAction="never" />
+
+    <!--menu_emergency_contacts-->
+    <item
+        android:id="@+id/menu_item_emergency_contacts"
+        android:orderInCategory="100"
+        android:title="@string/menu_emergency_contacts"
+        app:showAsAction="never" />
+
 </menu>

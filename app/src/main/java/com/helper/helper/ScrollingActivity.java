@@ -43,6 +43,7 @@ import android.widget.Toast;
 
 import com.helper.helper.Info.InfoFragment;
 import com.helper.helper.ble.BluetoothLeService;
+import com.helper.helper.contact.ContactActivity;
 import com.helper.helper.led.LEDFragment;
 import com.helper.helper.location.Constants;
 import com.helper.helper.location.FetchAddressIntentService;
@@ -69,6 +70,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private static final int TAB_STATUS = 0;
     private static final int TAB_LED = 1;
     private static final int TAB_TRACKING = 2;
+
     private static final int REQUEST_ENABLE_BT = 2001;
     private static final int AZIMUTH_PIVOT = 20;
     private static final int PITCH_PIVOT = 5;
@@ -719,7 +721,15 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
+        if (item.getItemId() == R.id.menu_item_guideline) {
+            return true;
+        } else if (item.getItemId() == R.id.menu_item_emergency_contacts) {
+            Toast.makeText(this, "Open Emergency contacts activity", Toast.LENGTH_SHORT).show();
+
+            Intent intent=new Intent(ScrollingActivity.this,ContactActivity.class);
+//            intent.putExtra("text",String.valueOf(editText.getText()));
+            startActivity(intent);
+
             return true;
         }
         return super.onOptionsItemSelected(item);
