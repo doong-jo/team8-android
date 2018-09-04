@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -24,6 +25,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -72,6 +74,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private static final int TAB_TRACKING = 2;
 
     private static final int REQUEST_ENABLE_BT = 2001;
+
     private static final int AZIMUTH_PIVOT = 20;
     private static final int PITCH_PIVOT = 5;
     private static final int ROLL_PIVOT = 20;
@@ -673,7 +676,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                         e.printStackTrace();
                     }
                 } else {
-                    Toast.makeText(this, "You can't use interaction helper device", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "You can't use interaction helper device (Please allow permisson)", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -873,6 +876,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         }
     }
+
     public void onSensorChanged(SensorEvent sensorEvent) {
 
         if (!m_bInitialize) { return; }

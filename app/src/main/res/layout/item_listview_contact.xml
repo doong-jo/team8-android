@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.helper.helper.widget.CheckableRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_marginRight="10dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp">
+
+
+    <TextView android:id="@+id/itemName"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:textColor="@color/textColorPrimary"
+        android:focusable="false" />
+
+    <TextView android:id="@+id/itemPhoneNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/itemName"
+        android:layout_marginLeft="10dp"
+        android:textSize="20dp"
+        android:textColor="@color/textColorPrimary"
+        android:focusable="false" />
+
+
+
+    <com.helper.helper.widget.InertCheckBox android:id="@+id/itemCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:focusable="false"
+        android:button="@drawable/checkbox" />
+
+</com.helper.helper.widget.CheckableRelativeLayout>

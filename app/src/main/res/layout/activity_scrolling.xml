@@ -53,8 +53,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/connect_device"
+                android:textStyle="bold"
                 android:textAlignment="textEnd"
-                android:textColor="#161616"
+                android:textColor="#2f6eff"
                 android:textSize="16sp" />
         </LinearLayout>
 
