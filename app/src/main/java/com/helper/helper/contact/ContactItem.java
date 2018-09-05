@@ -5,12 +5,12 @@ package com.helper.helper.contact;
  *
  * @author marvinlabs
  */
-public class Item implements Comparable<Item> {
+public class ContactItem implements Comparable<ContactItem> {
 
     private String m_name;
     private String m_phoneNumber;
 
-    public Item(String name, String number) {
+    public ContactItem(String name, String number) {
         super();
         this.m_name = name;
         this.m_phoneNumber = number;
@@ -37,7 +37,7 @@ public class Item implements Comparable<Item> {
      *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(Item other) {
+    public int compareTo(ContactItem other) {
         if ( other.getPhoneNumber() == m_phoneNumber) { return 1; } else { return 0; }
     }
 }

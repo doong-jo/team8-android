@@ -127,7 +127,8 @@ public class FetchAddressIntentService extends IntentService {
                 //Log.e("Address", ""+ address.getAddressLine(i));
                 addressFragments.add(address.getAddressLine(i));
             }
-            Log.i(TAG, getString(R.string.address_found));
+            /** Address Found print log **/
+//            Log.i(TAG, getString(R.string.address_found));
             deliverResultToReceiver(Constants.SUCCESS_RESULT,
                     TextUtils.join(System.getProperty("line.separator"), addressFragments));
         }

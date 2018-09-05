@@ -10,10 +10,15 @@ import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.helper.helper.R;
+import com.helper.helper.util.FileManagerUtil;
 
+import org.w3c.dom.Text;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +27,7 @@ public class ContactActivity extends ListActivity {
 
     private static final int REQUEST_ENABLE_CONTACTS = 2001;
 
-    private List<Item> listViewData;
+    private List<ContactItem> listViewData;
     private ListView listView;
     private ItemListAdapter adapter;
 
@@ -31,129 +36,44 @@ public class ContactActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
 
-        listViewData = new ArrayList<Item>();
+        listViewData = new ArrayList<ContactItem>();
 
         // Create the adapter to render our data
         // --
-        adapter = new ItemListAdapter(this, listViewData);
-        setListAdapter(adapter);
 
         // Get some views for later use
         // --
         listView = getListView();
         listView.setItemsCanFocus(false);
+
+        ////////////////Mode Define//////////////////
+        // ListView.CHOICE_MODE_SINGLE             //
+        // ListView.CHOICE_MODE_MULTIPLE           //
+        // ListView.CHOICE_MODE_NONE               //
+        /////////////////////////////////////////////
+
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+        try {
+            listViewData = FileManagerUtil.readXmlEmergencyContacts(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        adapter = new ItemListAdapter(this, listViewData);
+        setListAdapter(adapter);
+
+        toggleShowNotExistsContactsText();
     }
 
-//    public void onButtonClick(View v) {
-//        switch (v.getId()) {
-//            case R.id.viewCheckedIdsButton:
-//                showSelectedItemIds();
-//                break;
-//            case R.id.viewCheckedItemsButton:
-//                showSelectedItems();
-//                break;
-//            case R.id.toggleChoiceModeButton:
-////                toggleChoiceMode();
-//                break;
-//        }
-//    }
+    private void toggleShowNotExistsContactsText() {
+        TextView noExistsTextView = (TextView) findViewById(R.id.textViewNoContactsList);
 
-    /**
-     * Change the list selection mode
-     */
-//    private void toggleChoiceMode() {
-//        clearSelection();
-//
-//        final int currentMode = listView.getChoiceMode();
-//        switch (currentMode) {
-//            case ListView.CHOICE_MODE_NONE:
-//                listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-//                Toast.makeText(this, "List choice mode: SINGLE", Toast.LENGTH_SHORT).show();
-//                break;
-//            case ListView.CHOICE_MODE_SINGLE:
-//                listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-//                Toast.makeText(this, "List choice mode: MULTIPLE", Toast.LENGTH_SHORT).show();
-//                break;
-//            case ListView.CHOICE_MODE_MULTIPLE:
-//                listView.setChoiceMode(ListView.CHOICE_MODE_NONE);
-//                Toast.makeText(this, "List choice mode: NONE", Toast.LENGTH_SHORT).show();
-//                break;
-//        }
-//    }
-
-    /**
-     * Show a message giving the selected item captions
-     */
-    private void showSelectedItems() {
-        final StringBuffer sb = new StringBuffer("Selection: ");
-
-        // Get an array that tells us for each position whether the item is
-        // checked or not
-        // --
-        final SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-        if (checkedItems == null) {
-            Toast.makeText(this, "No selection info available", Toast.LENGTH_LONG).show();
-            return;
+        if( listViewData.size() != 0 ) {
+            noExistsTextView.setVisibility(View.GONE);
+        } else {
+            noExistsTextView.setVisibility(View.VISIBLE);
         }
-
-        // For each element in the status array
-        // --
-        boolean isFirstSelected = true;
-        final int checkedItemsCount = checkedItems.size();
-        for (int i = 0; i < checkedItemsCount; ++i) {
-            // This tells us the item position we are looking at
-            // --
-            final int position = checkedItems.keyAt(i);
-
-            // This tells us the item status at the above position
-            // --
-            final boolean isChecked = checkedItems.valueAt(i);
-
-            if (isChecked) {
-                if (!isFirstSelected) {
-                    sb.append(", ");
-                }
-                sb.append(listViewData.get(position).getName());
-                isFirstSelected = false;
-            }
-        }
-
-        // Show a message with the countries that are selected
-        // --
-        Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
-    }
-
-    /**
-     * Show a message giving the selected item IDs. There seems to be a bug with ListView#getCheckItemIds() on Android
-     * 1.6 at least @see http://code.google.com/p/android/issues/detail?id=6609
-     */
-    private void showSelectedItemIds() {
-        final StringBuffer sb = new StringBuffer("Selection: ");
-
-        // Get an array that contains the IDs of the list items that are checked
-        // --
-        final long[] checkedItemIds = listView.getCheckItemIds();
-        if (checkedItemIds == null) {
-            Toast.makeText(this, "No selection", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        // For each ID in the status array
-        // --
-        boolean isFirstSelected = true;
-        final int checkedItemsCount = checkedItemIds.length;
-        for (int i = 0; i < checkedItemsCount; ++i) {
-            if (!isFirstSelected) {
-                sb.append(", ");
-            }
-            sb.append(checkedItemIds[i]);
-            isFirstSelected = false;
-        }
-
-        // Show a message with the country IDs that are selected
-        // --
-        Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -163,6 +83,38 @@ public class ContactActivity extends ListActivity {
         final int itemCount = listView.getCount();
         for (int i = 0; i < itemCount; ++i) {
             listView.setItemChecked(i, false);
+        }
+    }
+
+    private void removeSeletedItems() {
+        final StringBuffer sb = new StringBuffer("Selection: ");
+
+        final long[] checkedItemIds = listView.getCheckedItemIds();
+
+        if (checkedItemIds == null) {
+            Toast.makeText(this, "No selection", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        clearSelection();
+
+        for (long i :
+                checkedItemIds) {
+            int I = (int)i;
+
+            ContactItem item = adapter.getItem((int) checkedItemIds[I]-I);
+            adapter.remove(item);
+        }
+
+        adapter.notifyDataSetChanged();
+
+        toggleShowNotExistsContactsText();
+
+        try {
+            FileManagerUtil.writeXmlEmergencyContacts(this, listViewData);
+        } catch (IOException e) {
+            Log.e(TAG, "removeSeletedItems: Can not write Emergency contacts into xml", e);
+            e.printStackTrace();
         }
     }
 
@@ -177,26 +129,46 @@ public class ContactActivity extends ListActivity {
                             new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                                     ContactsContract.CommonDataKinds.Phone.NUMBER}, null, null, null);
                     cursor.moveToFirst();
-                    String name = cursor.getString(0);        //0은 이름을 얻어옵니다.
-                    String number = cursor.getString(1);   //1은 번호를 받아옵니다.
 
-                    Log.d(TAG, "onActivityResult contacts name : " + name);
-                    Log.d(TAG, "onActivityResult contacts number : " + number);
+                    String name = cursor.getString(0);        //0은 이름을 얻어옵니다.
+                    String number = cursor.getString(1);      //1은 번호를 받아옵니다.
 
                     cursor.close();
 
-                    listViewData.add(new Item(name, number));
-                    setListAdapter(adapter);
-                } else {
-                    Toast.makeText(this, "You can't add contact (Please allow permisson)", Toast.LENGTH_SHORT).show();
+                    listViewData.add(new ContactItem(name, number));
+
+                    adapter.notifyDataSetChanged();
+
+                    toggleShowNotExistsContactsText();
+
+                    try {
+                        FileManagerUtil.writeXmlEmergencyContacts(this, listViewData);
+                    } catch (IOException e) {
+                        Log.e(TAG, "removeSeletedItems: Can not write Emergency contacts into xml", e);
+                        e.printStackTrace();
+                    }
+
                 }
                 break;
         }
     }
 
+    /**
+     * Touch floating button event, Move contact page.
+     * @param view
+     */
+
     public void showInternalContacts(View view) {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
         startActivityForResult(intent, REQUEST_ENABLE_CONTACTS);
+    }
+
+    /**
+     * Touch remove contact button event, Remove listview items.
+     * @param view
+     */
+    public void removeContactsClick(View view) {
+        removeSeletedItems();
     }
 }

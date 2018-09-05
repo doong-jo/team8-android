@@ -130,7 +130,7 @@ public class InfoFragment extends Fragment
                     Location location = locationList.get(locationList.size() - 1);
                     m_curLocation = location;
 
-                    Log.d(TAG, "" + location.getLatitude() + " " + location.getLongitude());
+//                    Log.d(TAG, "" + location.getLatitude() + " " + location.getLongitude());
 
                     try {
                         ((ScrollingActivity)getActivity()).setMapPosition(location.getLatitude(), location.getLongitude(), location);

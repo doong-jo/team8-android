@@ -15,7 +15,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -25,7 +24,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -46,6 +44,7 @@ import android.widget.Toast;
 import com.helper.helper.Info.InfoFragment;
 import com.helper.helper.ble.BluetoothLeService;
 import com.helper.helper.contact.ContactActivity;
+import com.helper.helper.contact.ContactItem;
 import com.helper.helper.led.LEDFragment;
 import com.helper.helper.location.Constants;
 import com.helper.helper.location.FetchAddressIntentService;
@@ -652,7 +651,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                         String.format("%f", m_infoFrag.getCurTrackingDistance()),
                         m_infoFrag.getCurrRecordedLocationList());
 
-                FileManagerUtil.writeTrackingDataInternalStorage(getApplicationContext(), trackingData);
+                FileManagerUtil.writeXmlTrackingData(getApplicationContext(), trackingData);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (IllegalStateException e) {
@@ -851,8 +850,21 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                     String strSMS1 = getString(R.string.sms_content) + "\n\n" +  m_strAddressOutput;
                     String strSMS2 = "https://google.com/maps?q=" + m_strLatitude + "," + m_strLogitude;
 
-                    sendSMS("+8201034823161", strSMS1);
-                    sendSMS("+8201034823161", strSMS2);
+                    List<ContactItem> contactItems;
+                    try {
+                        contactItems = FileManagerUtil.readXmlEmergencyContacts(this);
+
+                        for(ContactItem item:
+                                contactItems) {
+                            sendSMS(item.getPhoneNumber(), strSMS1);
+                            sendSMS(item.getPhoneNumber(), strSMS2);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+//                    sendSMS("+8201034823161", strSMS1);
+//                    sendSMS("+8201034823161", strSMS2);
                 } catch (RuntimeException e) {
                     e.printStackTrace();
                 }

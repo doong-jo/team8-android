@@ -68,7 +68,8 @@
                     android:src="@drawable/ic_user_minus_solid"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"
+                    android:onClick="removeContactsClick"/>
 
             </LinearLayout>
 
@@ -83,6 +84,17 @@
             <!--android:textStyle="bold"-->
             <!--android:onClick="showInternalContacts"-->
             <!--android:text="Add Contact"/>-->
+
+        <TextView
+            android:id="@+id/textViewNoContactsList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:gravity="center"
+            android:layout_margin="20dp"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="@string/no_emergency_contacts_list"/>
 
         <ListView
             android:id="@+id/android:list"

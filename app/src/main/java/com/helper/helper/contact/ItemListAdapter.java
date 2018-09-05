@@ -18,12 +18,12 @@ import com.helper.helper.widget.CheckableRelativeLayout;
  *
  * @author marvinlabs
  */
-public class ItemListAdapter extends ArrayAdapter<Item> {
+public class ItemListAdapter extends ArrayAdapter<ContactItem> {
 
     /**
      * Constructor from a list of items
      */
-    public ItemListAdapter(Context context, List<Item> items) {
+    public ItemListAdapter(Context context, List<ContactItem> items) {
         super(context, 0, items);
         li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -32,7 +32,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
     public View getView(int position, View convertView, ViewGroup parent) {
         // The item we want to get the view for
         // --
-        final Item item = getItem(position);
+        final ContactItem item = getItem(position);
 
         // Re-use the view if possible
         // --
@@ -58,15 +58,15 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         return convertView;
     }
 
-    @Override
-    public long getItemId(int position) {
-        String phoneNumber = getItem(position).getPhoneNumber();
-        long res = 0;
-        for (int i = 0; i < phoneNumber.length(); i++) {
-            res += phoneNumber.charAt(i) + i;
-        }
-        return res;
-    }
+//    @Override
+//    public long getItemId(int position) {
+//        String phoneNumber = getItem(position).getPhoneNumber();
+//        long res = 0;
+//        for (int i = 0; i < phoneNumber.length(); i++) {
+//            res += phoneNumber.charAt(i) + i;
+//        }
+//        return res;
+//    }
 
     @Override
     public boolean hasStableIds() {

@@ -9,16 +9,13 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,17 +38,6 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.helper.helper.R;
 import com.helper.helper.util.FileManagerUtil;
-import com.snatik.storage.Storage;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 public class TrackingFragment extends Fragment
         implements OnMapReadyCallback,
@@ -93,7 +79,7 @@ public class TrackingFragment extends Fragment
         m_nTrackingIndex = 0;
 
         try {
-            List<TrackingData> lReadTrackigData = FileManagerUtil.readMapDataXML(getContext());
+            List<TrackingData> lReadTrackigData = FileManagerUtil.readXMLTrackingData(getContext());
             if( lReadTrackigData != null ) {
                 for (TrackingData trackingData:
                         lReadTrackigData) {
