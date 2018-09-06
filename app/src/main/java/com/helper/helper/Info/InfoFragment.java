@@ -55,6 +55,7 @@ import org.w3c.dom.Text;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class InfoFragment extends Fragment
         implements OnMapReadyCallback,
@@ -150,7 +151,15 @@ public class InfoFragment extends Fragment
 //                        ((ScrollingActivity)getActivity()).setcurInterrupt(EMERGENCY);
 //                    }
 
-                    int curInterrutState = ((ScrollingActivity)getActivity()).getcurInterruptState();
+
+                    int curInterrutState;
+                    try {
+                        curInterrutState = ((ScrollingActivity) Objects.requireNonNull(getActivity())).getcurInterruptState();
+                    } catch (NullPointerException e){
+                        curInterrutState = ORIENTATION_NONE;
+                        e.printStackTrace();
+                    }
+
 
                     if ( curInterrutState == EMERGENCY && location.getSpeed() >= m_curSpeed ) {
                         writeStr = ((ScrollingActivity)getActivity()).getCurLED();
