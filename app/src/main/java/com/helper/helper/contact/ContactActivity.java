@@ -36,7 +36,7 @@ public class ContactActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
 
-        listViewData = new ArrayList<ContactItem>();
+
 
         // Create the adapter to render our data
         // --
@@ -60,6 +60,9 @@ public class ContactActivity extends ListActivity {
             e.printStackTrace();
         }
 
+        if( listViewData == null ) {
+            listViewData = new ArrayList<ContactItem>();
+        }
         adapter = new ItemListAdapter(this, listViewData);
         setListAdapter(adapter);
 
@@ -98,11 +101,12 @@ public class ContactActivity extends ListActivity {
 
         clearSelection();
 
+        int cnt = 0;
         for (long i :
                 checkedItemIds) {
             int I = (int)i;
 
-            ContactItem item = adapter.getItem((int) checkedItemIds[I]-I);
+            ContactItem item = adapter.getItem((int) I-cnt++);
             adapter.remove(item);
         }
 

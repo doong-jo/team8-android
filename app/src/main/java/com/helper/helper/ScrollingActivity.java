@@ -270,7 +270,6 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         m_viewPager.setAdapter(m_pagerAdapter);
         m_viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(m_tabLayout));
 
-
         m_tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -300,8 +299,6 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
             }
         });
-
-
 
         /* Tab end */
 
@@ -762,7 +759,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 //        sendToBluetoothDevice(writeStr.getBytes());
         try {
             m_bluetoothSocket.close();
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
     }
@@ -944,6 +941,17 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         }
         catch (IOException e) {
             updateConnectionLayout(false);
+            e.printStackTrace();
+        }
+    }
+
+    public void readFromBluetoothDevice() {
+        byte[] buffer = new byte[256];
+        int bytes;
+
+        try {
+            bytes = m_bluetoothInput.read(buffer);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
