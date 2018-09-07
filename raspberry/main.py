@@ -18,7 +18,7 @@ def main():
     bluetooth = BluetoothRFCOMM()
 
     try:
-        sw.run(led.setEmergency)
+        sw.run(led.setEmergency, bluetooth.sendMsg)
         led.run()
         bluetooth.run(led.setAttribute)
 

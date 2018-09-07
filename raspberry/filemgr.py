@@ -16,8 +16,14 @@ class FileManager(object):
             json.dump(dictionaryData, outfile)
 
     def readState(self):
-        with open(FILE_STATE_JSON_NAME, 'r') as f:
-            stateDic = json.load(f)
+
+        stateDic = None
+
+        try:
+            with open(FILE_STATE_JSON_NAME, 'r') as f:
+                stateDic = json.load(f)
+        except ValueError:
+            return None
 
         return stateDic
 

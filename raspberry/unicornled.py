@@ -58,14 +58,19 @@ class UnicornLED(object):
         # self.m_curType = LED_TYPE_NONE
         # self.m_curBright = LED_DEFAULT_BRIGHT
 
-        for ledState in state['LED_STATE']:
-            print ledState
-
-            self.m_curImageName = int(ledState['index'])
-            self.m_curType = float(ledState['type'])
-            self.m_curSpeed = float(ledState['speed'])
-            self.m_curBright = float(ledState['brightness'])
-            unicornhathd.brightness(self.m_curBright)
+        if state is not None:
+            for ledState in state['LED_STATE']:
+                self.m_curImageName = int(ledState['index'])
+                self.m_curType = float(ledState['type'])
+                self.m_curSpeed = float(ledState['speed'])
+                self.m_curBright = float(ledState['brightness'])
+                unicornhathd.brightness(self.m_curBright)
+        else:
+            self.m_curImageName = LED_DEFAULT_NAME
+            self.m_curType = LED_DEFAULT_TYPE
+            self.m_curSpeed = LED_DEFAULT_SPEED
+            self.m_curBright = LED_DEFAULT_BRIGHT
+            unicornhathd.brightness(LED_DEFAULT_BRIGHT)
 
         self.m_saveStateCallback = saveStateCb
 

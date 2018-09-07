@@ -16,19 +16,20 @@ class vibrateSW(object):
     def callback(self):
         self.count += 1
 
-    def vibrate_sensor(self, callback):
+    def vibrate_sensor(self, ledcallback, bluetoothcallback):
         try:
             while True:
                 time.sleep(1)
 
                 if self.count >= 10:
-                    print("Detect vibrate")
-                    callback()
+                    print("Detect vibrate " + self.count)
+                    ledcallback()
+                    bluetoothcallback("Detect vibrate")
 
                 else:
                     print("Not detect vibrate")
 
-                time.sleep(5)
+                # time.sleep(5)
                 self.count = 0
 
             # while True:
@@ -41,12 +42,11 @@ class vibrateSW(object):
             #         print("not detect vibrate.")
             #         time.sleep(0.05)
 
-
         except KeyboardInterrupt:
             GPIO.cleanup()
 
-    def run(self, ledcb):
-        t1 = threading.Thread(target=self.vibrate_sensor, args=(ledcb, ))
+    def run(self, ledcb, bluetoothcb):
+        t1 = threading.Thread(target=self.vibrate_sensor, args=(ledcb, bluetoothcb, ))
         t1.daemon = True
         t1.start()
 

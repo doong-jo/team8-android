@@ -28,13 +28,22 @@ BT_SIZE_READ_BYTE = 6
 BT_UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
 ######################################################
 
+client_sock = None
 
 class BluetoothRFCOMM(object):
     def __init__(self):
         pass
 
+    def sendMsg(self, string):
+        global client_sock
+
+        client_sock.send(string)
+        print("send Msg")
+
     def receiveMsg(self, ledcb):
         while True:
+
+            global client_sock
 
             server_sock = BluetoothSocket(RFCOMM)
             server_sock.bind(('', PORT_ANY))
@@ -49,13 +58,15 @@ class BluetoothRFCOMM(object):
 
             print("Waiting for connection : channel %d" % port)
             client_sock, client_info = server_sock.accept()
+            sendMsg(client_sock, "send initdata")
+
             print("Accepted connection from ", client_info)
 
             while True:
                 try:
                     print("Wating for recv")
                     data = client_sock.recv(BT_SIZE_READ_BYTE)
-                    print("data : %s", data);
+                    print("data : %s", data)
 
                     splitData = data.split('-')
 
