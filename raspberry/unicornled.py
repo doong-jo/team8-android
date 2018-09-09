@@ -72,9 +72,15 @@ class UnicornLED(object):
             self.m_curBright = LED_DEFAULT_BRIGHT
             unicornhathd.brightness(LED_DEFAULT_BRIGHT)
 
+        self.IsInturrpt = False
         self.m_saveStateCallback = saveStateCb
 
     def setAttribute(self, imageName, type, speed, brightness):
+        # set attributes from bluetooth data
+
+        if self.IsInturrpt is True:
+            return
+
         if imageName != -1:
             self.m_curImageName = imageName
 
@@ -110,13 +116,25 @@ class UnicornLED(object):
         time.sleep(0.3)
 
     def showLED(self, imagename, targetImage, type):
+        if self.IsInturrpt is True:
+            imagename = self.m_interruptImageName
+            targetImage = g_Images[self.m_interruptImageName]
+            type = self.m_interruptImageType
+
         for o_x in range(int(targetImage.size[0] / WIDTH)):
             for o_y in range(int(targetImage.size[1] / HEIGHT)):
                 valid = False
 
                 # if signal not equal, Interrupt LED!
-                if not eq(self.m_curImageName, imagename):
-                    break
+                if self.IsInturrpt is True:
+                    if imagename == LED_LEFT_LED_IND or imagename == LED_RIGHT_LED_IND or imagename == LED_EMERGENCY_LED_IND:
+                        pass
+                    else:
+                        break
+                else:
+                    if not eq(self.m_curImageName, imagename):
+                        break
+
 
                 for x in range(WIDTH):
                     for y in range(HEIGHT):
@@ -154,6 +172,22 @@ class UnicornLED(object):
                 unicornhathd.off()
                 print("receiveMsg KeyboardInterrupt")
                 break
+
+    def inturrptLED(self, type):
+        print("IsInturrpt is " + type)
+        self.IsInturrpt = True
+
+        if type == "left":
+            self.m_interruptImageName = LED_LEFT_LED_IND
+            self.m_interruptImageType = LED_TYPE_BLINK
+        elif type == "right":
+            self.m_interruptImageName = LED_RIGHT_LED_IND
+            self.m_interruptImageType = LED_TYPE_BLINK
+        elif type == "emergency":
+            self.m_interruptImageName = LED_EMERGENCY_LED_IND
+            self.m_interruptImageType = LED_TYPE_BLINK
+        elif type == "none":
+            self.IsInturrpt = False
 
     def run(self):
         t1 = threading.Thread(target=self.controlLED)

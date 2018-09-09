@@ -338,7 +338,25 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         m_resultAddressReceiver = new AddressResultReceiver(new Handler());
 
         m_bInitialize = true;
+
+        BluetoothReadThread thread = new BluetoothReadThread(); thread.start();
+
     }
+
+    private class BluetoothReadThread extends Thread {
+
+        public BluetoothReadThread() {
+            // 초기화 작업
+        }
+
+        public void run() {
+            while(true){
+                readFromBluetoothDevice();
+            }
+
+        }
+    }
+
 
     public void moveToLEDDash(View v) {
         m_viewPager.setCurrentItem(TAB_LED);
@@ -949,9 +967,41 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         byte[] buffer = new byte[256];
         int bytes;
 
+
         try {
             bytes = m_bluetoothInput.read(buffer);
+
+            String readMessage = new String(buffer, 0, bytes);
+            Log.d(TAG, "readFromBluetoothDevice: " + readMessage);
+
+            if (readMessage.equals("EMERGENCY")) {
+                Log.d(TAG, "shockStateDetector: ");
+                try {
+                    String strSMS1 = getString(R.string.sms_content) + "\n\n" +  m_strAddressOutput;
+                    String strSMS2 = "https://google.com/maps?q=" + m_strLatitude + "," + m_strLogitude;
+
+                    List<ContactItem> contactItems;
+                    try {
+                        contactItems = FileManagerUtil.readXmlEmergencyContacts(this);
+
+                        for(ContactItem item:
+                                contactItems) {
+                            sendSMS(item.getPhoneNumber(), strSMS1);
+                            sendSMS(item.getPhoneNumber(), strSMS2);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+//                    sendSMS("+8201034823161", strSMS1);
+//                    sendSMS("+8201034823161", strSMS2);
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e ) {
             e.printStackTrace();
         }
     }

@@ -37,8 +37,14 @@ class BluetoothRFCOMM(object):
     def sendMsg(self, string):
         global client_sock
 
-        client_sock.send(string)
-        print("send Msg")
+        print("try sendMsg" + string)
+
+        try:
+            print ("sendMsg Successful")
+            client_sock.send(string)
+        except AttributeError:
+            print ("sendMsg Attrubute Error")
+
 
     def receiveMsg(self, ledcb):
         while True:
@@ -58,7 +64,7 @@ class BluetoothRFCOMM(object):
 
             print("Waiting for connection : channel %d" % port)
             client_sock, client_info = server_sock.accept()
-            sendMsg(client_sock, "send initdata")
+            self.sendMsg("send initdata")
 
             print("Accepted connection from ", client_info)
 
