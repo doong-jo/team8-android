@@ -105,6 +105,9 @@ class UnicornLED(object):
 
         self.m_saveStateCallback(dicData)
 
+    def getLEDInfo(self):
+        return "info/"+str(self.m_curImageName)+"/"+str(self.m_curSpeed)+"/"+str(self.m_curBright)
+
     def setEmergency(self):
         self.m_curImageName = LED_EMERGENCY_LED_IND
         self.m_curType = LED_TYPE_BLINK
@@ -174,7 +177,7 @@ class UnicornLED(object):
                 break
 
     def inturrptLED(self, type):
-        print("IsInturrpt is " + type)
+        # print("IsInturrpt is " + type)
         self.IsInturrpt = True
 
         if type == "left":

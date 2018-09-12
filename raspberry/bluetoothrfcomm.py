@@ -1,5 +1,4 @@
 from bluetooth import *
-
 import threading
 
 # DEFINE SIGNAL_INDEX
@@ -46,7 +45,7 @@ class BluetoothRFCOMM(object):
             print ("sendMsg Attrubute Error")
 
 
-    def receiveMsg(self, ledcb):
+    def receiveMsg(self, ledcb, ledinfocb):
         while True:
 
             global client_sock
@@ -57,16 +56,17 @@ class BluetoothRFCOMM(object):
 
             port = server_sock.getsockname()[1]
 
-            advertise_service(server_sock, "BtLED",
+            advertise_service(server_sock, "helperService",
                               service_id=BT_UUID,
                               service_classes=[BT_UUID, SERIAL_PORT_CLASS],
                               profiles=[SERIAL_PORT_PROFILE])
 
             print("Waiting for connection : channel %d" % port)
             client_sock, client_info = server_sock.accept()
-            self.sendMsg("send initdata")
 
             print("Accepted connection from ", client_info)
+
+            self.sendMsg(ledinfocb())
 
             while True:
                 try:
@@ -97,15 +97,17 @@ class BluetoothRFCOMM(object):
                     print("disconnected")
                     client_sock.close()
                     server_sock.close()
-                    print("all done (disconnected)")
                     break
 
                 except KeyboardInterrupt:
                     print("receiveMsg KeyboardInterrupt")
+                    client_sock.close()
+                    server_sock.close()
                     break
 
 
-    def run(self, ledcb):
-        t1 = threading.Thread(target=self.receiveMsg, args=(ledcb, ))
+
+    def run(self, ledcb, ledinfocb):
+        t1 = threading.Thread(target=self.receiveMsg, args=(ledcb, ledinfocb, ))
         t1.daemon = True
         t1.start()

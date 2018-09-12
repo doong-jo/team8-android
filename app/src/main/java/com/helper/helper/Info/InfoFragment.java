@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -100,6 +101,7 @@ public class InfoFragment extends Fragment
 
     private ImageView m_curLEDView;
 
+
     public double getCurTrackingDistance() {
         return m_fCurDistance;
     }
@@ -108,9 +110,47 @@ public class InfoFragment extends Fragment
         return m_lCurRecordedLocation;
     }
 
-    public void setCurLEDView(int gifDrawable) {
-        GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
-        Glide.with(this).load(gifDrawable).into(gifimage);
+//    public final void runOnUiThread(Runnable action) { mHandler.post(action); }
+
+
+    public void setCurLEDView(final int ind, boolean selectable) {
+        final int[] images = {
+                R.drawable.bird,
+                R.drawable.characters,
+                R.drawable.windy,
+                R.drawable.snow,
+                R.drawable.rain,
+                R.drawable.cute,
+                R.drawable.moving_arrow_left_blink,
+                R.drawable.moving_arrow_right_blink,
+                R.drawable.emergency_blink,
+                R.drawable.mario,
+                R.drawable.boy,
+        };
+
+        if( selectable ) {
+            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+            Glide.with(this).load(ind).into(gifimage);
+        } else {
+            getActivity().runOnUiThread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+                            Glide.with(getActivity()).load(images[ind]).into(gifimage);
+                        }
+                    }
+            );
+        }
+
+
+//        if( selectable ) {
+//            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+//            Glide.with(this).load(selectable).into(gifimage);
+//        } else {
+//            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+//            Glide.with(this).load(images[ind]).into(gifimage);
+//        }
     }
 
     public InfoFragment() {
@@ -568,6 +608,16 @@ public class InfoFragment extends Fragment
     public void onDestroy() {
         super.onDestroy();
         m_mapView.onLowMemory();
+    }
+
+    public void setLEDAttribute(int ledInd, float spdVal, float brtVal) {
+        setCurLEDView(ledInd, false);
+
+        m_brightSeekbar = (SeekBar) getView().findViewById(R.id.brightSeek);
+        m_speedSeekbar = (SeekBar) getView().findViewById(R.id.speedSeek);
+
+        m_speedSeekbar.setProgress((int)(spdVal*100));
+        m_brightSeekbar.setProgress((int)(brtVal*100));
     }
 
 //    public void setTextTiltXYZ(float[] values) {

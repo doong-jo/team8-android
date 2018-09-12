@@ -15,14 +15,14 @@ from gyroscope import Gyroscope
 def main():
     filemanager = FileManager()
     # sw = vibrateSW(23)
-    led = UnicornLED(filemanager.readState(), filemanager.saveLEDState)
     bluetooth = BluetoothRFCOMM()
     gyroSensor = Gyroscope()
+    led = UnicornLED(filemanager.readState(), filemanager.saveLEDState)
 
     try:
         # sw.run(led.setEmergency, bluetooth.sendMsg)
         led.run()
-        bluetooth.run(led.setAttribute)
+        bluetooth.run(led.setAttribute, led.getLEDInfo)
         gyroSensor.run(led.inturrptLED, bluetooth.sendMsg)
 
     except KeyboardInterrupt:

@@ -5,7 +5,7 @@ import math
 
 PI = 3.141592
 SUM_COUNT = 3
-EMERGENCY_ANGLE = 300
+EMERGENCY_ANGLE = 150
 
 def get_y_rotation(x, y, z):
     radians = math.atan2(x, dist(y, z))
@@ -63,10 +63,10 @@ class Gyroscope(object):
             rotation_Y = get_y_rotation(divAccel_X, divAccel_Y, divAccel_Z)
 
 
-            print "X Rotation: ", get_x_rotation(divAccel_X, divAccel_Y,
-                                                 divAccel_Z)
-            print "Y Rotation: ", get_y_rotation(divAccel_X, divAccel_Y,
-                                                 divAccel_Z)
+            # print "X Rotation: ", get_x_rotation(divAccel_X, divAccel_Y,
+            #                                      divAccel_Z)
+            # print "Y Rotation: ", get_y_rotation(divAccel_X, divAccel_Y,
+            #                                      divAccel_Z)
 
             IsEmergency = False
 
@@ -76,10 +76,12 @@ class Gyroscope(object):
             angle_value += gyro_data['y']
             angle_value += gyro_data['z']
 
-            print("angle_value : ")
-            print angle_value
 
-            if angle_value >= EMERGENCY_ANGLE:
+            print("angle_value : ")
+            print math.fabs(angle_value)
+
+
+            if math.fabs(angle_value) >= EMERGENCY_ANGLE:
                 IsEmergency = True
                 bluetoothSendcb("EMERGENCY")
 
@@ -99,7 +101,7 @@ class Gyroscope(object):
 
             print("Temp: " + str(temp) + " C")
             # self.accel_calculate()
-            time.sleep(0.5)
+            time.sleep(0.25)
 
     # def accel_calculate(self) :
     #     accel_data = self.sensor.get_accel_data()

@@ -107,6 +107,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private BluetoothGattCharacteristic m_characteristicTX;
     private BluetoothGattCharacteristic m_characteristicRX;
     private BluetoothDevice m_pairedDevice;
+    BluetoothReadThread m_bluetoothReadthread;
 
     private BluetoothSocket m_bluetoothSocket;
     private InputStream m_bluetoothInput;
@@ -339,8 +340,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         m_bInitialize = true;
 
-        BluetoothReadThread thread = new BluetoothReadThread(); thread.start();
-
+        m_bluetoothReadthread = new BluetoothReadThread();
     }
 
     private class BluetoothReadThread extends Thread {
@@ -392,7 +392,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                 Toast.makeText(getApplicationContext(), "Already enable bluetooth", Toast.LENGTH_SHORT).show();
                 try {
                     connectDevice();
-                    updateConnectionLayout(true);
+
                 } catch (IOException e) {
                     e.printStackTrace();
                     updateConnectionLayout(false);
@@ -419,7 +419,6 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         } else {
             try {
                 connectDevice();
-                updateConnectionLayout(true);
             } catch (IOException e) {
                 e.printStackTrace();
                 updateConnectionLayout(false);
@@ -436,10 +435,26 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
             connectLayout.setOnClickListener(null);
             connectDiscription.setText(getString(R.string.connect_state));
             connectToggle.setText("");
+
+            if( m_bluetoothReadthread.getState() == Thread.State.NEW || m_bluetoothReadthread.getState() == Thread.State.WAITING ) {
+                m_bluetoothReadthread.start();
+
+//                String str = "3-";
+//                sendToBluetoothDevice(str.getBytes());
+            }
+
         } else {
             connectLayout.setOnClickListener(enableBluetoothView);
             connectDiscription.setText(getString(R.string.disconnect_state));
             connectToggle.setText(getString(R.string.connect_device));
+
+            if( m_bluetoothReadthread.getState() == Thread.State.RUNNABLE ) {
+                try {
+                    m_bluetoothReadthread.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
     }
@@ -450,7 +465,66 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         }
     };
 
+
+
+    private BroadcastReceiver mDiscoveryReceiver = new BroadcastReceiver() {
+
+
+        @Override
+
+        public void onReceive(Context context, Intent intent) {
+
+            if ( BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
+
+                BluetoothDevice searchedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if (searchedDevice.getName() == null) {
+                    return;
+                }
+
+                Log.d(TAG, "searchedDevice : " + searchedDevice.getName() + "\n" + searchedDevice.getAddress());
+
+                String deviceSSID = new String(getString(R.string.device_bluetooth_name));
+
+                if (searchedDevice.getName().equals(deviceSSID)
+                        ) {
+                    m_pairedDevice = searchedDevice;
+                    try {
+                        m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BT_UUID));
+                        m_bluetoothInput = m_bluetoothSocket.getInputStream();
+                        m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
+
+                        m_bluetoothSocket.connect();
+                        updateConnectionLayout(true);
+
+                        Toast.makeText(getApplicationContext(), "connected device HELPER!", Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            else if ( BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
+                BluetoothDevice searchedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if( m_pairedDevice == null ) {
+                    Toast.makeText(getApplicationContext(), "cannot found device HELPER!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+    };
+
     public void connectDevice() throws IOException {
+        if( m_pairedDevice != null ) {
+            Toast.makeText(getApplicationContext(), "Already connected device HELPER!", Toast.LENGTH_SHORT).show();
+            updateConnectionLayout(true);
+
+            return;
+
+//            m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BT_UUID));
+//            m_bluetoothInput = m_bluetoothSocket.getInputStream();
+//            m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
+//
+//            m_bluetoothSocket.connect();
+        }
         // 만약 페어링 기기들 리스트에 있다면 바로 연결
         List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>(m_bluetoothAdapter.getBondedDevices());
 
@@ -467,12 +541,19 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
             }
 
             if ( devices.get(i).getName().equals(deviceSSID) ) {
-                m_pairedDevice = devices.get(i);
-                m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BT_UUID));
-                m_bluetoothInput = m_bluetoothSocket.getInputStream();
-                m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
+                try {
+                    m_pairedDevice = devices.get(i);
+                    m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BT_UUID));
+                    m_bluetoothInput = m_bluetoothSocket.getInputStream();
+                    m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
 
-                m_bluetoothSocket.connect();
+                    m_bluetoothSocket.connect();
+                    updateConnectionLayout(true);
+                    return;
+                } catch (IOException e) {
+                    m_pairedDevice = null;
+                    e.printStackTrace();
+                }
 //                m_btThread = new ConnectedThread(m_bluetoothSocket);
 //                m_btThread.run();
                 return;
@@ -481,44 +562,10 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         // 페어링 기기가 없다면 새로 찾아서 연결
         if (m_bluetoothAdapter.startDiscovery()) {
-            BroadcastReceiver mDiscoveryReceiver = new BroadcastReceiver() {
+            IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+            filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 
-                @Override
-
-                public void onReceive(Context context, Intent intent) {
-
-                    if ( BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
-
-                        BluetoothDevice searchedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                        if (searchedDevice.getName() == null) {
-                            return;
-                        }
-
-                        Log.d(TAG, "searchedDevice : " + searchedDevice.getName() + "\n" + searchedDevice.getAddress());
-
-                        String deviceSSID = new String(getString(R.string.device_bluetooth_name));
-
-                        if (searchedDevice.getName().equals(deviceSSID)
-                                ) {
-                            m_pairedDevice = searchedDevice;
-                            try {
-                                m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BT_UUID));
-                                m_bluetoothInput = m_bluetoothSocket.getInputStream();
-                                m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
-
-                                m_bluetoothSocket.connect();
-
-                                Toast.makeText(getApplicationContext(), "connected device HELPER!", Toast.LENGTH_SHORT).show();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-
-            };
-
-            registerReceiver(mDiscoveryReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+            registerReceiver(mDiscoveryReceiver, filter);
         }
     }
 
@@ -546,76 +593,72 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         switch (imgName) {
             case "img0":
                 str = "0-00-0";
-                m_infoFrag.setCurLEDView(R.drawable.bird);
-                m_ledFrag.setCurLEDView(R.drawable.bird);
+                m_infoFrag.setCurLEDView(R.drawable.bird, true);
+                m_ledFrag.setCurLEDView(R.drawable.bird, true);
                 break;
 
             case "img1":
                 str = "0-01-0";
-                m_infoFrag.setCurLEDView(R.drawable.characters);
-                m_ledFrag.setCurLEDView(R.drawable.characters);
+                m_infoFrag.setCurLEDView(R.drawable.characters, true);
+                m_ledFrag.setCurLEDView(R.drawable.characters, true);
                 break;
 
             case "img2":
                 str = "0-02-0";
-                m_infoFrag.setCurLEDView(R.drawable.windy);
-                m_ledFrag.setCurLEDView(R.drawable.windy);
+                m_infoFrag.setCurLEDView(R.drawable.windy, true);
+                m_ledFrag.setCurLEDView(R.drawable.windy, true);
                 break;
 
             case "img3":
                 str = "0-03-0";
-                m_infoFrag.setCurLEDView(R.drawable.snow);
-                m_ledFrag.setCurLEDView(R.drawable.snow);
+                m_infoFrag.setCurLEDView(R.drawable.snow, true);
+                m_ledFrag.setCurLEDView(R.drawable.snow, true);
                 break;
 
             case "img4":
                 str = "0-04-0";
-                m_infoFrag.setCurLEDView(R.drawable.rain);
-                m_ledFrag.setCurLEDView(R.drawable.rain);
+                m_infoFrag.setCurLEDView(R.drawable.rain, true);
+                m_ledFrag.setCurLEDView(R.drawable.rain, true);
                 break;
 
             case "img5":
                 str = "0-05-0";
-                m_infoFrag.setCurLEDView(R.drawable.cute);
-                m_ledFrag.setCurLEDView(R.drawable.cute);
+                m_infoFrag.setCurLEDView(R.drawable.cute, true);
+                m_ledFrag.setCurLEDView(R.drawable.cute, true);
                 break;
 
             case "img6":
                 str = "0-06-1";
-                m_infoFrag.setCurLEDView(R.drawable.moving_arrow_left_blink);
-                m_ledFrag.setCurLEDView(R.drawable.moving_arrow_left_blink);
+                m_infoFrag.setCurLEDView(R.drawable.moving_arrow_left_blink, true);
+                m_ledFrag.setCurLEDView(R.drawable.moving_arrow_left_blink, true);
                 break;
 
             case "img7":
                 str = "0-07-1";
-                m_infoFrag.setCurLEDView(R.drawable.moving_arrow_right_blink);
-                m_ledFrag.setCurLEDView(R.drawable.moving_arrow_right_blink);
+                m_infoFrag.setCurLEDView(R.drawable.moving_arrow_right_blink, true);
+                m_ledFrag.setCurLEDView(R.drawable.moving_arrow_right_blink, true);
                 break;
 
             case "img8":
                 str = "0-08-1";
-                m_infoFrag.setCurLEDView(R.drawable.emergency_blink);
-                m_ledFrag.setCurLEDView(R.drawable.emergency_blink);
+                m_infoFrag.setCurLEDView(R.drawable.emergency_blink, true);
+                m_ledFrag.setCurLEDView(R.drawable.emergency_blink, true);
                 break;
 
             case "img9":
                 str = "0-09-0";
-                m_infoFrag.setCurLEDView(R.drawable.mario);
-                m_ledFrag.setCurLEDView(R.drawable.mario);
+                m_infoFrag.setCurLEDView(R.drawable.mario, true);
+                m_ledFrag.setCurLEDView(R.drawable.mario, true);
                 break;
 
             case "img10":
                 str = "0-10-0";
-                m_infoFrag.setCurLEDView(R.drawable.boy);
-                m_ledFrag.setCurLEDView(R.drawable.boy);
+                m_infoFrag.setCurLEDView(R.drawable.boy, true);
+                m_ledFrag.setCurLEDView(R.drawable.boy, true);
                 break;
         }
 
         m_curLED = str;
-
-
-
-        final byte[] tx = str.getBytes();
 
         sendToBluetoothDevice(str.getBytes());
 
@@ -905,40 +948,42 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     }
 
     public void onSensorChanged(SensorEvent sensorEvent) {
+        //Disabled Sensor
+        return;
 
-        if (!m_bInitialize) { return; }
-
-        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            m_fAccel[0] = sensorEvent.values[0];
-            m_fAccel[1] = sensorEvent.values[1];
-            m_fAccel[2] = sensorEvent.values[2];
-
-            shockStateDetector(m_fAccel[0], m_fAccel[1], m_fAccel[2]);
-        }
-        else if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-            m_fMag[0] = sensorEvent.values[0];
-            m_fMag[1] = sensorEvent.values[1];
-            m_fMag[2] = sensorEvent.values[2];
-        }
-
-        float[] resultValues = GyroManagerUtil.getOrientation(m_fAccel, m_fMag);
-
-        changeLeftOrRightLEDOfRoll(resultValues[2]);
-
-        GyroManagerUtil.setPivotRoll(resultValues[2]);
-
-        if( m_infoFrag == null) {
-            m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
-                    "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
-                            .getItemId(TAB_STATUS));
-
-//            m_infoFrag = (InfoFragment)m_viewPager
-//                    .getAdapter()
-//                    .instantiateItem(m_viewPager, TAB_STATUS);
-
-        } else {
-//            m_infoFrag.setTextTiltXYZ(resultValues);
-        }
+//        if (!m_bInitialize) { return; }
+//
+//        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+//            m_fAccel[0] = sensorEvent.values[0];
+//            m_fAccel[1] = sensorEvent.values[1];
+//            m_fAccel[2] = sensorEvent.values[2];
+//
+//            shockStateDetector(m_fAccel[0], m_fAccel[1], m_fAccel[2]);
+//        }
+//        else if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+//            m_fMag[0] = sensorEvent.values[0];
+//            m_fMag[1] = sensorEvent.values[1];
+//            m_fMag[2] = sensorEvent.values[2];
+//        }
+//
+//        float[] resultValues = GyroManagerUtil.getOrientation(m_fAccel, m_fMag);
+//
+//        changeLeftOrRightLEDOfRoll(resultValues[2]);
+//
+//        GyroManagerUtil.setPivotRoll(resultValues[2]);
+//
+//        if( m_infoFrag == null) {
+//            m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+//                    "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
+//                            .getItemId(TAB_STATUS));
+//
+////            m_infoFrag = (InfoFragment)m_viewPager
+////                    .getAdapter()
+////                    .instantiateItem(m_viewPager, TAB_STATUS);
+//
+//        } else {
+////            m_infoFrag.setTextTiltXYZ(resultValues);
+//        }
     }
 
     @Override
@@ -967,6 +1012,9 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         byte[] buffer = new byte[256];
         int bytes;
 
+        if( m_bluetoothInput == null || m_bluetoothSocket.isConnected() == false) {
+            return;
+        }
 
         try {
             bytes = m_bluetoothInput.read(buffer);
@@ -998,6 +1046,16 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
                 } catch (RuntimeException e) {
                     e.printStackTrace();
                 }
+            }
+            else if (readMessage.split("info").length != 0 ) {
+
+                String[] splitStr = readMessage.split("/");
+
+                int ledInd = Integer.parseInt(splitStr[1]);
+                float spdVal = Float.parseFloat(splitStr[2]);
+                float brtVal = Float.parseFloat(splitStr[3]);
+
+                m_infoFrag.setLEDAttribute(ledInd, spdVal, brtVal);
             }
         } catch (IOException e) {
             e.printStackTrace();

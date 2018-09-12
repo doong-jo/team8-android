@@ -21,9 +21,35 @@ public class LEDFragment extends Fragment {
 
     }
 
-    public void setCurLEDView(int gifDrawable) {
-        GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
-        Glide.with(this).load(gifDrawable).into(gifimage);
+    public void setCurLEDView(final int ind, boolean selectable) {
+        final int[] images = {
+                R.drawable.bird,
+                R.drawable.characters,
+                R.drawable.windy,
+                R.drawable.snow,
+                R.drawable.rain,
+                R.drawable.cute,
+                R.drawable.moving_arrow_left_blink,
+                R.drawable.moving_arrow_right_blink,
+                R.drawable.emergency_blink,
+                R.drawable.mario,
+                R.drawable.boy,
+        };
+
+        if (selectable) {
+            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+            Glide.with(this).load(ind).into(gifimage);
+        } else {
+            getActivity().runOnUiThread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+                            Glide.with(getActivity()).load(images[ind]).into(gifimage);
+                        }
+                    }
+            );
+        }
     }
 
     @Override
