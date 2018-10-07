@@ -20,6 +20,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -54,16 +55,24 @@ import com.helper.helper.util.GyroManagerUtil;
 import com.helper.helper.util.PermissionUtil;
 import com.snatik.storage.Storage;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import javax.net.ssl.HttpsURLConnection;
 
 
 public class ScrollingActivity extends AppCompatActivity implements SensorEventListener {
@@ -356,7 +365,6 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         }
     }
-
 
     public void moveToLEDDash(View v) {
         m_viewPager.setCurrentItem(TAB_LED);
@@ -877,6 +885,8 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         //sms.sendTextMessage(num, null, txt, null, null);
     }
 
+
+
     public void shockStateDetector(float accelX, float accelY, float accelZ) {
         long currentTime = System.currentTimeMillis();
         long gabOfTime = (currentTime - m_shockStateLastTime);
@@ -930,6 +940,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 //                    bProcessing = true;
 //                    hanSensor.sendEmptyMessage(0);
 //                    showMsgl("충격 발생 " + speed);
+
             }
 //                else { // 2차 충격
 //                    bProcessing = true;
@@ -945,6 +956,80 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
             m_beforeAccelZ = accelZ;
 
         }
+    }
+
+    public void sendEmergencyStateToServer() {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                //////////////////// Create URL ////////////////////
+                URL githubEndpoint = null;
+                try {
+                    githubEndpoint = new URL("https://helper-internal-core.run.goorm.io/user/sdong001?emergency=true");
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+
+                //////////////////// Create connection ///////////////////
+                HttpsURLConnection myConnection =
+                        null;
+                try {
+                    myConnection = (HttpsURLConnection) githubEndpoint.openConnection();
+                    myConnection.setDoOutput(true);
+                    myConnection.setRequestMethod("PUT");
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // Set request header.
+                if (myConnection != null) {
+//                    myConnection.setRequestProperty("Content-Type", "application/json");
+                    myConnection.setRequestProperty("User-Agent", "my-rest-app-v0.1");
+                }
+//                myConnection.setRequestProperty("Accept",
+//                        "application/vnd.github.v3+json");
+//                myConnection.setRequestProperty("Contact-Me",
+//                        "hathibelagal@example.com");
+
+                //////////////////// Create the data ////////////////////
+//                String myData = "sdong001";
+//                JSONObject json = new JSONObject();
+//                try {
+//                    json.put("emergency", false);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                String body = json.toString();
+
+// Enable writing
+
+
+// Write the data
+//                try {
+//                    myConnection.getOutputStream().write(json.toString().getBytes());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+
+                //////////////////// Request result ////////////////////
+                try {
+                    if (myConnection.getResponseCode() == 200) {
+                        // Success
+                        // Further processing here
+                        Log.d(TAG, "request rest run: success");
+                    } else {
+                        // Error handling code goes here
+                        Log.d(TAG, "request rest run: error");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        });
     }
 
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -1023,6 +1108,8 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
             Log.d(TAG, "readFromBluetoothDevice: " + readMessage);
 
             if (readMessage.equals("EMERGENCY")) {
+                sendEmergencyStateToServer();
+
                 Log.d(TAG, "shockStateDetector: ");
                 try {
                     String strSMS1 = getString(R.string.sms_content) + "\n\n" +  m_strAddressOutput;
