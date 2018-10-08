@@ -3,4 +3,16 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="google_polyline_width">12</dimen>
+
+    <dimen name="xx_text_size">48sp</dimen>
+    <dimen name="x_text_size">36sp</dimen>
+    <dimen name="m_text_size">24sp</dimen>
+    <dimen name="s_text_size">16sp</dimen>
+    <dimen name="xs_text_size">8sp</dimen>
+
+    <dimen name="xx_space_size">25dp</dimen>
+    <dimen name="x_space_size">20dp</dimen>
+    <dimen name="m_space_size">15dp</dimen>
+    <dimen name="s_space_size">10dp</dimen>
+    <dimen name="xs_space_size">5dp</dimen>
 </resources>
