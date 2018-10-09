@@ -36,8 +36,6 @@ public class ContactActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
 
-
-
         // Create the adapter to render our data
         // --
 

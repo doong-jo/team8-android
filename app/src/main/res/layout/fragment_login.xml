@@ -47,40 +47,63 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="@dimen/s_space_size"
                     android:orientation="horizontal"
+                    android:gravity="center"
                     android:weightSum="1">
 
-                    <ImageView
-                        android:src="@drawable/icon"
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_weight="0.2"
-                        android:layout_height="wrap_content"
-                        android:scaleType="fitXY" />
-                    <ImageView
-                        android:src="@drawable/icon"
+                        android:layout_height="match_parent" >
+
+                        <ImageView
+                            android:id="@+id/loginWithFbImg"
+                            android:src="@drawable/ic_facebook"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_weight="0.2"
-                        android:layout_height="wrap_content"
-                        android:scaleType="fitXY" />
-                    <ImageView
-                        android:src="@drawable/icon"
+                        android:layout_height="match_parent" >
+
+                        <ImageView
+                            android:id="@+id/loginWithGoogleImg"
+                            android:src="@drawable/ic_google"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_weight="0.2"
-                        android:layout_height="wrap_content"
-                        android:scaleType="fitXY" />
-                    <ImageView
-                        android:src="@drawable/icon"
+                        android:layout_height="match_parent" >
+
+                        <ImageView
+                            android:id="@+id/loginWithNaverImg"
+                            android:src="@drawable/naver"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_weight="0.2"
-                        android:layout_height="wrap_content"
-                        android:scaleType="fitXY" />
-                    <ImageView
-                        android:src="@drawable/icon"
-                        android:layout_width="0dp"
-                        android:layout_weight="0.2"
-                        android:layout_height="wrap_content"
-                        android:scaleType="fitXY" />
+                        android:layout_height="match_parent" >
+
+                        <ImageView
+                            android:id="@+id/loginWithInstaImg"
+                            android:src="@drawable/ic_instagram"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 

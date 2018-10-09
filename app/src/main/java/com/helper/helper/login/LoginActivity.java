@@ -81,20 +81,21 @@ public class LoginActivity extends FragmentActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         fragmentTransaction.add( R.id.fragmentPlace, fragment );
+        fragmentTransaction.addToBackStack(null);
+
         fragmentTransaction.commit();
     }
 
     public void moveToPrivacyTermFragment(View v) {
+
         Fragment fragment = new TermFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
-
-        for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
-            fragmentManager.popBackStack();
-        }
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         fragmentTransaction.add( R.id.fragmentPlace, fragment );
+        fragmentTransaction.addToBackStack(null);
+
         fragmentTransaction.commit();
     }
 }
