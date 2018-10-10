@@ -32,12 +32,13 @@ public class LoginFragment extends Fragment {
         View view = inflater.inflate( R.layout.fragment_login, container, false );
 
         m_loginWithFbImg = view.findViewById(R.id.loginWithFbImg);
-//        m_loginWithFbImg.bringToFront();
-//        m_loginWithFbImg.setClickable(true);
+
         m_loginWithFbImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(view.getContext(), "touch fbImage onClick", Toast.LENGTH_SHORT).show();
+
+
             }
         });
 
