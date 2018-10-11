@@ -1,10 +1,16 @@
 <resources>
+    <!--app base-->
     <string name="app_name">Safe &amp; Enjoy, HELPER</string>
     <string name="service_name">HELPER</string>
     <string name="device_bluetooth_name">helper-1</string>
+
+    <!--page name-->
     <string name="menu_guideline">Guideline</string>
     <string name="menu_emergency_contacts">Emergency contacts</string>
     <string name="title_activity_maps">Map</string>
+
+    <!--private key-->
+    <string name="server_uri">http://175.123.140.145/</string>
 
     <!--Info Fragment-->
     <string name="cardTitleSensor">Sensor</string>
@@ -46,6 +52,7 @@
     <string name="service_not_available">Sorry, the service is not available</string>
     <string name="invalid_lat_long_used">Invalid latitude or longitude used</string>
 
+    <!--Login-->
     <string name="login_another_service">다른 서비스로 로그인</string>
     <string name="login_or">또는</string>
     <string name="login_id_edittext_hint">이메일</string>
