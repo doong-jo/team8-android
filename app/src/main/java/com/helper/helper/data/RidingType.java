@@ -13,7 +13,7 @@ public enum RidingType {
 
     private String value;
 
-    private RidingType(String value) {
+    RidingType(String value) {
         this.value = value;
     }
 }

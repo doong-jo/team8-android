@@ -39,34 +39,54 @@
 
 
                 <EditText
+                    android:id="@+id/emailInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/s_space_size"
-                    android:hint="@string/join_id_edittext_hint"
+                    android:inputType="textEmailAddress"
+                    android:hint="@string/join_email_edittext_hint"
+                    android:maxLength="@integer/email_length"
+                    android:singleLine="true"
+                    android:nextFocusDown="@id/pwInput"
                     android:focusable="true"
                     android:focusableInTouchMode="true"/>
 
                 <EditText
+                    android:id="@+id/pwInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/s_space_size"
+                    android:inputType="textPassword"
                     android:hint="@string/join_pw_edittext_hint"
+                    android:maxLength="@integer/pw_length"
+                    android:singleLine="true"
+                    android:nextFocusDown="@id/pwConfirmInput"
                     android:focusable="true"
                     android:focusableInTouchMode="true"/>
 
                 <EditText
+                    android:id="@+id/pwConfirmInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/s_space_size"
+                    android:inputType="textPassword"
                     android:hint="@string/join_pw_chk_edittext_hint"
+                    android:maxLength="@integer/pw_length"
+                    android:singleLine="true"
+                    android:nextFocusDown="@id/nameInput"
                     android:focusable="true"
                     android:focusableInTouchMode="true"/>
 
                 <EditText
+                    android:id="@+id/nameInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/s_space_size"
+                    android:inputType="textShortMessage"
                     android:hint="@string/join_name_edittext_hint"
+                    android:maxLength="@integer/name_length"
+                    android:singleLine="true"
+                    android:imeOptions="actionDone"
                     android:focusable="true"
                     android:focusableInTouchMode="true"/>
 
@@ -75,6 +95,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_margin="@dimen/xs_space_size">
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/termChkBox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -102,6 +127,7 @@
                 </LinearLayout>
 
                 <Button
+                    android:id="@+id/joinBtn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/join_button_text"

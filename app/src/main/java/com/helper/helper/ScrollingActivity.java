@@ -1036,7 +1036,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
             Log.d(TAG, "readFromBluetoothDevice: " + readMessage);
 
             if (readMessage.equals("EMERGENCY")) {
-                HttpManagerUtil.requestHttp("/user?sdong001&emergency=true", "PUT");
+//                HttpManagerUtil.requestHttp("/user?sdong001&emergency=true", "PUT");
 
                 Log.d(TAG, "shockStateDetector: ");
                 try {

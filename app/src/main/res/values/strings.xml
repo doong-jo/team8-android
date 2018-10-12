@@ -10,7 +10,7 @@
     <string name="title_activity_maps">Map</string>
 
     <!--private key-->
-    <string name="server_uri">http://175.123.140.145/</string>
+    <string name="server_uri">http://175.123.140.145:80</string>
 
     <!--Info Fragment-->
     <string name="cardTitleSensor">Sensor</string>
@@ -61,10 +61,10 @@
     <string name="suggest_join">계정이 없으신가요?</string>
     <string name="join_us">회원가입</string>
 
-    <string name="join_id_edittext_hint">이메일</string>
+    <string name="join_email_edittext_hint">이메일</string>
     <string name="join_pw_edittext_hint">비밀번호 (영문,숫자,특수문자 8-15자)</string>
     <string name="join_pw_chk_edittext_hint">비밀번호 확인</string>
-    <string name="join_name_edittext_hint">이름 (2-15자)</string>
+    <string name="join_name_edittext_hint">이름(2-15자)</string>
     <string name="join_button_text">계정 만들기</string>
     <string name="suggest_login">이미 계정이 있으세요?</string>
     <string name="accept_join_term_f">Team 8에서 제공하는</string>

@@ -15,22 +15,66 @@ public class User {
     private String m_userEmail;
     private String m_userPw;
     private String m_userPhone;
+    private String m_userName;
     private RidingType m_userRidingType;
-    private String m_userEmergency;
+    private Boolean m_userEmergency;
     private Date m_userLastAccess;
     private ArrayList<Location> m_lastPosition;
     private ArrayList<Location> m_accPosition;
     private ArrayList<String> m_ledIndicies;
     private ArrayList<String> m_trackIndicies;
 
-    public User(String userEmail, String userPw, String userPhone) {
-        m_userEmail = userEmail;
-        m_userPw = userPw;
-        m_userPhone = userPhone;
+    public static class Builder {
+
+        private String m_userEmail;
+        private String m_userPw;
+        private String m_userPhone;
+        private String m_userName;
+
+        public Builder() {
+
+        }
+        public Builder email(String emailStr) {
+            this.m_userEmail = emailStr;
+            return this;
+        }
+
+        public Builder pw(String pwStr) {
+            this.m_userPw = pwStr;
+            return this;
+        }
+
+        public Builder phone(String phoneStr) {
+            this.m_userPhone = phoneStr;
+            return this;
+        }
+
+        public Builder name(String nameStr) {
+            this.m_userName = nameStr;
+            return this;
+        }
+
+        public User build() {
+            return new User(this);
+        }
+    }
+
+    public User(Builder builder) {
+        m_userEmail = builder.m_userEmail;
+        m_userPw = builder.m_userPw;
+        m_userPhone = builder.m_userPhone;
+        m_userName = builder.m_userName;
+        m_userRidingType = RidingType.BICYCLE;
+        m_userLastAccess = new Date();
+        m_userEmergency = false;
+        m_userLastAccess = null;
+        m_lastPosition = new ArrayList<Location>();
+        m_accPosition = new ArrayList<Location>();
+        m_ledIndicies = new ArrayList<String>();
+        m_trackIndicies = new ArrayList<String>();
     }
 
     public String getUserEmail() {
-
         return m_userEmail;
     }
 
@@ -42,5 +86,14 @@ public class User {
         return m_userPhone;
     }
 
-
+    public String getUserInfoQueryFormat() {
+        return
+                "email="+ m_userEmail + "&" +
+                "passwd="+ m_userPw + "&" +
+                "name="+ m_userName + "&" +
+                "phone="+ m_userPhone + "&" +
+                "riding_type=" + m_userRidingType + "&" +
+                "emergency=" + String.valueOf(m_userEmergency) + "&" +
+                "lastAccess" + m_userLastAccess.toString();
+    }
 }

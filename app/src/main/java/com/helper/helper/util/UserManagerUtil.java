@@ -37,7 +37,7 @@ public class UserManagerUtil {
         String userId = user.getUserEmail();
         String userPw = user.getUserPw();
 
-        String response = HttpManagerUtil.requestHttp("user?id="+userId+"&passwd="+userPw, "GET");
+//        String response = HttpManagerUtil.requestHttp("user?id="+userId+"&passwd="+userPw, "GET");
 
         Log.d(TAG, "doLogin: ");
     }
@@ -47,14 +47,12 @@ public class UserManagerUtil {
     }
 
     public static void doJoin(User user) {
-        String userId = user.getUserEmail();
-        String userPw = user.getUserPw();
-        String userPhone = user.getUserPhone();
-        HttpManagerUtil.requestHttp(
-                "user?id="+userId
-                +"&passwd="+userPw
-                +"&phone="+userPhone,
-                "POST"
-        );
+//        HttpManagerUtil.requestHttp(
+//                "user?email="+user.getUserEmail()
+//                +"&passwd="+user.getUserPw()
+//                +"&phone="+user.getUserPhone()
+//                +"&name"+user.getUserName(),
+//                "POST"
+//        );
     }
 }

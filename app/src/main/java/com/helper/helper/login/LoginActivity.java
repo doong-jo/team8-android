@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.helper.helper.R;
 import com.helper.helper.util.FileManagerUtil;
+import com.helper.helper.util.HttpManagerUtil;
 
 import org.w3c.dom.Text;
 
@@ -45,9 +46,7 @@ public class LoginActivity extends FragmentActivity {
         fragmentTransaction.add( R.id.fragmentPlace, fragment );
         fragmentTransaction.commit();
 
-//        m_loginViewPager.setAdapter(new pagerAdapter(this.getSupportFragmentManager()));
-
-//        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        HttpManagerUtil.setServerURI(getString(R.string.server_uri));
     }
 
     @Override

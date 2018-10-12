@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <!--디바이스 검색 시작, Bluetooth 설정을 조작하기 위해 필요한 권한-->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <!--디바이스의 상태(전화번호 등)-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
     <uses-feature android:name="android.hardware.accelerometer" android:required="true" />
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
@@ -37,6 +40,7 @@
 
         <activity android:name=".login.LoginActivity"
             android:screenOrientation="portrait"
+            android:noHistory="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
