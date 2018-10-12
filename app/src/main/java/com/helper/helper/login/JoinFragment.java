@@ -319,11 +319,7 @@ public class JoinFragment extends Fragment {
     public void InsertUserinServer(User user, final ValidateCallback callback) throws JSONException {
         if( HttpManagerUtil.useCollection("user") ) {
 
-            JSONObject reqObject = new JSONObject();
-            reqObject.put("email", user.getUserEmail());
-            reqObject.put("passwd", user.getUserPw());
-            reqObject.put("name", user.getUserEmail());
-            reqObject.put("phone", user.getUserPhone());
+            JSONObject reqObject = user.getTransformUserToJSON();
 //            reqObject.put("lastAccess", new Date().toString());
 
             HttpManagerUtil.requestHttp(reqObject, "POST", new HttpCallback() {
@@ -344,8 +340,8 @@ public class JoinFragment extends Fragment {
         }
     }
 
-    public void createUser(User formUser) {
-        return
-                new User.Builder()
-    }
+//    public void createUser(User formUser) {
+//        return
+//                new User.Builder()
+//    }
 }

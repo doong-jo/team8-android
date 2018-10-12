@@ -74,9 +74,15 @@ public class HttpManagerUtil {
         Iterator<String> keys = obj.keys();
         while(keys.hasNext()) {
             String key = keys.next();
-
+            String value = "";
             try {
-                String value = (String) obj.get(key);
+                try {
+                    value = (String) obj.get(key);
+                } catch (ClassCastException e) {
+                    if( obj.get(key).getClass().getName().equals("java.lang.Boolean") ) {
+                        value = String.valueOf(obj.get(key));
+                    }
+                }
 
 
                 if( !resultStr.toString().equals("") ) {

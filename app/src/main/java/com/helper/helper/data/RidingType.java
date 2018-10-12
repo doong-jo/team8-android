@@ -11,7 +11,7 @@ public enum RidingType {
     MOTORCYCLE("motorcycle"),
     SMART_MOBILITY("smart_mobility");
 
-    private String value;
+    public String value;
 
     RidingType(String value) {
         this.value = value;

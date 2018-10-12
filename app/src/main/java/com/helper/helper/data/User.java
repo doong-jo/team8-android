@@ -8,7 +8,10 @@ package com.helper.helper.data;
 
 import android.location.Location;
 
-import java.sql.Date;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Date;
 import java.util.ArrayList;
 
 public class User {
@@ -16,7 +19,7 @@ public class User {
     private String m_userPw;
     private String m_userPhone;
     private String m_userName;
-    private RidingType m_userRidingType;
+    private String m_userRidingType;
     private Boolean m_userEmergency;
     private Date m_userLastAccess;
     private ArrayList<Location> m_lastPosition;
@@ -64,10 +67,9 @@ public class User {
         m_userPw = builder.m_userPw;
         m_userPhone = builder.m_userPhone;
         m_userName = builder.m_userName;
-        m_userRidingType = RidingType.BICYCLE;
+        m_userRidingType = RidingType.BICYCLE.value;
         m_userLastAccess = new Date();
         m_userEmergency = false;
-        m_userLastAccess = null;
         m_lastPosition = new ArrayList<Location>();
         m_accPosition = new ArrayList<Location>();
         m_ledIndicies = new ArrayList<String>();
@@ -86,14 +88,22 @@ public class User {
         return m_userPhone;
     }
 
-    public String getUserInfoQueryFormat() {
-        return
-                "email="+ m_userEmail + "&" +
-                "passwd="+ m_userPw + "&" +
-                "name="+ m_userName + "&" +
-                "phone="+ m_userPhone + "&" +
-                "riding_type=" + m_userRidingType + "&" +
-                "emergency=" + String.valueOf(m_userEmergency) + "&" +
-                "lastAccess" + m_userLastAccess.toString();
+    public String getUserName() { return m_userName; }
+
+    public JSONObject getTransformUserToJSON() {
+        JSONObject obj = new JSONObject();
+
+        try {
+            obj.put("email", m_userEmail);
+            obj.put("passwd", m_userPw);
+            obj.put("name", m_userName);
+            obj.put("phone", m_userPhone);
+            obj.put("riding_type", m_userRidingType);
+            obj.put("emergency", m_userEmergency);
+            obj.put("lastAccess", m_userLastAccess);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return obj;
     }
 }
