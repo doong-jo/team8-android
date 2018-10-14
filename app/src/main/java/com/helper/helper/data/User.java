@@ -35,7 +35,7 @@ public class User {
         private String m_userName;
 
         public Builder() {
-
+            m_userPw = "";
         }
         public Builder email(String emailStr) {
             this.m_userEmail = emailStr;
@@ -83,6 +83,8 @@ public class User {
     public String getUserPw() {
         return m_userPw;
     }
+
+    public String getUserRidingType() { return m_userRidingType; }
 
     public String getUserPhone() {
         return m_userPhone;

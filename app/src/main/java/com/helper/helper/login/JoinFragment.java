@@ -9,9 +9,11 @@
 package com.helper.helper.login;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatCheckBox;
@@ -71,8 +73,6 @@ public class JoinFragment extends Fragment {
     private static final int RESULT_VALIDATION_SUCCESS = 231;
     /************************************************************/
 
-
-
     public JoinFragment() {
 
     }
@@ -91,7 +91,6 @@ public class JoinFragment extends Fragment {
         m_termChkBox = view.findViewById(R.id.termChkBox);
         /*******************************************************************/
 
-
         /******************* Make Listener in View *******************/
         OnClickListener makeTryJoinListener = makeTryJoinListener();
 
@@ -106,6 +105,11 @@ public class JoinFragment extends Fragment {
             new OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    View focusView = getActivity().getCurrentFocus();
+
+                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+
                     String email = m_emailInput.getText().toString();
                     String pw = m_pwInput.getText().toString();
                     String pwConfirm = m_pwConfirmInput.getText().toString();
@@ -148,13 +152,20 @@ public class JoinFragment extends Fragment {
                                         @Override
                                         public void onDone(int resultCode) {
                                             if( resultCode == RESULT_VALIDATION_SUCCESS ) {
-                                                View view = getActivity().getCurrentFocus();
+                                                getActivity().runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        new Handler().postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                ProgressDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.join_loading_title), getString(R.string.join_loading_message), true);
 
-                                                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-                                                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-
-                                                Intent intent=new Intent(getActivity(),ScrollingActivity.class);
-                                                startActivity(intent);
+                                                                Intent intent = new Intent(getActivity(), ScrollingActivity.class);
+                                                                startActivity(intent);
+                                                            }
+                                                        }, 1000);
+                                                    }
+                                                });
                                             } else {
                                                 getActivity().runOnUiThread(new Runnable() {
                                                     @Override

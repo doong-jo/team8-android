@@ -9,10 +9,12 @@
 package com.helper.helper.login;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -37,6 +39,7 @@ import com.helper.helper.data.User;
 import com.helper.helper.util.HttpCallback;
 import com.helper.helper.util.HttpManagerUtil;
 import com.helper.helper.util.PermissionUtil;
+import com.helper.helper.util.UserManagerUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,9 +68,11 @@ public class LoginFragment extends Fragment {
         m_loginBtn = view.findViewById(R.id.loginBtn);
         /*******************************************************************/
 
+        /******************* Make Listener in View *******************/
         OnClickListener makeTryLoginListener = makeTryLoginListener();
 
         m_loginBtn.setOnClickListener(makeTryLoginListener);
+        /*************************************************************/
 
         return view;
     }
@@ -77,9 +82,13 @@ public class LoginFragment extends Fragment {
                 new OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        View focusView = getActivity().getCurrentFocus();
+
+                        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+
                         String email = m_emailInput.getText().toString();
                         String pw = m_pwInput.getText().toString();
-
 
                         if( HttpManagerUtil.useCollection("user") ) {
                             JSONObject reqObject = new JSONObject();
@@ -95,16 +104,28 @@ public class LoginFragment extends Fragment {
                                     @Override
                                     public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
                                         int arrLen = existIdjsonArray.length();
+                                        UserManagerUtil.setUser(existIdjsonArray.getJSONObject(0));
+
+                                        /** account exist **/
                                         if( arrLen != 0 ) {
-                                            View focusView = getActivity().getCurrentFocus();
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    new Handler().postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            ProgressDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.login_loading_title), getString(R.string.login_loading_message), true);
 
-                                            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-                                            imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+                                                            Intent intent=new Intent(getActivity(),ScrollingActivity.class);
+                                                            startActivity(intent);
+                                                        }
+                                                    }, 1000);
+                                                }
+                                            });
+                                        }
+                                        /** account not exist **/
+                                        else {
 
-                                            Intent intent=new Intent(getActivity(),ScrollingActivity.class);
-                                            startActivity(intent);
-                                        } else {
-                                            /** email exist **/
                                             getActivity().runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {

@@ -60,7 +60,10 @@
     <string name="login">로그인</string>
     <string name="suggest_join">계정이 없으신가요?</string>
     <string name="join_us">회원가입</string>
+    <string name="login_loading_title">"사용자 정보를 불러오는 중입니다."</string>
+    <string name="login_loading_message">"잠시만 기다려주세요..."</string>
 
+    <!--Join-->
     <string name="join_email_edittext_hint">이메일</string>
     <string name="join_pw_edittext_hint">비밀번호 (영문,숫자,특수문자 8-15자)</string>
     <string name="join_pw_chk_edittext_hint">비밀번호 확인</string>
@@ -70,6 +73,9 @@
     <string name="accept_join_term_f">Team 8에서 제공하는</string>
     <string name="term"><u>서비스 약관</u></string>FF
     <string name="accept_join_term_e">에 동의합니다.</string>
+
+    <string name="join_loading_title">"회원가입을 완료하는 중입니다."</string>
+    <string name="join_loading_message">"잠시만 기다려주세요..."</string>
 
     <string name="confirm_privacy_term">상기 내용을 확인하였습니다.</string>
 

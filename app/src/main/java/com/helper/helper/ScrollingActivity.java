@@ -46,16 +46,21 @@ import com.helper.helper.Info.InfoFragment;
 import com.helper.helper.ble.BluetoothLeService;
 import com.helper.helper.contact.ContactActivity;
 import com.helper.helper.contact.ContactItem;
+import com.helper.helper.data.User;
 import com.helper.helper.led.LEDFragment;
 import com.helper.helper.location.Constants;
 import com.helper.helper.location.FetchAddressIntentService;
+import com.helper.helper.login.ValidateCallback;
 import com.helper.helper.tracking.TrackingData;
 import com.helper.helper.util.FileManagerUtil;
 import com.helper.helper.util.GyroManagerUtil;
+import com.helper.helper.util.HttpCallback;
 import com.helper.helper.util.HttpManagerUtil;
 import com.helper.helper.util.PermissionUtil;
+import com.helper.helper.util.UserManagerUtil;
 import com.snatik.storage.Storage;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -74,7 +79,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.net.ssl.HttpsURLConnection;
-
 
 public class ScrollingActivity extends AppCompatActivity implements SensorEventListener {
     private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
@@ -360,7 +364,11 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         public void run() {
             while(true){
-                readFromBluetoothDevice();
+                try {
+                    readFromBluetoothDevice();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
         }
@@ -956,8 +964,63 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         }
     }
 
-    public void sendEmergencyStateToServer() {
+    public void insertAccidentinServer(User user, Location accLocation) throws JSONException {
+        JSONObject locationObject = new JSONObject();
+        locationObject.put("latitude", m_strLatitude);
+        locationObject.put("longitude", m_strLogitude);
 
+        if (HttpManagerUtil.useCollection("accident")) {
+            JSONObject reqObject = new JSONObject();
+            reqObject.put("user_id", user.getUserEmail());
+            reqObject.put("riding_type", user.getUserRidingType());
+            reqObject.put("occured_date", new Date().toString());
+            reqObject.put("position", locationObject);
+
+
+            HttpManagerUtil.requestHttp(reqObject, "POST", new HttpCallback() {
+                @Override
+                public void onSuccess(JSONArray jsonArray) throws JSONException {
+                    Log.d(TAG, "insertAccidentinServer: onSuccess!");
+                }
+
+                @Override
+                public void onError(String err) throws JSONException {
+
+                }
+            });
+        }
+    }
+
+    public void doEmergencyStateAction(User user, Location accLocation) throws JSONException {
+
+        //        HttpManagerUtil.requestHttp("/user?sdong001&emergency=true", "PUT");
+
+//        String email = m_emailInput.getText().toString();
+//        String pw = m_pwInput.getText().toString();
+
+        final String strSMS1 = getString(R.string.sms_content) + "\n\n" + m_strAddressOutput;
+        final String strSMS2 = "https://google.com/maps?q=" + m_strLatitude + "," + m_strLogitude;
+
+        Location location = new Location("");
+        location.setLatitude(Double.valueOf(m_strLatitude));
+        location.setLongitude(Double.valueOf(m_strLatitude));
+
+        insertAccidentinServer(UserManagerUtil.getUser(), location);
+
+        //                    List<ContactItem> contactItems;
+//        try {
+//            contactItems = FileManagerUtil.readXmlEmergencyContacts(this);
+//            for(ContactItem item:
+//                    contactItems) {
+//                sendSMS(item.getPhoneNumber(), strSMS1);
+//                            sendSMS(item.getPhoneNumber(), strSMS2);
+//            }
+//        } catch (IOException e) {
+//            e.printStaxxckTrace();
+//        }
+
+        //                    sendSMS("+8201034823161", strSMS1);
+        //                    sendSMS("+8201034823161", strSMS2);
     }
 
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -1021,7 +1084,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         }
     }
 
-    public void readFromBluetoothDevice() {
+    public void readFromBluetoothDevice() throws JSONException {
         byte[] buffer = new byte[256];
         int bytes;
 
@@ -1036,31 +1099,11 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
             Log.d(TAG, "readFromBluetoothDevice: " + readMessage);
 
             if (readMessage.equals("EMERGENCY")) {
-//                HttpManagerUtil.requestHttp("/user?sdong001&emergency=true", "PUT");
+                Location location = new Location("");
+                location.setLatitude(Double.valueOf(m_strLatitude));
+                location.setLongitude(Double.valueOf(m_strLogitude));
 
-                Log.d(TAG, "shockStateDetector: ");
-                try {
-                    String strSMS1 = getString(R.string.sms_content) + "\n\n" +  m_strAddressOutput;
-                    String strSMS2 = "https://google.com/maps?q=" + m_strLatitude + "," + m_strLogitude;
-
-                    List<ContactItem> contactItems;
-                    try {
-                        contactItems = FileManagerUtil.readXmlEmergencyContacts(this);
-
-                        for(ContactItem item:
-                                contactItems) {
-                            sendSMS(item.getPhoneNumber(), strSMS1);
-                            sendSMS(item.getPhoneNumber(), strSMS2);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-//                    sendSMS("+8201034823161", strSMS1);
-//                    sendSMS("+8201034823161", strSMS2);
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
-                }
+                doEmergencyStateAction(UserManagerUtil.getUser(), location);
             }
             else if (readMessage.split("info").length != 0 ) {
 
