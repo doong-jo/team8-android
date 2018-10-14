@@ -22,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -81,14 +82,14 @@ public class JoinFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_join, container, false);
 
 
-        /******************* Define widgtes in view *******************/
+        /******************* Connect widgtes with layout *******************/
         Button joinBtn = view.findViewById(R.id.joinBtn);
         m_emailInput = view.findViewById(R.id.emailInput);
         m_pwInput = view.findViewById(R.id.pwInput);
         m_pwConfirmInput = view.findViewById(R.id.pwConfirmInput);
         m_nameInput = view.findViewById(R.id.nameInput);
         m_termChkBox = view.findViewById(R.id.termChkBox);
-        /**************************************************************/
+        /*******************************************************************/
 
 
         /******************* Make Listener in View *******************/
@@ -147,6 +148,11 @@ public class JoinFragment extends Fragment {
                                         @Override
                                         public void onDone(int resultCode) {
                                             if( resultCode == RESULT_VALIDATION_SUCCESS ) {
+                                                View view = getActivity().getCurrentFocus();
+
+                                                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                                                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
                                                 Intent intent=new Intent(getActivity(),ScrollingActivity.class);
                                                 startActivity(intent);
                                             } else {
@@ -325,7 +331,9 @@ public class JoinFragment extends Fragment {
             HttpManagerUtil.requestHttp(reqObject, "POST", new HttpCallback() {
                 @Override
                 public void onSuccess(JSONArray jsonArray) throws JSONException {
-                    if( jsonArray.get(0) == "1" ) {
+                    JSONObject resultObj = (JSONObject)jsonArray.get(0);
+                    boolean result = resultObj.getBoolean("result");
+                    if( result ) {
                         callback.onDone(RESULT_VALIDATION_SUCCESS);
                     } else {
                         callback.onDone(RESULT_VALIDATION_ERROR);

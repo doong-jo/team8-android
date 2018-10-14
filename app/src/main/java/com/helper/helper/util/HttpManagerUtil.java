@@ -171,12 +171,15 @@ public class HttpManagerUtil {
 
                                 if( method.equals("GET") ) {
                                     m_resultJsonArray = new JSONArray(readResponse);
-                                    callback.onSuccess(m_resultJsonArray);
                                 } else {
-                                    callback.onSuccess(new JSONArray('{'+'"'+"result"+'"'+":"+readResponse+"}"));
+                                    m_resultJsonArray = new JSONArray("[{result:"+readResponse+"}]");
+                                    callback.onSuccess(m_resultJsonArray);
                                 }
 
+                                callback.onSuccess(m_resultJsonArray);
+
                             } catch (JSONException e) {
+                                callback.onError(e.getMessage());
                                 e.printStackTrace();
                             }
                         } else {

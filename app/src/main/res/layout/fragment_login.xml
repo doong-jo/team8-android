@@ -141,6 +141,7 @@
                 </LinearLayout>
 
                 <EditText
+                    android:id="@+id/loginEmailInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/s_space_size"
@@ -149,6 +150,7 @@
                     android:focusableInTouchMode="true"/>
 
                 <EditText
+                    android:id="@+id/loginPwInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/s_space_size"
