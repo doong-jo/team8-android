@@ -4,6 +4,9 @@
     <string name="service_name">HELPER</string>
     <string name="device_bluetooth_name">helper-1</string>
 
+    <!--Bluetooth-->
+    <string name="bluetooth_uuid">94f39d29-7d6d-437d-973b-fba39e49d4ee</string>
+
     <!--page name-->
     <string name="menu_guideline">Guideline</string>
     <string name="menu_emergency_contacts">Emergency contacts</string>
@@ -37,7 +40,6 @@
 
     <!--Emergency Contacts-->
     <string name="no_emergency_contacts_list">No exists contacts.\n Please add for your safe!</string>
-    <!---->
 
     <!--SMS content-->
     <string name="sms_content">사고가 발생하였습니다. 도와주세요!!!</string>

@@ -13,6 +13,7 @@ import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -48,6 +49,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.helper.helper.R;
+import com.helper.helper.controller.BTManager;
 import com.helper.helper.view.Info.InfoFragment;
 import com.helper.helper.controller.ble.BluetoothLeService;
 import com.helper.helper.view.contact.ContactActivity;
@@ -73,7 +75,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,7 +94,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     private static final int AZIMUTH_PIVOT = 20;
     private static final int PITCH_PIVOT = 5;
     private static final int ROLL_PIVOT = 20;
-    private static final String BT_UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee";
+
     private static final int MESSAGE_STATE_CHANGE = 1;
     public static final int MESSAGE_WRITE = 2;
     public static final int MESSAGE_READ = 3;
@@ -320,15 +321,6 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         });
         /* Tab end */
 
-        /* Valid Bluetooth supports start */
-        m_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (m_bluetoothAdapter == null) {
-            m_IsSupportedBT = false;
-        } else {
-            m_IsSupportedBT = true;
-        }
-        /* Valid Bluetooth supports end */
-
         /* Internal File Storage setup start */
         Storage storage = new Storage(getApplicationContext());
         String path = storage.getInternalFilesDirectory();
@@ -342,8 +334,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         /* Internal File Storage setup end */
 
         /* Set Bluetooth start */
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+        BTManager.initBluetooth(this);
         /* Set Bluetooth end */
 
         /* Sensor start */
@@ -354,7 +345,6 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         m_resultAddressReceiver = new AddressResultReceiver(new Handler());
         m_bInitialize = true;
-        m_bluetoothReadthread = new BluetoothReadThread();
 
     }
 
@@ -483,107 +473,6 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         }
     };
 
-
-    private BroadcastReceiver mDiscoveryReceiver = new BroadcastReceiver() {
-
-
-        @Override
-
-        public void onReceive(Context context, Intent intent) {
-
-            if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
-
-                BluetoothDevice searchedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if (searchedDevice.getName() == null) {
-                    return;
-                }
-
-                Log.d(TAG, "searchedDevice : " + searchedDevice.getName() + "\n" + searchedDevice.getAddress());
-
-                String deviceSSID = new String(getString(R.string.device_bluetooth_name));
-
-                if (searchedDevice.getName().equals(deviceSSID)
-                        ) {
-                    m_pairedDevice = searchedDevice;
-                    try {
-                        m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BT_UUID));
-                        m_bluetoothInput = m_bluetoothSocket.getInputStream();
-                        m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
-
-                        m_bluetoothSocket.connect();
-                        updateConnectionLayout(true);
-
-                        Toast.makeText(getApplicationContext(), "connected device HELPER!", Toast.LENGTH_SHORT).show();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
-                BluetoothDevice searchedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if (m_pairedDevice == null) {
-                    Toast.makeText(getApplicationContext(), "cannot found device HELPER!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-
-    };
-
-    public void connectDevice() throws IOException {
-        if (m_pairedDevice != null) {
-            Toast.makeText(getApplicationContext(), "Already connected device HELPER!", Toast.LENGTH_SHORT).show();
-            updateConnectionLayout(true);
-
-            return;
-
-//            m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BT_UUID));
-//            m_bluetoothInput = m_bluetoothSocket.getInputStream();
-//            m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
-//
-//            m_bluetoothSocket.connect();
-        }
-        // 만약 페어링 기기들 리스트에 있다면 바로 연결
-        List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>(m_bluetoothAdapter.getBondedDevices());
-
-        String[] deviceLabels = new String[devices.size()];
-        for (int i = 0; i < deviceLabels.length; ++i) {
-            Log.d(TAG, "connectDevice: " + devices.get(i).getName());
-            Log.d(TAG, "connectDevice: " + getString(R.string.device_bluetooth_name));
-            String deviceSSID = new String(getString(R.string.device_bluetooth_name));
-
-            if (devices.get(i).getName().equals(deviceSSID)) {
-                Log.d(TAG, "connectDevice: equal");
-            } else {
-                Log.d(TAG, "connectDevice: not equal");
-            }
-
-            if (devices.get(i).getName().equals(deviceSSID)) {
-                try {
-                    m_pairedDevice = devices.get(i);
-                    m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BT_UUID));
-                    m_bluetoothInput = m_bluetoothSocket.getInputStream();
-                    m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
-
-                    m_bluetoothSocket.connect();
-                    updateConnectionLayout(true);
-                    return;
-                } catch (IOException e) {
-                    m_pairedDevice = null;
-                    e.printStackTrace();
-                }
-//                m_btThread = new ConnectedThread(m_bluetoothSocket);
-//                m_btThread.run();
-                return;
-            }
-        }
-
-        // 페어링 기기가 없다면 새로 찾아서 연결
-        if (m_bluetoothAdapter.startDiscovery()) {
-            IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-
-            registerReceiver(mDiscoveryReceiver, filter);
-        }
-    }
 
     public void ledImageListener(View v) {
 
