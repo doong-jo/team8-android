@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.helper.helper.R;
+import com.helper.helper.view.Info.InfoFragment;
+import com.helper.helper.view.TabPagerAdapter;
 
 public class LEDFragment extends Fragment {
 
@@ -109,3 +111,109 @@ public class LEDFragment extends Fragment {
         return view;
     }
 }
+
+/*
+    public void ledImageListener(View v) {
+
+
+    private String m_curLED;
+    private byte[] m_curSignalStr;
+
+        String str = "helper";
+
+        String resName = v.getResources().getResourceName(v.getId());
+        String imgName = resName.split(String.format("%s", '/'))[1];
+
+        if (m_infoFrag == null) {
+            m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+                    "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter) m_viewPager.getAdapter())
+                            .getItemId(TAB_STATUS));
+        }
+
+        if (m_ledFrag == null) {
+            m_ledFrag = (LEDFragment) getSupportFragmentManager().findFragmentByTag(
+                    "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter) m_viewPager.getAdapter())
+                            .getItemId(TAB_LED));
+        }
+
+
+        switch (imgName) {
+            case "img0":
+                str = "0-00-0";
+                m_infoFrag.setCurLEDView(R.drawable.bird, true);
+                m_ledFrag.setCurLEDView(R.drawable.bird, true);
+                break;
+
+            case "img1":
+                str = "0-01-0";
+                m_infoFrag.setCurLEDView(R.drawable.characters, true);
+                m_ledFrag.setCurLEDView(R.drawable.characters, true);
+                break;
+
+            case "img2":
+                str = "0-02-0";
+                m_infoFrag.setCurLEDView(R.drawable.windy, true);
+                m_ledFrag.setCurLEDView(R.drawable.windy, true);
+                break;
+
+            case "img3":
+                str = "0-03-0";
+                m_infoFrag.setCurLEDView(R.drawable.snow, true);
+                m_ledFrag.setCurLEDView(R.drawable.snow, true);
+                break;
+
+            case "img4":
+                str = "0-04-0";
+                m_infoFrag.setCurLEDView(R.drawable.rain, true);
+                m_ledFrag.setCurLEDView(R.drawable.rain, true);
+                break;
+
+            case "img5":
+                str = "0-05-0";
+                m_infoFrag.setCurLEDView(R.drawable.cute, true);
+                m_ledFrag.setCurLEDView(R.drawable.cute, true);
+                break;
+
+            case "img6":
+                str = "0-06-1";
+                m_infoFrag.setCurLEDView(R.drawable.moving_arrow_left_blink, true);
+                m_ledFrag.setCurLEDView(R.drawable.moving_arrow_left_blink, true);
+                break;
+
+            case "img7":
+                str = "0-07-1";
+                m_infoFrag.setCurLEDView(R.drawable.moving_arrow_right_blink, true);
+                m_ledFrag.setCurLEDView(R.drawable.moving_arrow_right_blink, true);
+                break;
+
+            case "img8":
+                str = "0-08-1";
+                m_infoFrag.setCurLEDView(R.drawable.emergency_blink, true);
+                m_ledFrag.setCurLEDView(R.drawable.emergency_blink, true);
+                break;
+
+            case "img9":
+                str = "0-09-0";
+                m_infoFrag.setCurLEDView(R.drawable.mario, true);
+                m_ledFrag.setCurLEDView(R.drawable.mario, true);
+                break;
+
+            case "img10":
+                str = "0-10-0";
+                m_infoFrag.setCurLEDView(R.drawable.boy, true);
+                m_ledFrag.setCurLEDView(R.drawable.boy, true);
+                break;
+        }
+
+        m_curLED = str;
+
+        sendToBluetoothDevice(str.getBytes());
+
+//        m_characteristicTX.setValue(tx);
+//
+//        m_bluetoothLeService.writeCharacteristic(m_characteristicTX);
+//        m_bluetoothLeService.readCharacteristic(m_characteristicRX);
+//
+//        Log.d("DEV", "sendSignal called! TX : " + new String(m_characteristicTX.getValue()));
+//        Log.d("DEV", "sendSignal called! RX : " + new String(m_characteristicRX.getValue()));
+    }*/

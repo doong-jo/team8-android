@@ -6,9 +6,6 @@
 
 package com.helper.helper.interfaces;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 public interface BluetoothReadCallback {
     void onResult(String result);
 }

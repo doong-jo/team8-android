@@ -154,106 +154,106 @@ public class InfoFragment extends Fragment
     }
 
     @SuppressWarnings("MissingPermission")
-    private LocationCallback mLocationCallback;
-
-    {
-        mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-
-                List<Location> locationList = locationResult.getLocations();
-                if (locationList.size() > 0) {
-                    //The last location in the list is the newest
-                    Location location = locationList.get(locationList.size() - 1);
-                    m_curLocation = location;
-
-//                    Log.d(TAG, "" + location.getLatitude() + " " + location.getLongitude());
-
-                    try {
-                        ((ScrollingActivity)getActivity()).setMapPosition(location.getLatitude(), location.getLongitude(), location);
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
-                    }
-
-                    String writeStr = "";
-
-//                    m_textCurSpeed.setText("현재 속도 : " + String.format("%f", location.getSpeed()));
-//                    m_textBeforeSpeed.setText("이전 속도 : " + String.format("%f", m_curSpeed));
-
-//                    if( location.getSpeed() >= 1 && location.getSpeed() * EMENRGENCY_SPPED_PIVOT < m_curSpeed ) {
-//                    if( location.getSpeed() < m_curSpeed ) {
-//                        writeStr = "0-08-1";
+//    private LocationCallback mLocationCallback;
 //
-//                        ((ScrollingActivity)getActivity()).setcurInterrupt(EMERGENCY);
+//    {
+//        mLocationCallback = new LocationCallback() {
+//            @Override
+//            public void onLocationResult(LocationResult locationResult) {
+//
+//                List<Location> locationList = locationResult.getLocations();
+//                if (locationList.size() > 0) {
+//                    //The last location in the list is the newest
+//                    Location location = locationList.get(locationList.size() - 1);
+//                    m_curLocation = location;
+//
+////                    Log.d(TAG, "" + location.getLatitude() + " " + location.getLongitude());
+//
+//                    try {
+//                        ((ScrollingActivity)getActivity()).setMapPosition(location.getLatitude(), location.getLongitude(), location);
+//                    } catch (NullPointerException e) {
+//                        e.printStackTrace();
 //                    }
-
-
-                    int curInterrutState;
-                    try {
-                        curInterrutState = ((ScrollingActivity) Objects.requireNonNull(getActivity())).getcurInterruptState();
-                    } catch (NullPointerException e){
-                        curInterrutState = ORIENTATION_NONE;
-                        e.printStackTrace();
-                    }
-
-
-                    if ( curInterrutState == EMERGENCY && location.getSpeed() >= m_curSpeed ) {
-                        writeStr = ((ScrollingActivity)getActivity()).getCurLED();
-
-                        ((ScrollingActivity)getActivity()).setcurInterrupt(ORIENTATION_NONE);
-                    }
-
-                    try{
-                        if( writeStr != "" ) {
-                            ((ScrollingActivity)getActivity()).sendToBluetoothDevice(writeStr.getBytes());
-                        }
-                    }
-                    catch (NullPointerException e) {
-                        e.printStackTrace();
-                    }
-
-
-//                    Toast.makeText(getContext(), "C: " + location.getSpeed() + " / B: " + m_curSpeed, Toast.LENGTH_SHORT).show();
-
-                    m_curSpeed = location.getSpeed();
-//                    Toast.makeText(getContext(), "onLocationResult : "+ location.getSpeed(), Toast.LENGTH_SHORT).show();
-
-                    if (m_curLocationMarker != null) {
-                        m_curLocationMarker.remove();
-                    }
-
-                    setCurrentLocation(location, "Current Position", "GPS Position");
-                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-                    try{
-                        if (((ScrollingActivity) getActivity()).getIsRecorded()) {
-                            m_lCurRecordedLocation.add(new LatLng(m_curLocation.getLatitude(), m_curLocation.getLongitude()));
-
-                            if (m_beforeLatlng != null) {
-                                m_googleMap.addPolyline((new PolylineOptions())
-                                        .add(m_beforeLatlng, latLng)
-                                        .width(R.dimen.google_polyline_width).color(Color.BLUE)
-                                        .geodesic(true));
-
-                                m_fCurDistance += CalculationByDistance(m_beforeLatlng, latLng);
-                            }
-                        }
-                        m_beforeLatlng = latLng;
-                    }
-                    catch (NullPointerException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            }
-        };
-    }
+//
+//                    String writeStr = "";
+//
+////                    m_textCurSpeed.setText("현재 속도 : " + String.format("%f", location.getSpeed()));
+////                    m_textBeforeSpeed.setText("이전 속도 : " + String.format("%f", m_curSpeed));
+//
+////                    if( location.getSpeed() >= 1 && location.getSpeed() * EMENRGENCY_SPPED_PIVOT < m_curSpeed ) {
+////                    if( location.getSpeed() < m_curSpeed ) {
+////                        writeStr = "0-08-1";
+////
+////                        ((ScrollingActivity)getActivity()).setcurInterrupt(EMERGENCY);
+////                    }
+//
+//
+//                    int curInterrutState;
+//                    try {
+//                        curInterrutState = ((ScrollingActivity) Objects.requireNonNull(getActivity())).getcurInterruptState();
+//                    } catch (NullPointerException e){
+//                        curInterrutState = ORIENTATION_NONE;
+//                        e.printStackTrace();
+//                    }
+//
+//
+//                    if ( curInterrutState == EMERGENCY && location.getSpeed() >= m_curSpeed ) {
+//                        writeStr = ((ScrollingActivity)getActivity()).  getCurLED();
+//
+//                        ((ScrollingActivity)getActivity()).setcurInterrupt(ORIENTATION_NONE);
+//                    }
+//
+//                    try{
+//                        if( writeStr != "" ) {
+//                            ((ScrollingActivity)getActivity()).sendToBluetoothDevice(writeStr.getBytes());
+//                        }
+//                    }
+//                    catch (NullPointerException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//
+////                    Toast.makeText(getContext(), "C: " + location.getSpeed() + " / B: " + m_curSpeed, Toast.LENGTH_SHORT).show();
+//
+//                    m_curSpeed = location.getSpeed();
+////                    Toast.makeText(getContext(), "onLocationResult : "+ location.getSpeed(), Toast.LENGTH_SHORT).show();
+//
+//                    if (m_curLocationMarker != null) {
+//                        m_curLocationMarker.remove();
+//                    }
+//
+//                    setCurrentLocation(location, "Current Position", "GPS Position");
+//                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+//
+//                    try{
+//                        if (((ScrollingActivity) getActivity()).getIsRecorded()) {
+//                            m_lCurRecordedLocation.add(new LatLng(m_curLocation.getLatitude(), m_curLocation.getLongitude()));
+//
+//                            if (m_beforeLatlng != null) {
+//                                m_googleMap.addPolyline((new PolylineOptions())
+//                                        .add(m_beforeLatlng, latLng)
+//                                        .width(R.dimen.google_polyline_width).color(Color.BLUE)
+//                                        .geodesic(true));
+//
+//                                m_fCurDistance += CalculationByDistance(m_beforeLatlng, latLng);
+//                            }
+//                        }
+//                        m_beforeLatlng = latLng;
+//                    }
+//                    catch (NullPointerException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//            }
+//        };
+//    }
 
     private SeekBar.OnSeekBarChangeListener m_seekBarBrightChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
             String str = "2-" + String.format("%02d-%d", i/10, i%10);
-            ((ScrollingActivity)getActivity()).sendToBluetoothDevice(str.getBytes());
+//            ((ScrollingActivity)getActivity()).sendToBluetoothDevice(str.getBytes());
         }
 
         @Override
@@ -271,7 +271,7 @@ public class InfoFragment extends Fragment
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
             String str = "1-" + String.format("%02d-%d", i/10, i%10);
-            ((ScrollingActivity)getActivity()).sendToBluetoothDevice(str.getBytes());
+//            ((ScrollingActivity)getActivity()).sendToBluetoothDevice(str.getBytes());
         }
 
 
@@ -371,27 +371,6 @@ public class InfoFragment extends Fragment
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            if ( !PermissionManager.checkPermissions(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ||
-                    !PermissionManager.checkPermissions(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
-
-                /* Result about user selection -> onActivityResult in ScrollActivity */
-                PermissionManager.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, GPS_ENABLE_REQUEST_CODE);
-            } else {
-                if ( m_googleApiClient == null) {
-                    buildGoogleApiClient();
-                }
-                requsetLocation();
-            }
-
-            if ( !PermissionManager.checkPermissions(getActivity(), Manifest.permission.SEND_SMS) ) {
-
-                /* Result about user selection -> onActivityResult in ScrollActivity */
-                PermissionManager.requestPermissions(getActivity(), new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_REQUEST_CODE);
-            } else {
-
-            }
-
-
         } else {
 
             if ( m_googleApiClient == null) {
@@ -473,7 +452,7 @@ public class InfoFragment extends Fragment
             }
         });
 
-        LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(m_locationReq, mLocationCallback, Looper.myLooper());
+//        LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(m_locationReq, mLocationCallback, Looper.myLooper());
     }
 
     @Override

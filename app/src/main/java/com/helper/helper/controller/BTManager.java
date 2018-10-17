@@ -7,6 +7,7 @@
 package com.helper.helper.controller;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -24,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.helper.helper.Constants;
 import com.helper.helper.R;
 import com.helper.helper.controller.ble.BluetoothLeService;
 import com.helper.helper.interfaces.BluetoothReadCallback;
@@ -48,7 +50,9 @@ public class BTManager {
     public static final String BLUETOOTH_UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee";
     public static final String DEVICE_ALIAS = "helper-1";
 
-    private static final int REQUEST_ENABLE_BT = 2001;
+    public static final int SUCCESS_BLUETOOTH_CONNECT = 1001;
+    public static final int REQUEST_ENABLE_BT = 2001;
+
     /************************************************************/
 
     private static class BluetoothReadThread extends Thread {
@@ -62,7 +66,7 @@ public class BTManager {
                 BTManager.readFromBluetoothDevice(new BluetoothReadCallback() {
                     @Override
                     public void onResult(String result) {
-                        (ScrollingActivity)
+                        bluetoothSignalHandler(result);
                     }
                 });
             }
@@ -81,14 +85,18 @@ public class BTManager {
     private static OutputStream m_bluetoothOutput;
     private static BroadcastReceiver m_discoveryReceiver = makeBroadcastReceiver();
     private static BluetoothReadThread m_bluetoothReadthread;
-
+    private static ProgressDialog m_loadingDlg;
     public static void initBluetooth(final Activity activity) {
-        m_activity = activity;
+        if( activity != null) {
+            m_activity = activity;
+        }
+
         m_IsProcessing = true;
 
-        /** create bluetooth service **/
-        Intent bluetoothServiceIntent = new Intent(m_activity, BluetoothLeService.class);
-        m_activity.bindService(bluetoothServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        /** create bluetooth (GATT) service **/
+//        Intent bluetoothServiceIntent = new Intent(m_activity, BluetoothLeService.class);
+//        m_activity.bindService(bluetoothServiceIntent, m_serviceConnection, Context.BIND_AUTO_CREATE);
+//        m_activity.startService()
 
         /** create adapter and return enablable device **/
         m_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -97,21 +105,22 @@ public class BTManager {
             return;
         }
 
+        if (!m_bluetoothAdapter.isEnabled()) {
+            Toast.makeText(m_activity, "블루투스가 비활성화 되어있습니다.", Toast.LENGTH_SHORT).show();
+            requestEnableBluetooth();
+        } else {
+            prepareDevice();
+        }
+
         /** create bluetooth read thread (not running)**/
         m_bluetoothReadthread = new BluetoothReadThread();
-
     }
 
-    private final static ServiceConnection mServiceConnection = new ServiceConnection() {
+    private final static ServiceConnection m_serviceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
-            if (!m_bluetoothAdapter.isEnabled()) {
-                Toast.makeText(m_activity, "블루투스가 비활성화 되어있습니다.", Toast.LENGTH_SHORT).show();
-                requestEnableBluetooth();
-            } else {
-                prepareDevice();
-            }
+
         }
 
         @Override
@@ -120,12 +129,31 @@ public class BTManager {
         }
     };
 
+    private static void bluetoothSignalHandler(String signalMsg) {
+        if ( signalMsg.equals("EMERGENCY") ) {
+            try {
+                EmergencyManager.startEmergencyProcess(m_activity);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else if( signalMsg.split("info").length != 0 ) {
+            String[] splitStr = signalMsg.split("/");
+
+            int ledInd = Integer.parseInt(splitStr[1]);
+            float spdVal = Float.parseFloat(splitStr[2]);
+            float brtVal = Float.parseFloat(splitStr[3]);
+        }
+    }
+
     /** Find Bluetooth Device **/
     private static void prepareDevice()  {
         if (m_pairedDevice != null) {
             Toast.makeText(m_activity, "이미 디바이스와 연결되어 있습니다.", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        m_loadingDlg = ProgressDialog.show(m_activity, m_activity.getString(R.string.bluetooth_loading_title), m_activity.getString(R.string.bluetooth_loading_message), true);
+
         /** 만약 페어링 기기들 리스트에 있다면 바로 연결 **/
         List<BluetoothDevice> devices = new ArrayList<>(m_bluetoothAdapter.getBondedDevices());
 
@@ -157,15 +185,19 @@ public class BTManager {
 
             m_bluetoothSocket.connect();
             m_bluetoothReadthread.start();
+
+            Toast.makeText(m_activity, "디바이스 연결에 성공했습니다.", Toast.LENGTH_SHORT).show();
+
+            m_activity.setResult(BTManager.SUCCESS_BLUETOOTH_CONNECT);
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(m_activity, "디바이스 연결에 실패했습니다.", Toast.LENGTH_SHORT).show();
         }
-
+        m_loadingDlg.dismiss();
     }
 
     /** Find Bluetooth **/
-    private static BroadcastReceiver makeBroadcastReceiver() throws IOException {
+    private static BroadcastReceiver makeBroadcastReceiver() {
         return new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -177,12 +209,15 @@ public class BTManager {
                         return;
                     }
 
+                    String searchDeviceName = searchedDevice.getName();
+                    Log.d(TAG, "searchedDeviceName onReceive: " + searchDeviceName);
                     if (searchedDevice.getName().equals(DEVICE_ALIAS)) {
                         connectDevice(searchedDevice);
                     }
 
                 } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
                     Toast.makeText(m_activity, "디비이스를 찾지 못했습니다.", Toast.LENGTH_SHORT).show();
+                    m_loadingDlg.dismiss();
                 }
             }
         };
@@ -195,7 +230,7 @@ public class BTManager {
         }
     }
 
-    public void sendToBluetoothDevice(byte[] bytes) {
+    public static void writeToBluetoothDevice(byte[] bytes) {
         if (m_bluetoothInput == null || !m_bluetoothSocket.isConnected()) {
             return;
         }
@@ -221,6 +256,16 @@ public class BTManager {
             bytes = m_bluetoothInput.read(buffer);
             String readMessage = new String(buffer, 0, bytes);
             callback.onResult(readMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void closeBluetoothSocket() {
+        try {
+            if( m_bluetoothSocket != null && m_bluetoothSocket.isConnected() ) {
+                m_bluetoothSocket.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
