@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--State Color-->
+    <color name="white">#FFFFFF</color>
+    <color name="gray">#DFE0E2</color>
+    <color name="xgray">#CECED0></color>
+    <color name="xxgray">#B4B4B5</color>
+    <color name="xxxgray">#727272</color>
+    <color name="xxxxgray">#575758</color>
+    <color name="xxxxxgray">#424242</color>
+
+
+
+
+
+
     <!--toolbar text color-->
     <color name="textColorPrimary">#161616</color>
     <!--action bar background-->
@@ -11,4 +25,5 @@
     <color name="tabBackgroundColor">#FAFAFA</color>
     <color name="loginBackgroundColor">#F5F5F5</color>
     <color name="softBlackColor">#313338</color>
+
 </resources>
