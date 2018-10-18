@@ -63,6 +63,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import static android.support.design.widget.TabLayout.*;
+
 public class ScrollingActivity extends AppCompatActivity implements SensorEventListener {
     private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
     private static final int TAB_STATUS = 0;
@@ -92,44 +94,20 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         setContentView(R.layout.activity_scrolling);
 
-        /** Http Server **/
-        HttpManager.setServerURI(getString(R.string.server_uri));
-
-        /** ToolBar **/
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        /** UI **/
-
-
-        /******************* Connect widgtes with layout *******************/
-        TextView connectToggle = (TextView) findViewById(R.id.connect_toggle_text);
-        /*******************************************************************/
-
-        /******************* Make Listener in View *******************/
-        connectToggle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                BTManager.initBluetooth(null);
-            }
-        });
-        /*************************************************************/
-
         /** Tab **/
         m_tabLayout = findViewById(R.id.tabLayout);
         m_tabLayout.addTab(m_tabLayout.newTab().setText("Status"));
         m_tabLayout.addTab(m_tabLayout.newTab().setText("LED"));
         m_tabLayout.addTab(m_tabLayout.newTab().setText("Tracking"));
 
-        m_viewPager = findViewById(R.id.pager);
-
         m_pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), m_tabLayout.getTabCount());
-        m_viewPager.setAdapter(m_pagerAdapter);
-        m_viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(m_tabLayout));
 
-        m_tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        m_viewPager = findViewById(R.id.pager);
+        m_viewPager.setAdapter(m_pagerAdapter);
+        m_viewPager.addOnPageChangeListener(new TabLayoutOnPageChangeListener(m_tabLayout));
+        m_tabLayout.addOnTabSelectedListener(new OnTabSelectedListener() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
+            public void onTabSelected(Tab tab) {
                 Log.d("DEV", "onTabSelected called! posistion : " + tab.getPosition());
                 m_viewPager.setCurrentItem(tab.getPosition());
 
@@ -147,15 +125,37 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
+            public void onTabUnselected(Tab tab) {
 
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
+            public void onTabReselected(Tab tab) {
 
             }
         });
+
+        /******************* Connect widgtes with layout *******************/
+        TextView connectToggle = (TextView) findViewById(R.id.connect_toggle_text);
+        /*******************************************************************/
+
+        /******************* Make Listener in View *******************/
+        connectToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Already pass activity -> null
+                BTManager.initBluetooth(null);
+            }
+        });
+        /*************************************************************/
+
+
+        /** Http Server **/
+        HttpManager.setServerURI(getString(R.string.server_uri));
+
+        /** ToolBar **/
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         /** Request permissions **/
         if ( !PermissionManager.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION) ||
@@ -201,11 +201,11 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     }
 
     /** UI **/
-    public void moveToLEDDash(View v) {
+    private void moveToLEDDash(View v) {
         m_viewPager.setCurrentItem(TAB_LED);
     }
 
-    public void moveToTrackingDash(View v) {
+    private void moveToTrackingDash(View v) {
         m_viewPager.setCurrentItem(TAB_TRACKING);
     }
 
@@ -255,11 +255,16 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         return super.onOptionsItemSelected(item);
     }
 
+    /** Result handler **/
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case BTManager.SUCCESS_BLUETOOTH_CONNECT:
                 Toast.makeText(this, "디바이스 블루투스 연결 성공", Toast.LENGTH_SHORT).show();
+                updateConnectionLayout(true);
+                break;
+
+            case BTManager.FAIL_BLUETOOTH_CONNECT:
                 updateConnectionLayout(true);
                 break;
 
@@ -279,7 +284,19 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         switch (requestCode) {
             case PERMISSION_REQUEST:
-                Toast.makeText(this, "권한이 승인되었습니다.", Toast.LENGTH_SHORT).show();
+                if( !PermissionManager.checkPermissions(
+                        this, Manifest.permission.ACCESS_FINE_LOCATION) ||
+                        !PermissionManager.checkPermissions(
+                                this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                    Toast.makeText(this, getString(R.string.not_grant_location_permission), Toast.LENGTH_SHORT).show();
+                }
+
+                if( !PermissionManager.checkPermissions(
+                        this, Manifest.permission.SEND_SMS) ) {
+                    Toast.makeText(this, getString(R.string.not_grant_contacts_permission), Toast.LENGTH_SHORT).show();
+                }
+
+                Toast.makeText(this, "권한요청 프로세스 완료", Toast.LENGTH_SHORT).show();
                 break;
         }
 //        if (requestCode == PermissionManager.REQUEST_LOCATION) {
@@ -337,7 +354,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         BTManager.closeBluetoothSocket();
     }
 
-    /** Gyro **/
+    /** GyroSensor **/
     public void onSensorChanged(SensorEvent sensorEvent) {
         //Disabled Sensor
         return;

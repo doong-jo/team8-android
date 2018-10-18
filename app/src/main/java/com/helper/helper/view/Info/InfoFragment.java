@@ -61,16 +61,8 @@ public class InfoFragment extends Fragment
         LocationListener {
     private final static String TAG = InfoFragment.class.getSimpleName() + "/DEV";
     private static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
-    private static final int GPS_ENABLE_REQUEST_CODE = 2002;
-    private static final int SEND_SMS_REQUEST_CODE = 947;
     private static final int UPDATE_INTERVAL_MS = 1500;
     private static final int FASTEST_UPDATE_INTERVAL_MS = 1000;
-    private static final float EMENRGENCY_SPPED_PIVOT = 0.8f;
-
-    private static final int ORIENTATION_LEFT = 944;
-    private static final int ORIENTATION_RIGHT = 344;
-    private static final int ORIENTATION_NONE = 892;
-    private static final int EMERGENCY = 121;
 
     private BatteryView m_batView;
     private MapView m_mapView;
@@ -79,34 +71,14 @@ public class InfoFragment extends Fragment
     private LocationRequest m_locationReq;
     private Location m_curLocation;
     private Marker m_curLocationMarker;
-    private static LatLng m_beforeLatlng = null;
-    private float m_curSpeed;
 
     private double m_fCurDistance = 0.0;
     private List<LatLng> m_lCurRecordedLocation;
-
-    private TextView m_textViewTiltX;
-    private TextView m_textViewTiltY;
-    private TextView m_textViewTiltZ;
-
-    private TextView m_textBeforeSpeed;
-    private TextView m_textCurSpeed;
 
     private SeekBar m_brightSeekbar;
     private SeekBar m_speedSeekbar;
 
     private ImageView m_curLEDView;
-
-
-    public double getCurTrackingDistance() {
-        return m_fCurDistance;
-    }
-
-    public List<LatLng> getCurrRecordedLocationList() {
-        return m_lCurRecordedLocation;
-    }
-
-//    public final void runOnUiThread(Runnable action) { mHandler.post(action); }
 
 
     public void setCurLEDView(final int ind, boolean selectable) {
@@ -309,34 +281,7 @@ public class InfoFragment extends Fragment
         return meter;
     }
 
-    public void setCurrentLocation(Location location, String markerTitle, String markerSnippet) {
-        if (m_curLocationMarker != null) m_curLocationMarker.remove();
 
-        if (location != null) {
-            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(currentLocation);
-            markerOptions.title(markerTitle);
-            markerOptions.snippet(markerSnippet);
-            markerOptions.draggable(true);
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            m_curLocationMarker = this.m_googleMap.addMarker(markerOptions);
-
-            this.m_googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
-            return;
-        }
-
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(DEFAULT_LOCATION);
-        markerOptions.title(markerTitle);
-        markerOptions.snippet(markerSnippet);
-        markerOptions.draggable(true);
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-        m_curLocationMarker = this.m_googleMap.addMarker(markerOptions);
-
-        this.m_googleMap.moveCamera(CameraUpdateFactory.newLatLng(DEFAULT_LOCATION));
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -352,31 +297,7 @@ public class InfoFragment extends Fragment
         m_batView = (BatteryView) view.findViewById(R.id.batView);
         m_batView.setPower(100);
 
-//        if (m_mapView == null) {
-            m_mapView = (MapView) view.findViewById(R.id.map);
-            m_mapView.onCreate(savedInstanceState);
-            m_mapView.onResume();
-            m_mapView.getMapAsync(this);
-//        }
-
-
         adjustMapVerticalTouch(view);
-
-//        m_textViewTiltX = (TextView) view.findViewById(R.id.TiltX);
-//        m_textViewTiltY = (TextView) view.findViewById(R.id.TiltY);
-//        m_textViewTiltZ = (TextView) view.findViewById(R.id.TiltZ);
-
-//        m_textCurSpeed = (TextView) view.findViewById(R.id.curSpeed);
-//        m_textBeforeSpeed = (TextView) view.findViewById(R.id.beforeSpeed);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-        } else {
-
-            if ( m_googleApiClient == null) {
-                buildGoogleApiClient();
-            }
-        }
 
         m_brightSeekbar = (SeekBar) view.findViewById(R.id.brightSeek);
         m_speedSeekbar = (SeekBar) view.findViewById(R.id.speedSeek);
@@ -401,6 +322,7 @@ public class InfoFragment extends Fragment
         m_mapView.onSaveInstanceState(outState);
     }
 
+    /** support mapview in scrollview touch **/
     @SuppressLint("ClickableViewAccessibility")
     public void adjustMapVerticalTouch(View view) {
         final NestedScrollView mainScrollView = (NestedScrollView) view.findViewById(R.id.infoFragment);
@@ -434,116 +356,10 @@ public class InfoFragment extends Fragment
         });
     }
 
-    @SuppressLint("MissingPermission")
-    public void requsetLocation() {
-        if (!PermissionManager.checkPermissions(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) &&
-                !PermissionManager.checkPermissions(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            return;
-        }
 
-        LocationServices.getFusedLocationProviderClient(getActivity()).getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location != null) {
-                    m_curLocation = location;
 
-                    setCurrentLocation(m_curLocation, "GPS Position", "GPS Position");
-                }
-            }
-        });
 
-//        LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(m_locationReq, mLocationCallback, Looper.myLooper());
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        m_googleMap = googleMap;
-
-        setCurrentLocation(null, "Unknown GPS signal", "Check your GPS permission");
-
-        m_googleMap.getUiSettings().setCompassEnabled(true);
-        m_googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        m_googleMap.setMyLocationEnabled(true);
-
-        m_googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-
-        if( m_curLocation == null) {
-            m_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15));
-        } else {
-            m_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(m_curLocation.getLatitude(), m_curLocation.getLongitude()), 15));
-            setCurrentLocation(m_curLocation, "Current Position", "GPS Position");
-        }
-    }
-
-    public boolean checkLocationServicesStatus() {
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        m_googleMap.getUiSettings().setCompassEnabled(true);
-        m_googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Location location = new Location("");
-        location.setLatitude(DEFAULT_LOCATION.latitude);
-        location.setLongitude((DEFAULT_LOCATION.longitude));
-
-        setCurrentLocation(null, "Unknown GPS signal", "Check your GPS permission");
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        m_curLocation = location;
-        Toast.makeText(getContext(), "LocationChaged : " + location.getSpeed(), Toast.LENGTH_SHORT).show();
-        setCurrentLocation(m_curLocation, "내 위치", "GPS Position");
-    }
-
-    public void recordStopAndEraseLocationList() {
-        m_lCurRecordedLocation.clear();
-    }
-
-    @Override
-    public void onConnectionSuspended(int connect) {
-
-    }
-
-    private void createLocationRequest() {
-        m_locationReq = new LocationRequest();
-        m_locationReq.setInterval(UPDATE_INTERVAL_MS);//3000
-        m_locationReq.setFastestInterval(FASTEST_UPDATE_INTERVAL_MS);//1500
-        m_locationReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-    protected synchronized  void buildGoogleApiClient() {
-        if(m_googleApiClient == null) {
-            m_googleApiClient = new GoogleApiClient.Builder(getActivity())
-                    .enableAutoManage((FragmentActivity) getActivity(), this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-            m_googleApiClient.connect();
-        }
-
-        createLocationRequest();
-    }
-
+    /** Life Cycle **/
     @Override
     public void onStart() {
         super.onStart();

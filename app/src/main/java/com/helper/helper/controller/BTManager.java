@@ -31,7 +31,6 @@ import com.helper.helper.controller.ble.BluetoothLeService;
 import com.helper.helper.interfaces.BluetoothReadCallback;
 import com.helper.helper.view.Info.InfoFragment;
 import com.helper.helper.view.ScrollingActivity;
-import com.helper.helper.view.TabPagerAdapter;
 
 import org.json.JSONException;
 
@@ -51,6 +50,7 @@ public class BTManager {
     public static final String DEVICE_ALIAS = "helper-1";
 
     public static final int SUCCESS_BLUETOOTH_CONNECT = 1001;
+    public static final int FAIL_BLUETOOTH_CONNECT = 1002;
     public static final int REQUEST_ENABLE_BT = 2001;
 
     /************************************************************/
@@ -188,10 +188,13 @@ public class BTManager {
 
             Toast.makeText(m_activity, "디바이스 연결에 성공했습니다.", Toast.LENGTH_SHORT).show();
 
-            m_activity.setResult(BTManager.SUCCESS_BLUETOOTH_CONNECT);
+            ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
+            scrollingActivity.updateConnectionLayout(true);
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(m_activity, "디바이스 연결에 실패했습니다.", Toast.LENGTH_SHORT).show();
+            ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
+            scrollingActivity.updateConnectionLayout(true);
         }
         m_loadingDlg.dismiss();
     }
@@ -206,6 +209,10 @@ public class BTManager {
 
                     BluetoothDevice searchedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     if (searchedDevice.getName() == null) {
+                        Toast.makeText(m_activity, "디비이스를 찾지 못했습니다.", Toast.LENGTH_SHORT).show();
+                        ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
+                        scrollingActivity.updateConnectionLayout(false);
+                        m_loadingDlg.dismiss();
                         return;
                     }
 
@@ -217,6 +224,8 @@ public class BTManager {
 
                 } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
                     Toast.makeText(m_activity, "디비이스를 찾지 못했습니다.", Toast.LENGTH_SHORT).show();
+                    ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
+                    scrollingActivity.updateConnectionLayout(true);
                     m_loadingDlg.dismiss();
                 }
             }
@@ -265,6 +274,7 @@ public class BTManager {
         try {
             if( m_bluetoothSocket != null && m_bluetoothSocket.isConnected() ) {
                 m_bluetoothSocket.close();
+                m_bluetoothReadthread.interrupt();
             }
         } catch (IOException e) {
             e.printStackTrace();
