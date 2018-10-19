@@ -8,11 +8,8 @@
     <color name="xxxgray">#727272</color>
     <color name="xxxxgray">#575758</color>
     <color name="xxxxxgray">#424242</color>
-
-
-
-
-
+    <color name="accent_blue">#136DF5</color>
+    <color name="accent_red">#FF4622</color>
 
     <!--toolbar text color-->
     <color name="textColorPrimary">#161616</color>

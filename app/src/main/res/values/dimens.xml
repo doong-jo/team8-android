@@ -1,13 +1,13 @@
 <resources>
     <!--Card-->
-    <dimen name="card_large_widly_width"></dimen>
-    <dimen name="card_large_widly_height"></dimen>
-    <dimen name="card_square_width"></dimen>
-    <dimen name="card_square_height"></dimen>
-    <dimen name="card_medium_width"></dimen>
-    <dimen name="card_medium_height"></dimen>
-    <dimen name="card_category_width"></dimen>
-    <dimen name="card_category_height"></dimen>
+    <dimen name="card_large_widly_width">325dp</dimen>
+    <dimen name="card_large_widly_height">96dp</dimen>
+    <dimen name="card_square_width">128dp</dimen>
+    <dimen name="card_square_height">128dp</dimen>
+    <dimen name="card_medium_width">325dp</dimen>
+    <dimen name="card_medium_height">64dp</dimen>
+    <dimen name="card_category_width">153dp</dimen>
+    <dimen name="card_category_height">118dp</dimen>
 
     <!--Typo-->
     <dimen name="typo_headline_size">22dp</dimen>
