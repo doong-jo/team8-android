@@ -13,17 +13,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.helper.helper.R;
+import com.helper.helper.controller.FormManager;
 import com.helper.helper.view.ScrollingActivity;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.controller.HttpManager;
@@ -57,83 +61,112 @@ public class LoginFragment extends Fragment {
         /*******************************************************************/
 
         /******************* Make Listener in View *******************/
-        OnClickListener makeTryLoginListener = makeTryLoginListener();
+        m_loginBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                tryLogin();
+            }
+        });
 
-        m_loginBtn.setOnClickListener(makeTryLoginListener);
+        m_pwInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if(actionId == EditorInfo.IME_ACTION_DONE) {
+                    tryLogin();
+                    return true;
+                }
+                return false;
+            }
+        });
         /*************************************************************/
 
         return view;
     }
 
-    private OnClickListener makeTryLoginListener() {
-        return
-                new OnClickListener() {
+    private void tryLogin() {
+        View focusView = getActivity().getCurrentFocus();
+
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+
+        String email = m_emailInput.getText().toString();
+        String pw = m_pwInput.getText().toString();
+
+        if(FormManager.emailCharValidate(email) == FormManager.RESULT_VALIDATION_EMAIL_WRONG) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getActivity(), "올바르지 않은 아이디입니다.", Toast.LENGTH_SHORT).show();
+                }
+            });
+            return;
+        }
+
+//        if(FormManager.passwordCharValidate(pw) == FormManager.RESULT_VALIDATION_PW_WRONG) {
+//            getActivity().runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(getActivity(), "올바르지 않은 비밀번호입니다.", Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//            return;
+//        }
+
+
+        if( HttpManager.useCollection("user") ) {
+            JSONObject reqObject = new JSONObject();
+            try {
+                reqObject.put("email", email);
+                reqObject.put("passwd", pw);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
                     @Override
-                    public void onClick(View view) {
-                        View focusView = getActivity().getCurrentFocus();
+                    public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
+                        int arrLen = existIdjsonArray.length();
+                        UserManager.setUser(existIdjsonArray.getJSONObject(0));
 
-                        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+                        /** account exist **/
+                        if( arrLen != 0 ) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ProgressDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.login_loading_title), getString(R.string.login_loading_message), true);
 
-                        String email = m_emailInput.getText().toString();
-                        String pw = m_pwInput.getText().toString();
-
-                        if( HttpManager.useCollection("user") ) {
-                            JSONObject reqObject = new JSONObject();
-                            try {
-                                reqObject.put("email", email);
-                                reqObject.put("passwd", pw);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                            try {
-                                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
-                                    @Override
-                                    public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
-                                        int arrLen = existIdjsonArray.length();
-                                        UserManager.setUser(existIdjsonArray.getJSONObject(0));
-
-                                        /** account exist **/
-                                        if( arrLen != 0 ) {
-                                            getActivity().runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    new Handler().postDelayed(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            ProgressDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.login_loading_title), getString(R.string.login_loading_message), true);
-
-                                                            Intent intent=new Intent(getActivity(),ScrollingActivity.class);
-                                                            startActivity(intent);
-                                                        }
-                                                    }, 1000);
-                                                }
-                                            });
+                                            Intent intent=new Intent(getActivity(),ScrollingActivity.class);
+                                            startActivity(intent);
                                         }
-                                        /** account not exist **/
-                                        else {
+                                    }, 1000);
+                                }
+                            });
+                        }
+                        /** account not exist **/
+                        else {
 
-                                            getActivity().runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    Toast.makeText(getActivity(), "아이디 혹은 비밀번호가 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getActivity(), "아이디 혹은 비밀번호가 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
 
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onError(String err) {
-                                        Log.d(TAG, "JoinFragment onError: " + err);
-                                    }
-                                });
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
                         }
                     }
-                };
+
+                    @Override
+                    public void onError(String err) {
+                        Log.d(TAG, "JoinFragment onError: " + err);
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

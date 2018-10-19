@@ -36,8 +36,7 @@
             android:layout_height="wrap_content"
             android:background="#FAFAFA"
             android:orientation="horizontal"
-            android:padding="20dp"
-            android:onClick="enableBluetooth">
+            android:padding="20dp">
 
             <TextView
                 android:id="@+id/connect_desc_text"

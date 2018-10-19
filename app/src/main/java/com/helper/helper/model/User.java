@@ -24,7 +24,7 @@ public class User {
     private String m_userRidingType;
     private Boolean m_userEmergency;
     private Date m_userLastAccess;
-    private ArrayList<Location> m_lastPosition;
+    private Location m_lastPosition;
     private ArrayList<Location> m_accPosition;
     private ArrayList<String> m_ledIndicies;
     private ArrayList<String> m_trackIndicies;
@@ -72,7 +72,7 @@ public class User {
         m_userRidingType = RidingType.BICYCLE.value;
         m_userLastAccess = new Date();
         m_userEmergency = false;
-        m_lastPosition = new ArrayList<Location>();
+        m_lastPosition = new Location("");
         m_accPosition = new ArrayList<Location>();
         m_ledIndicies = new ArrayList<String>();
         m_trackIndicies = new ArrayList<String>();
@@ -93,6 +93,8 @@ public class User {
     }
 
     public String getUserName() { return m_userName; }
+
+    public Location getUserPosition() { return m_lastPosition; }
 
     public JSONObject getTransformUserToJSON() {
         JSONObject obj = new JSONObject();

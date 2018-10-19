@@ -4,6 +4,9 @@
     <string name="service_name">HELPER</string>
     <string name="device_bluetooth_name">helper-1</string>
 
+    <!--Bluetooth-->
+    <string name="bluetooth_uuid">94f39d29-7d6d-437d-973b-fba39e49d4ee</string>
+
     <!--page name-->
     <string name="menu_guideline">Guideline</string>
     <string name="menu_emergency_contacts">Emergency contacts</string>
@@ -11,6 +14,11 @@
 
     <!--private key-->
     <string name="server_uri">http://175.123.140.145:80</string>
+
+    <!--permission-->
+    <string name="not_grant_location_permission">위치 서비스가 허용되지 않으면 "트래킹 서비스"와 "사고 대응 시스템"을 정상적으로 이용하실 수 없습니다. [설정-애플리케이션]에서 허용해주세요.</string>
+
+    <string name="not_grant_contacts_permission">연락처 권한이 허용되지 않으면 "사고 대응 시스템"을 정상적으로 이용하실 수 없습니다. [설정-애플리케이션]에서 허용해주세요.</string>
 
     <!--Info Fragment-->
     <string name="cardTitleSensor">Sensor</string>
@@ -21,6 +29,8 @@
     <string name="disconnect_state">Disconnected device</string>
     <string name="connect_state">connected device</string>
     <string name="connect_device">Connect</string>
+    <string name="bluetooth_loading_title">"블루투스 연결 준비중입니다."</string>
+    <string name="bluetooth_loading_message">잠시만 기다려주세요...</string>
 
     <!--LED Fragment-->
     <string name="cardTitleLEDDetail">Current LED</string>
@@ -37,7 +47,6 @@
 
     <!--Emergency Contacts-->
     <string name="no_emergency_contacts_list">No exists contacts.\n Please add for your safe!</string>
-    <!---->
 
     <!--SMS content-->
     <string name="sms_content">사고가 발생하였습니다. 도와주세요!!!</string>

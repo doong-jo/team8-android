@@ -20,6 +20,26 @@ public class GyroManager {
 
     private static long m_fTimerStartTime = 0;
 
+    private static final int AZIMUTH_PIVOT = 20;
+    private static final int PITCH_PIVOT = 5;
+    private static final int ROLL_PIVOT = 20;
+
+    private static final int SHAKE_THRESHOLD = 5000;
+    private static final int ORIENTATION_LEFT = 944;
+    private static final int ORIENTATION_RIGHT = 344;
+    private static final int ORIENTATION_NONE = 892;
+    private static final int EMERGENCY = 121;
+
+    /** Gyro **/
+//    private SensorManager m_sensorManager;
+//    private Sensor m_sensorAccel;
+//    private Sensor m_sensorMag;
+//    private float[] m_fMag = new float[3];
+//    private float[] m_fAccel = new float[3];
+//    private long m_shockStateLastTime;
+//    private float m_beforeAccelX;
+//    private float m_beforeAccelY;
+//    private float m_beforeAccelZ;
 
     public static float getPivotRoll() {
         return m_fPivotRoll;
@@ -88,3 +108,116 @@ public class GyroManager {
         return result;
     }
 }
+
+
+
+    /*
+    public void shockStateDetector(float accelX, float accelY, float accelZ) {
+        long currentTime = System.currentTimeMillis();
+        long gabOfTime = (currentTime - m_shockStateLastTime);
+        float speed = 0;
+        if (gabOfTime > 100) {
+            m_shockStateLastTime = currentTime;
+
+            speed = Math.abs(accelX + accelY + accelZ - m_beforeAccelX - m_beforeAccelY - m_beforeAccelZ) / gabOfTime * 10000;
+
+//            if(count++ < 3 ) {
+//                sum_speed += speed;
+//                return;
+//            } else {
+//                count = 0;
+//                speed = sum_speed/3;
+//                sum_speed = 0;
+//            }
+//            if (speed > 700 && speed < SHAKE_THRESHOLD) {
+//                Log.e("speed", "speed : " + speed);
+//                if(bProcessing) {// 사용자 실수시 가볍게 흔들어서 취소
+//                    hanSensor.removeMessages(1);
+//                    hanSensor.sendEmptyMessageDelayed(2, 1000);
+//                    showMsgl("취소 " + speed);
+//                    return;
+//                }
+            if (speed > SHAKE_THRESHOLD) {
+                Log.d(TAG, "shockStateDetector: ");
+                try {
+                    String strSMS1 = getString(R.string.sms_content) + "\n\n" + m_strAddressOutput;
+                    String strSMS2 = "https://google.com/maps?q=" + m_strLatitude + "," + m_strLogitude;
+
+                    List<ContactItem> contactItems;
+                    try {
+                        contactItems = FileManager.readXmlEmergencyContacts(this);
+
+                        for (ContactItem item :
+                                contactItems) {
+                            sendSMS(item.getPhoneNumber(), strSMS1);
+                            sendSMS(item.getPhoneNumber(), strSMS2);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+//                    sendSMS("+8201034823161", strSMS1);
+//                    sendSMS("+8201034823161", strSMS2);
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                }
+//                if(!bProcessing) {
+//                    bProcessing = true;
+//                    hanSensor.sendEmptyMessage(0);
+//                    showMsgl("충격 발생 " + speed);
+
+            }
+//                else { // 2차 충격
+//                    bProcessing = true;
+//                    hanSensor.removeMessages(1); // 다이얼로그 연장
+//                    hanSensor.sendEmptyMessageDelayed(1, send_time * 1000);
+//                    showMsgl("2,3차 충격 " + speed);
+//                }
+//            }
+
+
+            m_beforeAccelX = accelX;
+            m_beforeAccelY = accelY;
+            m_beforeAccelZ = accelZ;
+
+        }
+    }
+
+    public void changeLeftOrRightLEDOfRoll(float roll) {
+        String writeStr = "";
+
+        if (m_curInterrupt == EMERGENCY) {
+            return;
+        }
+
+        if (roll >= ROLL_PIVOT) {
+            Log.d(TAG, "onSensorChanged: right");
+            writeStr = "0-07-1";
+            sendToBluetoothDevice(writeStr.getBytes());
+
+            m_curInterrupt = ORIENTATION_RIGHT;
+        } else if (roll <= -ROLL_PIVOT) {
+            Log.d(TAG, "onSensorChanged: left");
+            writeStr = "0-06-1";
+            sendToBluetoothDevice(writeStr.getBytes());
+
+            m_curInterrupt = ORIENTATION_LEFT;
+        }
+
+        if (Math.abs(GyroManager.getPivotRoll()) >= 20 &&
+                Math.abs(roll) < 20) {
+            writeStr = m_curLED;
+
+            if (writeStr == null) {
+                return;
+            }
+
+
+            sendToBluetoothDevice(writeStr.getBytes());
+
+            m_curInterrupt = ORIENTATION_NONE;
+        }
+    }
+
+}*/
+

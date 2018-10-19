@@ -146,6 +146,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/s_space_size"
                     android:inputType="textEmailAddress"
+                    android:nextFocusDown="@id/loginPwInput"
                     android:hint="@string/login_id_edittext_hint"
                     android:focusable="true"
                     android:focusableInTouchMode="true"/>
@@ -156,6 +157,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/s_space_size"
                     android:inputType="textPassword"
+                    android:imeOptions="actionDone"
                     android:hint="@string/login_pw_edittext_hint"
                     android:focusable="true"
                     android:focusableInTouchMode="true"/>

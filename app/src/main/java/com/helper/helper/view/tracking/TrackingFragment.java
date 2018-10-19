@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,6 +41,8 @@ import com.helper.helper.R;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.model.TrackingData;
 import com.helper.helper.model.TrackingRecordedListItem;
+import com.helper.helper.view.Info.InfoFragment;
+import com.helper.helper.view.TabPagerAdapter;
 
 public class TrackingFragment extends Fragment
         implements OnMapReadyCallback,
@@ -352,3 +355,54 @@ public class TrackingFragment extends Fragment
         m_cardLocationListDic.put(m_nTrackingIndex-1, latLngs);
     }
 }
+
+
+
+//    public void toggleRecord(View v) {
+//        if (m_viewPager.getCurrentItem() != TAB_STATUS) {
+//            return;
+//        }
+//
+//        m_IsRecorded = !m_IsRecorded;
+//
+//        if (m_IsRecorded) {
+//            Date date = new Date();
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//            m_recordStartDate = dateFormat.format(date);
+//
+//            SimpleDateFormat startTimeFormat = new SimpleDateFormat("hh:mm");
+//            m_recordStartTime = startTimeFormat.format(date);
+//
+//            ((FloatingActionButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_solid, getApplicationContext().getTheme()));
+//        } else {
+//            ((FloatingActionButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_circle_solid, getApplicationContext().getTheme()));
+//
+//            Date date = new Date();
+//
+//            SimpleDateFormat endTimeFormat = new SimpleDateFormat("hh:mm");
+//            m_recordEndTime = endTimeFormat.format(date);
+//
+//            if (m_infoFrag == null) {
+//                m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
+//                        "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter) m_viewPager.getAdapter())
+//                                .getItemId(TAB_STATUS));
+//            }
+//
+//            try {
+//                TrackingData trackingData = new TrackingData(
+//                        m_recordStartDate,
+//                        m_recordStartTime,
+//                        m_recordEndTime,
+//                        String.format("%f", m_infoFrag.getCurTrackingDistance()),
+//                        m_infoFrag.getCurrRecordedLocationList());
+//
+//                FileManager.writeXmlTrackingData(getApplicationContext(), trackingData);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } catch (IllegalStateException e) {
+//                e.printStackTrace();
+//            }
+//
+//            m_infoFrag.recordStopAndEraseLocationList();
+//        }
+//    }
