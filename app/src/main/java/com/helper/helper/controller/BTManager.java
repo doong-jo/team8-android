@@ -208,21 +208,22 @@ public class BTManager {
                 if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
 
                     BluetoothDevice searchedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    if (searchedDevice.getName() == null) {
-                        Toast.makeText(m_activity, "디비이스를 찾지 못했습니다.", Toast.LENGTH_SHORT).show();
-                        ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
-                        scrollingActivity.updateConnectionLayout(false);
-                        m_loadingDlg.dismiss();
-                        return;
-                    }
+//                    if (searchedDevice.getName() == null) {
+//                        Toast.makeText(m_activity, "디비이스를 찾지 못했습니다.", Toast.LENGTH_SHORT).show();
+//                        ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
+//                        scrollingActivity.updateConnectionLayout(false);
+//                        m_loadingDlg.dismiss();
+//                        return;
+//                    }
 
                     String searchDeviceName = searchedDevice.getName();
+                    if ( searchDeviceName == null ) { return; }
                     Log.d(TAG, "searchedDeviceName onReceive: " + searchDeviceName);
                     if (searchedDevice.getName().equals(DEVICE_ALIAS)) {
                         connectDevice(searchedDevice);
                     }
 
-                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
+                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()) ) {
                     Toast.makeText(m_activity, "디비이스를 찾지 못했습니다.", Toast.LENGTH_SHORT).show();
                     ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
                     scrollingActivity.updateConnectionLayout(true);

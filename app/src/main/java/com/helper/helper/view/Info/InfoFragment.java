@@ -54,11 +54,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class InfoFragment extends Fragment
-        implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+public class InfoFragment extends Fragment {
     private final static String TAG = InfoFragment.class.getSimpleName() + "/DEV";
     private static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
     private static final int UPDATE_INTERVAL_MS = 1500;
@@ -319,7 +315,6 @@ public class InfoFragment extends Fragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        m_mapView.onSaveInstanceState(outState);
     }
 
     /** support mapview in scrollview touch **/
@@ -354,51 +349,6 @@ public class InfoFragment extends Fragment
                 }
             }
         });
-    }
-
-
-
-
-    /** Life Cycle **/
-    @Override
-    public void onStart() {
-        super.onStart();
-        m_mapView.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        m_mapView.onStop();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        m_mapView.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        m_mapView.onPause();
-        if( m_googleApiClient != null ) {
-            m_googleApiClient.stopAutoManage(getActivity());
-            m_googleApiClient.disconnect();
-        }
-
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        m_mapView.onLowMemory();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        m_mapView.onLowMemory();
     }
 
     public void setLEDAttribute(int ledInd, float spdVal, float brtVal) {

@@ -42,27 +42,49 @@ import java.util.List;
 
 public class GoogleMapManager {
     private final static String TAG = InfoFragment.class.getSimpleName() + "/DEV";
-    private static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
+    public static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
     private static final int UPDATE_INTERVAL_MS = 1500;
     private static final int FASTEST_UPDATE_INTERVAL_MS = 1000;
 
     private static GoogleApiClient m_googleApiClient;
     private static GoogleMap m_googleMap;
+    private static float m_zoomLevel;
     private static LocationRequest m_locationReq;
     private static Location m_curLocation;
     private static Activity m_activity;
 
-    private static void initGoogleMap(Activity activity) {
+    public static GoogleMap getGoogleMap() { return m_googleMap; }
+
+    public static Location getCurLocation() { return m_curLocation; }
+
+    public static float getZoomLevel() { return m_zoomLevel; }
+
+    public static void initGoogleMap(Activity activity) {
         m_activity = activity;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        buildGoogleApiClient();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//
+//        } else {
+//
+//            if ( m_googleApiClient == null) {
+//                buildGoogleApiClient();
+//            }
+//        }
+    }
 
-        } else {
-
-            if ( m_googleApiClient == null) {
-                buildGoogleApiClient();
-            }
+    private static synchronized void buildGoogleApiClient() {
+        if(m_googleApiClient == null) {
+            m_googleApiClient = new GoogleApiClient.Builder(m_activity)
+                    .enableAutoManage((FragmentActivity) m_activity, (GoogleApiClient.OnConnectionFailedListener) m_activity)
+                    .addConnectionCallbacks((GoogleApiClient.ConnectionCallbacks) m_activity)
+                    .addOnConnectionFailedListener((GoogleApiClient.OnConnectionFailedListener) m_activity)
+                    .addApi(LocationServices.API)
+                    .build();
+            m_googleApiClient.connect();
         }
+
+        createLocationRequest();
     }
 
     private static void createLocationRequest() {
@@ -72,21 +94,11 @@ public class GoogleMapManager {
         m_locationReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    protected static synchronized void buildGoogleApiClient() {
-        if(m_googleApiClient == null) {
-            m_googleApiClient = new GoogleApiClient.Builder(m_activity)
-                    .enableAutoManage((FragmentActivity) m_activity, this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-            m_googleApiClient.connect();
-        }
 
-        createLocationRequest();
-    }
-    public void setCurrentLocation(Location location, String markerTitle, String markerSnippet) {
+    public static void setCurrentLocation(Location location, String markerTitle, String markerSnippet) {
 //        if (m_curLocationMarker != null) m_curLocationMarker.remove();
+
+        m_curLocation = location;
 
         if (location != null) {
             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
@@ -99,7 +111,7 @@ public class GoogleMapManager {
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 //            m_curLocationMarker = this.m_googleMap.addMarker(markerOptions);
 
-            this.m_googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
+            m_googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
             return;
         }
 
@@ -111,7 +123,7 @@ public class GoogleMapManager {
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 //        m_curLocationMarker = this.m_googleMap.addMarker(markerOptions);
 
-        this.m_googleMap.moveCamera(CameraUpdateFactory.newLatLng(DEFAULT_LOCATION));
+        m_googleMap.moveCamera(CameraUpdateFactory.newLatLng(DEFAULT_LOCATION));
     }
 
     @SuppressLint("MissingPermission")
@@ -178,7 +190,7 @@ public class GoogleMapManager {
 //        m_googleMap.getUiSettings().setCompassEnabled(true);
 //        m_googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 //    }
-//
+//x
 //    @Override
 //    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 //        Location location = new Location("");

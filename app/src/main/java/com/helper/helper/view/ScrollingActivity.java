@@ -20,6 +20,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -37,10 +38,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.Constants;
 import com.helper.helper.R;
 import com.helper.helper.controller.AddressManager;
 import com.helper.helper.controller.BTManager;
+import com.helper.helper.controller.GoogleMapManager;
 import com.helper.helper.interfaces.BluetoothReadCallback;
 import com.helper.helper.view.Info.InfoFragment;
 import com.helper.helper.view.contact.ContactActivity;
@@ -65,7 +74,12 @@ import java.util.Locale;
 
 import static android.support.design.widget.TabLayout.*;
 
-public class ScrollingActivity extends AppCompatActivity implements SensorEventListener {
+public class ScrollingActivity extends AppCompatActivity
+        implements SensorEventListener,
+        OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
     private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
     private static final int TAB_STATUS = 0;
     private static final int TAB_LED = 1;
@@ -92,6 +106,7 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /******************* Connect widgtes with layout *******************/
         setContentView(R.layout.activity_scrolling);
 
         /** Tab **/
@@ -135,8 +150,10 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
             }
         });
 
-        /******************* Connect widgtes with layout *******************/
         TextView connectToggle = (TextView) findViewById(R.id.connect_toggle_text);
+        /** ToolBar **/
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         /*******************************************************************/
 
         /******************* Make Listener in View *******************/
@@ -153,12 +170,8 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         /** Http Server **/
         HttpManager.setServerURI(getString(R.string.server_uri));
 
-        /** ToolBar **/
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         /** Request permissions **/
-        if ( !PermissionManager.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION) ||
+        if (!PermissionManager.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION) ||
                 !PermissionManager.checkPermissions(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
 
             /* Result about user selection -> onActivityResult in ScrollActivity */
@@ -189,6 +202,9 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
         if (!dirExists) {
             storage.createDirectory(newDir);
         }
+
+        /** GoogleMap **/
+        GoogleMapManager.initGoogleMap(this);
 
         /** Bluetooth  **/
         BTManager.initBluetooth(this);
@@ -284,15 +300,15 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 
         switch (requestCode) {
             case PERMISSION_REQUEST:
-                if( !PermissionManager.checkPermissions(
+                if (!PermissionManager.checkPermissions(
                         this, Manifest.permission.ACCESS_FINE_LOCATION) ||
                         !PermissionManager.checkPermissions(
                                 this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                     Toast.makeText(this, getString(R.string.not_grant_location_permission), Toast.LENGTH_SHORT).show();
                 }
 
-                if( !PermissionManager.checkPermissions(
-                        this, Manifest.permission.SEND_SMS) ) {
+                if (!PermissionManager.checkPermissions(
+                        this, Manifest.permission.SEND_SMS)) {
                     Toast.makeText(this, getString(R.string.not_grant_contacts_permission), Toast.LENGTH_SHORT).show();
                 }
 
@@ -327,6 +343,61 @@ public class ScrollingActivity extends AppCompatActivity implements SensorEventL
 //        }
     }
 
+    /** GoogleMap callback **/
+
+    @Override
+    public void onLocationChanged(Location location) {
+        GoogleMapManager.setCurrentLocation(location, "내 위치", "GPS Position");
+        Toast.makeText(this, "LocationChaged : " + location.getSpeed(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        GoogleMapManager.setCurrentLocation(null, "Unknown GPS signal", "Check your GPS permission");
+
+        googleMap.getUiSettings().setCompassEnabled(true);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            Toast.makeText(this, "위치 서비스 권한을 확인해주세요.", Toast.LENGTH_SHORT).show();
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        googleMap.setMyLocationEnabled(true);
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+
+        final Location location = GoogleMapManager.getCurLocation();
+        final float zoomLevel = GoogleMapManager.getZoomLevel();
+
+        if( GoogleMapManager.getCurLocation() == null) {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(GoogleMapManager.DEFAULT_LOCATION, zoomLevel));
+        } else {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), zoomLevel));
+            GoogleMapManager.setCurrentLocation(location, "Current Position", "GPS Position");
+        }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Toast.makeText(this, "GoogleMap connected!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this, "GoogleMap connection failed!", Toast.LENGTH_SHORT).show();
+    }
 
     /** Life cycle **/
     @Override
