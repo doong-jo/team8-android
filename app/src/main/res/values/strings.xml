@@ -20,6 +20,15 @@
 
     <string name="not_grant_contacts_permission">연락처 권한이 허용되지 않으면 "사고 대응 시스템"을 정상적으로 이용하실 수 없습니다. [설정-애플리케이션]에서 허용해주세요.</string>
 
+    <!--StartFragment-->
+    <string name="continue_with_fb">Continue with Facebook</string>
+    <string name="continue_with_kakao">Continue with KaKao</string>
+    <string name="signup_with_email">Sign up with Email</string>
+    <string name="login_question">Already a member?</string>
+    <string name="log_in">Log in</string>
+    <string name="or_divide">OR</string>
+
+
     <!--Info Fragment-->
     <string name="cardTitleSensor">Sensor</string>
     <string name="cardTitleBattery">Battery</string>
@@ -73,6 +82,7 @@
     <string name="login_loading_message">"잠시만 기다려주세요..."</string>
 
     <!--Join-->
+    <string name="join_intro_text">Would you like to join us?</string>
     <string name="join_email_edittext_hint">이메일</string>
     <string name="join_pw_edittext_hint">비밀번호 (영문,숫자,특수문자 8-15자)</string>
     <string name="join_pw_chk_edittext_hint">비밀번호 확인</string>

@@ -2,6 +2,7 @@
 <resources>
     <!--State Color-->
     <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
     <color name="gray">#DFE0E2</color>
     <color name="xgray">#CECED0</color>
     <color name="xxgray">#B4B4B5</color>

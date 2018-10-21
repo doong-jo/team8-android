@@ -22,6 +22,7 @@
         <item name="android:textColor">@color/textColorPrimary</item>
     </style>
 
+    <!--Buttons-->
     <style name="PrimaryButton" parent="android:Widget.Button">
         <item name="android:color">#136DF5</item>
         <item name="android:textColor">#FFFFFF</item>
@@ -33,6 +34,53 @@
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:radius">11dp</item>
     </style>
+
+    <!--Typo-->
+    <style name="HeadlineTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:textSize">22dp</item>
+    </style>
+
+    <style name="TitleTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textSize">18dp</item>
+    </style>
+
+    <style name="CategoryCardTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textSize">16dp</item>
+    </style>
+
+    <style name="CategoryCardTitleTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textSize">15dp</item>
+    </style>
+
+    <style name="TopTabBarTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textSize">14dp</item>
+    </style>
+
+    <style name="OptionTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textSize">13dp</item>
+    </style>
+
+    <style name="OptionAccentTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:textSize">13dp</item>
+    </style>
+
+    <style name="BodyTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textSize">12dp</item>
+    </style>
+
+    <style name="SnackBarTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textSize">11dp</item>
+    </style>
+
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

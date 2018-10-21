@@ -1,5 +1,12 @@
 apply plugin: 'com.android.application'
 
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "https://jitpack.io" }
+    }
+}
+
 android {
     compileSdkVersion 28
     packagingOptions {
@@ -43,6 +50,12 @@ dependencies {
     implementation 'com.github.brnunes:swipeablerecyclerview:1.0.2'
     implementation 'com.snatik:storage:2.1.0'
     implementation 'commons-validator:commons-validator:1.5.1'
+    implementation 'com.android.support:support-v4:+'
+    implementation 'com.squareup.picasso:picasso:2.3.2'
+    implementation 'com.nineoldandroids:library:2.4.0'
+    implementation 'com.daimajia.slider:library:1.1.5@aar'
+    implementation 'com.github.ar-android:FloatingLabelEditText:0.2'
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

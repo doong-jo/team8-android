@@ -49,11 +49,11 @@ public class JoinFragment extends Fragment {
     private final static String TAG = JoinFragment.class.getSimpleName() + "/DEV";
 
     /******************* Define widgtes in view *******************/
-    private EditText m_emailInput;
-    private EditText m_pwInput;
-    private EditText m_pwConfirmInput;
-    private EditText m_nameInput;
-    private AppCompatCheckBox m_termChkBox;
+//    private EditText m_emailInput;
+//    private EditText m_pwInput;
+//    private EditText m_pwConfirmInput;
+//    private EditText m_nameInput;
+//    private AppCompatCheckBox m_termChkBox;
     /**************************************************************/
 
     public JoinFragment() {
@@ -66,130 +66,130 @@ public class JoinFragment extends Fragment {
 
 
         /******************* Connect widgtes with layout *******************/
-        Button joinBtn = view.findViewById(R.id.joinBtn);
-        m_emailInput = view.findViewById(R.id.emailInput);
-        m_pwInput = view.findViewById(R.id.pwInput);
-        m_pwConfirmInput = view.findViewById(R.id.pwConfirmInput);
-        m_nameInput = view.findViewById(R.id.nameInput);
-        m_termChkBox = view.findViewById(R.id.termChkBox);
+//        Button joinBtn = view.findViewById(R.id.joinBtn);
+//        m_emailInput = view.findViewById(R.id.emailInput);
+//        m_pwInput = view.findViewById(R.id.pwInput);
+//        m_pwConfirmInput = view.findViewById(R.id.pwConfirmInput);
+//        m_nameInput = view.findViewById(R.id.nameInput);
+//        m_termChkBox = view.findViewById(R.id.termChkBox);
         /*******************************************************************/
 
         /******************* Make Listener in View *******************/
-        joinBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                tryJoin();
-            }
-        });
-
-        m_nameInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_DONE) {
-                    tryJoin();
-                    return true;
-                }
-                return false;
-            }
-        });
+//        joinBtn.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                tryJoin();
+//            }
+//        });
+//
+//        m_nameInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+//                if(actionId == EditorInfo.IME_ACTION_DONE) {
+//                    tryJoin();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
         /*************************************************************/
 
         return view;
     }
 
-    private void tryJoin() {
-        View focusView = getActivity().getCurrentFocus();
-
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
-
-        String email = m_emailInput.getText().toString();
-        String pw = m_pwInput.getText().toString();
-        String pwConfirm = m_pwConfirmInput.getText().toString();
-        String name = m_nameInput.getText().toString();
-        String phone = "";
-
-        TelephonyManager tMgr = (TelephonyManager) getActivity().getSystemService(getActivity().TELEPHONY_SERVICE);
-
-        PermissionManager.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_PHONE_STATE}, PermissionManager.READ_PHONE_STATE);
-
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getActivity(), "디바이스 정보를 알 수 없습니다. 허용 권한을 확인해주세요.", Toast.LENGTH_SHORT).show();
-            return;
-        } else {
-            phone = tMgr.getLine1Number();
-        }
-
-        final User joinUser = new User.Builder()
-                .email(email)
-                .pw(pw)
-                .name(name)
-                .phone(phone)
-                .build();
-
-        try {
-            validateJoinForm(joinUser, pwConfirm, new ValidateCallback() {
-                @Override
-                public void onDone(int resultCode) throws JSONException {
-                    if( resultCode == FormManager.RESULT_VALIDATION_SUCCESS && m_termChkBox.isChecked() ) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), "가입 유효성 검사 통과!", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                        InsertUserinServer(joinUser, new ValidateCallback() {
-                            @Override
-                            public void onDone(int resultCode) {
-                                if( resultCode == FormManager.RESULT_VALIDATION_SUCCESS ) {
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            new Handler().postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    ProgressDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.join_loading_title), getString(R.string.join_loading_message), true);
-
-                                                    Intent intent = new Intent(getActivity(), ScrollingActivity.class);
-                                                    startActivity(intent);
-                                                }
-                                            }, 1000);
-                                        }
-                                    });
-                                } else {
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(getActivity(), "서버 전송 실패.", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    } else if( resultCode == FormManager.RESULT_VALIDATION_SUCCESS && !m_termChkBox.isChecked() ) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), "이용약관에 동의해주세요.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    } else {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), "입력을 다시 확인해주세요.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                }
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    };
+//    private void tryJoin() {
+//        View focusView = getActivity().getCurrentFocus();
+//
+//        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+//        imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+//
+//        String email = m_emailInput.getText().toString();
+//        String pw = m_pwInput.getText().toString();
+//        String pwConfirm = m_pwConfirmInput.getText().toString();
+//        String name = m_nameInput.getText().toString();
+//        String phone = "";
+//
+//        TelephonyManager tMgr = (TelephonyManager) getActivity().getSystemService(getActivity().TELEPHONY_SERVICE);
+//
+//        PermissionManager.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_PHONE_STATE}, PermissionManager.READ_PHONE_STATE);
+//
+//        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
+//                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED &&
+//                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+//            Toast.makeText(getActivity(), "디바이스 정보를 알 수 없습니다. 허용 권한을 확인해주세요.", Toast.LENGTH_SHORT).show();
+//            return;
+//        } else {
+//            phone = tMgr.getLine1Number();
+//        }
+//
+//        final User joinUser = new User.Builder()
+//                .email(email)
+//                .pw(pw)
+//                .name(name)
+//                .phone(phone)
+//                .build();
+//
+//        try {
+//            validateJoinForm(joinUser, pwConfirm, new ValidateCallback() {
+//                @Override
+//                public void onDone(int resultCode) throws JSONException {
+//                    if( resultCode == FormManager.RESULT_VALIDATION_SUCCESS && m_termChkBox.isChecked() ) {
+//                        getActivity().runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Toast.makeText(getActivity(), "가입 유효성 검사 통과!", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//
+//                        InsertUserinServer(joinUser, new ValidateCallback() {
+//                            @Override
+//                            public void onDone(int resultCode) {
+//                                if( resultCode == FormManager.RESULT_VALIDATION_SUCCESS ) {
+//                                    getActivity().runOnUiThread(new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//                                            new Handler().postDelayed(new Runnable() {
+//                                                @Override
+//                                                public void run() {
+//                                                    ProgressDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.join_loading_title), getString(R.string.join_loading_message), true);
+//
+//                                                    Intent intent = new Intent(getActivity(), ScrollingActivity.class);
+//                                                    startActivity(intent);
+//                                                }
+//                                            }, 1000);
+//                                        }
+//                                    });
+//                                } else {
+//                                    getActivity().runOnUiThread(new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//                                            Toast.makeText(getActivity(), "서버 전송 실패.", Toast.LENGTH_SHORT).show();
+//                                        }
+//                                    });
+//                                }
+//                            }
+//                        });
+//                    } else if( resultCode == FormManager.RESULT_VALIDATION_SUCCESS && !m_termChkBox.isChecked() ) {
+//                        getActivity().runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Toast.makeText(getActivity(), "이용약관에 동의해주세요.", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//                    } else {
+//                        getActivity().runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Toast.makeText(getActivity(), "입력을 다시 확인해주세요.", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//                    }
+//                }
+//            });
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    };
 
     public void validateJoinForm(User user, final String pwConfirm, final ValidateCallback callback) throws JSONException {
         /** Email **/
