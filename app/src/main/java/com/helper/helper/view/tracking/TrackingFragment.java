@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
+//import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -113,39 +113,39 @@ public class TrackingFragment extends Fragment
         m_recyclerView.setAdapter(m_recordedListAdapter);
 //        m_recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        SwipeableRecyclerViewTouchListener swipeTouchListener =
-                new SwipeableRecyclerViewTouchListener(m_recyclerView,
-                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
-                            @Override
-                            public boolean canSwipeLeft(int position) {
-                                return true;
-                            }
-
-                            @Override
-                            public boolean canSwipeRight(int position) {
-                                return true;
-                            }
-
-                            @Override
-                            public void onDismissedBySwipeLeft(RecyclerView m_recyclerView, int[] reverseSortedPositions) {
-                                for (int position : reverseSortedPositions) {
-                                    m_recordedItemList.remove(position);
-                                    m_recordedListAdapter.notifyItemRemoved(position);
-                                }
-                                m_recordedListAdapter.notifyDataSetChanged();
-                            }
-
-                            @Override
-                            public void onDismissedBySwipeRight(RecyclerView m_recyclerView, int[] reverseSortedPositions) {
-                                for (int position : reverseSortedPositions) {
-                                    m_recordedItemList.remove(position);
-                                    m_recordedListAdapter.notifyItemRemoved(position);
-                                }
-                                m_recordedListAdapter.notifyDataSetChanged();
-                            }
-                        });
-
-        m_recyclerView.addOnItemTouchListener(swipeTouchListener);
+//        SwipeableRecyclerViewTouchListener swipeTouchListener =
+//                new SwipeableRecyclerViewTouchListener(m_recyclerView,
+//                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
+//                            @Override
+//                            public boolean canSwipeLeft(int position) {
+//                                return true;
+//                            }
+//
+//                            @Override
+//                            public boolean canSwipeRight(int position) {
+//                                return true;
+//                            }
+//
+//                            @Override
+//                            public void onDismissedBySwipeLeft(RecyclerView m_recyclerView, int[] reverseSortedPositions) {
+//                                for (int position : reverseSortedPositions) {
+//                                    m_recordedItemList.remove(position);
+//                                    m_recordedListAdapter.notifyItemRemoved(position);
+//                                }
+//                                m_recordedListAdapter.notifyDataSetChanged();
+//                            }
+//
+//                            @Override
+//                            public void onDismissedBySwipeRight(RecyclerView m_recyclerView, int[] reverseSortedPositions) {
+//                                for (int position : reverseSortedPositions) {
+//                                    m_recordedItemList.remove(position);
+//                                    m_recordedListAdapter.notifyItemRemoved(position);
+//                                }
+//                                m_recordedListAdapter.notifyDataSetChanged();
+//                            }
+//                        });
+//
+//        m_recyclerView.addOnItemTouchListener(swipeTouchListener);
 
         return view;
     }

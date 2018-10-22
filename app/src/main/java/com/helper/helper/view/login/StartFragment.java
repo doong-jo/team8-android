@@ -11,8 +11,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.daimajia.slider.library.Animations.DescriptionAnimation;
+import com.daimajia.slider.library.Indicators.PagerIndicator;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
+import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.helper.helper.R;
@@ -21,7 +23,7 @@ import java.util.HashMap;
 
 public class StartFragment extends Fragment implements BaseSliderView.OnSliderClickListener, ViewPagerEx.OnPageChangeListener{
     private final static String TAG = LoginFragment.class.getSimpleName() + "/DEV";
-    private static final int MAX_INTRO_IMGS = 4;
+    private static final int MAX_INTRO_IMGS = 3;
     private SliderLayout m_slider;
 
     /******************* Define widgtes in view *******************/
@@ -51,18 +53,19 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
         file_maps.put("서비스 소개3",R.drawable.naver);
 
 
-        int[] imgs = new int[]{R.drawable.naver, R.drawable.naver, R.drawable.naver, R.drawable.naver};
+        int[] imgs = new int[]{R.drawable.naver, R.drawable.naver, R.drawable.naver};
 
         for (int i = 0; i < imgs.length; i++) {
-            TextSliderView textSliderView = new TextSliderView(getContext());
-            textSliderView
-                    .description(String.valueOf(i))
+
+            DefaultSliderView defaultSliderView = new DefaultSliderView(getContext());
+            defaultSliderView
                     .image(imgs[i])
                     .setScaleType(BaseSliderView.ScaleType.Fit)
                     .setOnSliderClickListener(this);
-            textSliderView.bundle(new Bundle());
 
-            m_slider.addSlider(textSliderView);
+            defaultSliderView.bundle(new Bundle());
+
+            m_slider.addSlider(defaultSliderView);
         }
 
         //Building TextSlider
@@ -85,7 +88,9 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
 
         m_slider.setPresetTransformer(SliderLayout.Transformer.Default);
         m_slider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
+        m_slider.setCustomIndicator((PagerIndicator) view.findViewById(R.id.custom_indicator));
         m_slider.setCustomAnimation(new DescriptionAnimation());
+        m_slider.setCurrentPosition(0);
         m_slider.startAutoCycle(7000, 7000, false);
         m_slider.addOnPageChangeListener(this);
 

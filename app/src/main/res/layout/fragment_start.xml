@@ -7,11 +7,42 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.daimajia.slider.library.SliderLayout
-        android:id="@+id/slider"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="344dp"
-        />
+        android:layout_height="336dp">
+        <com.daimajia.slider.library.SliderLayout
+            android:id="@+id/slider"
+            android:layout_width="match_parent"
+            android:layout_height="336dp"
+            android:layout_alignParentTop="true"
+            />
+
+        <com.daimajia.slider.library.Indicators.PagerIndicator
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/custom_indicator"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            app:selected_drawable="@drawable/indicator_selected"
+            app:selected_color="@color/accent_blue"
+            app:selected_width="@dimen/indicator_width"
+            app:selected_height="@dimen/indicator_height"
+            app:selected_padding_left="7dp"
+            app:selected_padding_right="7dp"
+
+            app:unselected_drawable="@drawable/indicator_unselected"
+            app:unselected_color="@color/white"
+            app:unselected_width="@dimen/indicator_width"
+            app:unselected_height="@dimen/indicator_width"
+            app:unselected_padding_left="7dp"
+            app:unselected_padding_right="7dp"
+            android:gravity="center"
+            />
+
+    </RelativeLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,7 +64,7 @@
                 android:id="@+id/continueWithFacebook"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32.68dp"
+                android:layout_marginTop="33dp"
                 android:gravity="left"
                 android:orientation="horizontal"
                 app:layout_constraintTop_toBottomOf="parent">
@@ -67,7 +98,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="18dp"
-                    android:src="@drawable/ic_facebook" />
+                    android:src="@drawable/ic_kakaotalk" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -107,7 +138,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="18dp"
-                    android:src="@drawable/ic_facebook" />
+                    android:src="@drawable/ic_mail" />
 
                 <TextView
                     android:layout_width="wrap_content"

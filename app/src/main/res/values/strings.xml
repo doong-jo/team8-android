@@ -71,6 +71,10 @@
     <string name="invalid_lat_long_used">Invalid latitude or longitude used</string>
 
     <!--Login-->
+    <string name="invalid_email">Not a valid email address</string>
+    <string name="invalid_password">Please must contain 8 or mor characters, letters, and numbers</string>
+    <string name="info_password">Please contain 8 or more characters, letters, and numbers</string>
+    <string name="check_term">Please check term privacy</string>
     <string name="login_another_service">다른 서비스로 로그인</string>
     <string name="login_or">또는</string>
     <string name="login_id_edittext_hint">이메일</string>
@@ -83,6 +87,7 @@
 
     <!--Join-->
     <string name="join_intro_text">Would you like to join us?</string>
+    <string name="join_next">Next</string>
     <string name="join_email_edittext_hint">이메일</string>
     <string name="join_pw_edittext_hint">비밀번호 (영문,숫자,특수문자 8-15자)</string>
     <string name="join_pw_chk_edittext_hint">비밀번호 확인</string>

@@ -12,6 +12,9 @@
     <color name="accent_blue">#136DF5</color>
     <color name="accent_red">#FF4622</color>
 
+    <color name="snackbarbkg">#E7E7E7</color>
+    <color name="snackbartxt">#2D2D2D</color>
+
     <!--toolbar text color-->
     <color name="textColorPrimary">#161616</color>
     <!--action bar background-->

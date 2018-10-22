@@ -19,6 +19,10 @@
     <dimen name="card_category_width">153dp</dimen>
     <dimen name="card_category_height">118dp</dimen>
 
+    <!--Indicator-->
+    <dimen name="indicator_width">8dp</dimen>
+    <dimen name="indicator_height">8dp</dimen>
+
     <!--Typo-->
     <dimen name="typo_headline_size">22dp</dimen>
     <dimen name="typo_title_size">18dp</dimen>

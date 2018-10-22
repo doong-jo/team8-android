@@ -1,5 +1,6 @@
 package com.helper.helper.view.login;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,8 +16,6 @@ import com.helper.helper.controller.HttpManager;
 
 public class LoginActivity extends FragmentActivity {
     private final static String TAG = LoginActivity.class.getSimpleName() + "/DEV";
-
-    private ViewPager m_loginViewPager;             //검색밑에 있는 뷰페이저
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +37,7 @@ public class LoginActivity extends FragmentActivity {
 
     }
 
+
     public void moveToLoginFragment(View v) {
         Fragment fragment = new LoginFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -48,7 +48,7 @@ public class LoginActivity extends FragmentActivity {
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        fragmentTransaction.add( R.id.fragmentPlace, fragment );
+        fragmentTransaction.replace(R.id.fragmentPlace, fragment);
         fragmentTransaction.commit();
     }
 
@@ -62,7 +62,25 @@ public class LoginActivity extends FragmentActivity {
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        fragmentTransaction.add( R.id.fragmentPlace, fragment );
+        fragmentTransaction.replace(R.id.fragmentPlace, fragment);
+//        fragmentTransaction.add( R.id.fragmentPlace, fragment );
+        fragmentTransaction.addToBackStack(null);
+
+        fragmentTransaction.commit();
+    }
+
+    public void moveToStartFragment(View v) {
+
+        Fragment fragment = new StartFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
+            fragmentManager.popBackStack();
+        }
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        fragmentTransaction.replace(R.id.fragmentPlace, fragment);
         fragmentTransaction.addToBackStack(null);
 
         fragmentTransaction.commit();
@@ -75,7 +93,7 @@ public class LoginActivity extends FragmentActivity {
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        fragmentTransaction.add( R.id.fragmentPlace, fragment );
+        fragmentTransaction.add(R.id.fragmentPlace, fragment);
         fragmentTransaction.addToBackStack(null);
 
         fragmentTransaction.commit();

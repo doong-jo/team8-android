@@ -40,12 +40,14 @@
 
         <activity android:name=".view.intro.YoutubeActivity"
             android:screenOrientation="portrait">
+
         </activity>
 
         <activity android:name=".view.login.LoginActivity"
             android:screenOrientation="portrait"
             android:noHistory="true"
             android:windowSoftInputMode="adjustResize">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

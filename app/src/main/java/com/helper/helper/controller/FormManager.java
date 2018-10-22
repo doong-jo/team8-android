@@ -57,13 +57,13 @@ public class FormManager {
         return passwd.matches(pattern) ? RESULT_VALIDATION_SUCCESS : RESULT_VALIDATION_PW_WRONG;
     }
 
-    public static int passwordValidate(String passwd, String pwConfirm) {
+    public static int passwordValidate(String passwd) {
         /** Password **/
 
-        if( !passwd.equals(pwConfirm) ) {
-            /** password incorrect **/
-            return RESULT_VALIDATION_PW_INCORRECT;
-        }
+//        if( !passwd.equals(pwConfirm) ) {
+//            /** password incorrect **/
+//            return RESULT_VALIDATION_PW_INCORRECT;
+//        }
 
         /** password wrong **/
         return passwordCharValidate(passwd);

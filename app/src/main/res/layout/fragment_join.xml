@@ -3,12 +3,12 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
     <LinearLayout
+        android:id="@+id/parentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
         android:weightSum="1">
         <View
             android:layout_width="0dp"
@@ -22,14 +22,14 @@
             android:layout_weight="0.96"
             android:orientation="vertical">
             <ImageView
+                android:id="@+id/backStartFragment"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="18dp"
+                android:layout_marginBottom="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_back"/>
 
             <TextView
-                android:layout_marginBottom="56dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:theme="@style/HeadlineTypo"
@@ -37,25 +37,133 @@
                 android:text="@string/join_intro_text"
                 android:alpha="@dimen/black_alpha_lv7"/>
 
-            <com.ahmadrosid.library.FloatingLabelEditText
-                android:layout_marginTop="41dp"
+            <FrameLayout
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:editText_hint="Email"/>
+                android:layout_height="wrap_content">
 
-            <com.ahmadrosid.library.FloatingLabelEditText
-                android:layout_marginTop="47dp"
+                <com.ahmadrosid.library.FloatingLabelEditText
+                    android:id="@+id/emailInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nextFocusDown="@id/pwInput"
+                    android:focusableInTouchMode="true"
+                    android:focusable="false"
+                    app:editText_color="@color/xxxgray"
+                    app:editText_hint="Email"/>
+
+                <Button
+                    android:id="@+id/emailInput_clear"
+                    android:visibility="invisible"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:background="@drawable/ic_delete" />
+
+            </FrameLayout>
+
+
+            <FrameLayout
+                android:layout_marginTop="37dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.ahmadrosid.library.FloatingLabelEditText
+                    android:id="@+id/pwInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:editText_color="@color/xxxgray"
+                    app:editText_hint="Password"/>
+
+                <Button
+                    android:id="@+id/pwInput_clear"
+                    android:visibility="invisible"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:background="@drawable/ic_delete" />
+
+            </FrameLayout>
+
+
+
+            <LinearLayout
+                android:layout_marginTop="27dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:editText_hint="Password"/>
+                android:orientation="horizontal">
+                <android.support.v7.widget.AppCompatCheckBox
+                    android:id="@+id/termChkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/CategoryCardTitleTypo"
+                    android:text="@string/accept_join_term_f"
+                    />
+
+                <TextView
+                    android:id="@+id/termText"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/HyoertextTypo"
+                    android:text="@string/term"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/CategoryCardTitleTypo"
+                    android:text="@string/accept_join_term_e"/>
+
+            </LinearLayout>
+
+
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@s"
-                />
+                android:id="@+id/joinBtn"
+                android:layout_marginTop="25dp"
+                android:layout_gravity="center"
+                style="@style/PrimaryButton"
+                android:text="@string/join_next"/>
         </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/snackBar"
+        android:paddingLeft="15dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/snackbarbkg"
+        android:orientation="horizontal"
+        android:visibility="invisible">
+
+        <ImageView
+            android:id="@+id/snackBarIcon"
+            android:layout_marginRight="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_inf"/>
+
+        <TextView
+            android:id="@+id/snackBarMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/SnackBarTypo"
+            android:textColor="@color/snackbartxt"
+            android:text="@string/invalid_password"/>
+
 
     </LinearLayout>
 </RelativeLayout>
