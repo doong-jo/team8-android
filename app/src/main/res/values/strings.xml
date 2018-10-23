@@ -30,6 +30,16 @@
     <string name="log_in">Log in</string>
     <string name="or_divide">OR</string>
 
+    <!--MakeProfielFragment-->
+    <string name="make_profile_title">Add Profile Photo</string>
+    <string name="make_profile_message">Add a profile photo so your firends know it\'s you.</string>
+    <string name="add_a_photo">Add a Photo</string>
+    <string name="skip">Skip</string>
+
+    <!--CongrateFragment-->
+    <string name="congrate_title">Congratulations!\nYou are in oure TEAM EIGHT</string>
+    <string name="start">Start</string>
+    <string name="change_username">Change Username</string>
 
     <!--Info Fragment-->
     <string name="cardTitleSensor">Sensor</string>

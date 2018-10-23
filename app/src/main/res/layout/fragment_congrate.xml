@@ -19,6 +19,16 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_back"/>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:alpha="0.77"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:text="@string/congrate_title"
+            android:theme="@style/HeadlineTypo"/>
+
         <ImageView
             android:id="@+id/previewImage"
             android:src="@drawable/none_profile_square"
@@ -28,28 +38,20 @@
             android:layout_height="86dp" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:alpha="0.77"
-            android:layout_gravity="center"
-            android:text="@string/make_profile_title"
-            android:theme="@style/HeadlineTypo"/>
-
-        <TextView
+            android:id="@+id/userName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:alpha="0.49"
             android:layout_gravity="center"
-            android:text="@string/make_profile_message"
+            android:text="username"
             android:theme="@style/OptionBigTypo"/>
-        
+
         <Button
             android:id="@+id/addPhotoBtn"
             android:layout_marginTop="72dp"
             android:layout_gravity="center"
-            android:text="@string/add_a_photo"
+            android:text="@string/start"
             style="@style/PrimaryButton" />
 
         <TextView
@@ -58,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/skip"
+            android:text="@string/change_username"
             android:theme="@style/HyoertextTypo"/>
 
     </LinearLayout>

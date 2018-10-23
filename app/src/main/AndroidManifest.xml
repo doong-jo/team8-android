@@ -45,6 +45,12 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k" />
 
+        <activity android:name="me.iwf.photopicker.PhotoPickerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"/>
+
+        <activity android:name="me.iwf.photopicker.PhotoPagerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"/>
+
         <activity android:name=".view.intro.YoutubeActivity"
             android:screenOrientation="portrait">
 
@@ -52,7 +58,7 @@
 
         <activity android:name=".view.login.LoginActivity"
             android:screenOrientation="portrait"
-            android:noHistory="true"
+            android:noHistory="false"
             android:windowSoftInputMode="adjustResize">
 
             <intent-filter>

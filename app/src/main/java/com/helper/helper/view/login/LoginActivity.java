@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -28,10 +29,8 @@ public class LoginActivity extends FragmentActivity {
         setContentView(R.layout.activity_login);
 
         Fragment fragment = new MakeProfileFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add( R.id.fragmentPlace, fragment );
-        fragmentTransaction.commit();
+
+        getSupportFragmentManager().beginTransaction().add(R.id.fragmentPlace, fragment).commit();
 
         HttpManager.setServerURI(getString(R.string.server_uri));
     }
@@ -108,25 +107,5 @@ public class LoginActivity extends FragmentActivity {
         fragmentTransaction.addToBackStack(null);
 
         fragmentTransaction.commit();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == 0){
-            return;
-        }
-        if(data == null){
-            return;
-        }
-
-        if ( requestCode == PermissionManager.REQUEST_CAMERA_EXTERNAL_STORAGE) {
-            if (!PermissionManager.checkPermissions(
-                    this, Manifest.permission.ACCESS_FINE_LOCATION) ||
-                    !PermissionManager.checkPermissions(
-                            this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                Toast.makeText(this, getString(R.string.not_grant_camera_permission), Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 }
