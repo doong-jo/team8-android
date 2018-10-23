@@ -1,13 +1,27 @@
 <resources>
+    <!--Alpha-->
+    <item name="black_alpha_lv0" type="dimen" format="float">0.0</item>
+    <item name="black_alpha_lv1" type="dimen" format="float">0.5</item>
+    <item name="black_alpha_lv2" type="dimen" format="float">0.13</item>
+    <item name="black_alpha_lv3" type="dimen" format="float">0.23</item>
+    <item name="black_alpha_lv4" type="dimen" format="float">0.49</item>
+    <item name="black_alpha_lv5" type="dimen" format="float">0.65</item>
+    <item name="black_alpha_lv6" type="dimen" format="float">0.77</item>
+    <item name="black_alpha_lv7" type="dimen" format="float">0.9</item>
+
     <!--Card-->
-    <dimen name="card_large_widly_width"></dimen>
-    <dimen name="card_large_widly_height"></dimen>
-    <dimen name="card_square_width"></dimen>
-    <dimen name="card_square_height"></dimen>
-    <dimen name="card_medium_width"></dimen>
-    <dimen name="card_medium_height"></dimen>
-    <dimen name="card_category_width"></dimen>
-    <dimen name="card_category_height"></dimen>
+    <dimen name="card_large_widly_width">325dp</dimen>
+    <dimen name="card_large_widly_height">96dp</dimen>
+    <dimen name="card_square_width">128dp</dimen>
+    <dimen name="card_square_height">128dp</dimen>
+    <dimen name="card_medium_width">325dp</dimen>
+    <dimen name="card_medium_height">64dp</dimen>
+    <dimen name="card_category_width">153dp</dimen>
+    <dimen name="card_category_height">118dp</dimen>
+
+    <!--Indicator-->
+    <dimen name="indicator_width">8dp</dimen>
+    <dimen name="indicator_height">8dp</dimen>
 
     <!--Typo-->
     <dimen name="typo_headline_size">22dp</dimen>

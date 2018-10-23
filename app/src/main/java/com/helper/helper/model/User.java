@@ -37,7 +37,11 @@ public class User {
         private String m_userName;
 
         public Builder() {
+            m_userEmail = "";
+            m_userPhone = "";
             m_userPw = "";
+            m_userPhone = "";
+            m_userName = "";
         }
         public Builder email(String emailStr) {
             this.m_userEmail = emailStr;
@@ -69,7 +73,7 @@ public class User {
         m_userPw = builder.m_userPw;
         m_userPhone = builder.m_userPhone;
         m_userName = builder.m_userName;
-        m_userRidingType = RidingType.BICYCLE.value;
+        m_userRidingType = "";
         m_userLastAccess = new Date();
         m_userEmergency = false;
         m_lastPosition = new Location("");
@@ -100,13 +104,24 @@ public class User {
         JSONObject obj = new JSONObject();
 
         try {
-            obj.put("email", m_userEmail);
-            obj.put("passwd", m_userPw);
-            obj.put("name", m_userName);
-            obj.put("phone", m_userPhone);
-            obj.put("riding_type", m_userRidingType);
-            obj.put("emergency", m_userEmergency);
-            obj.put("lastAccess", m_userLastAccess);
+            if( !m_userEmail.equals("")) {
+                obj.put("email", m_userEmail);
+            }
+            if( !m_userPw.equals("")) {
+                obj.put("passwd", m_userPw);
+            }
+            if( !m_userName.equals("") ) {
+                obj.put("name", m_userName);
+            }
+            if( !m_userPhone.equals("")) {
+                obj.put("phone", m_userPhone);
+            }
+            if( !m_userName.equals("")) {
+                obj.put("name", m_userPhone);
+            }
+            if( !m_userRidingType.equals("")) {
+                obj.put("riding_type", m_userRidingType);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

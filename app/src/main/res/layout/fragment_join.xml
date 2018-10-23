@@ -1,176 +1,176 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/loginBackgroundColor">
-
+    xmlns:style="http://schemas.android.com/tools"
+    android:background="@color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
+        android:id="@+id/parentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
         android:weightSum="1">
         <View
-            android:layout_weight="0.1"
             android:layout_width="0dp"
-            android:layout_height="1dp" />
+            android:layout_height="1dp"
+            android:layout_weight="0.04" />
 
-        <RelativeLayout
+
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.8">
-            <LinearLayout
+            android:layout_weight="0.96"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/backStartFragment"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_back"/>
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_centerInParent="true"
-                android:layout_margin="5dp"
-                android:focusableInTouchMode="true">
+                android:theme="@style/HeadlineTypo"
+                android:textColor="@color/black"
+                android:text="@string/join_intro_text"
+                android:alpha="@dimen/black_alpha_lv7"/>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAlignment="center"
-                    android:textStyle="bold"
-                    android:textSize="@dimen/xx_text_size"
-                    android:textColor="@color/softBlackColor"
-                    android:text="@string/service_name"
-                    android:layout_marginBottom="@dimen/xx_space_size" />
+            <FrameLayout
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-
-                <EditText
+                <com.ahmadrosid.library.FloatingLabelEditText
                     android:id="@+id/emailInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/s_space_size"
-                    android:inputType="textEmailAddress"
-                    android:hint="@string/join_email_edittext_hint"
-                    android:maxLength="@integer/email_length"
-                    android:singleLine="true"
                     android:nextFocusDown="@id/pwInput"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"/>
+                    android:focusableInTouchMode="true"
+                    android:focusable="false"
+                    app:editText_color="@color/xxxgray"
+                    app:editText_hint="Email"/>
 
-                <EditText
+                <Button
+                    android:id="@+id/emailInput_clear"
+                    android:visibility="invisible"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:background="@drawable/ic_delete" />
+
+            </FrameLayout>
+
+
+            <FrameLayout
+                android:layout_marginTop="37dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.ahmadrosid.library.FloatingLabelEditText
                     android:id="@+id/pwInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/s_space_size"
-                    android:inputType="textPassword"
-                    android:hint="@string/join_pw_edittext_hint"
-                    android:maxLength="@integer/pw_length"
-                    android:singleLine="true"
-                    android:nextFocusDown="@id/pwConfirmInput"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"/>
-
-                <EditText
-                    android:id="@+id/pwConfirmInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/s_space_size"
-                    android:inputType="textPassword"
-                    android:hint="@string/join_pw_chk_edittext_hint"
-                    android:maxLength="@integer/pw_length"
-                    android:singleLine="true"
-                    android:nextFocusDown="@id/nameInput"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"/>
-
-                <EditText
-                    android:id="@+id/nameInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/s_space_size"
-                    android:inputType="textShortMessage"
-                    android:hint="@string/join_name_edittext_hint"
-                    android:maxLength="@integer/name_length"
-                    android:singleLine="true"
-                    android:imeOptions="actionDone"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_margin="@dimen/xs_space_size">
-                    <android.support.v7.widget.AppCompatCheckBox
-                        android:id="@+id/termChkBox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="@dimen/s_text_size"
-                        android:layout_marginEnd="@dimen/xs_space_size"
-                        android:textColor="@color/softBlackColor"
-                        android:text="@string/accept_join_term_f" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:textSize="@dimen/s_text_size"
-                        android:textColor="@color/colorAccent"
-                        android:text="@string/term"
-                        android:onClick="moveToPrivacyTermFragment"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="@dimen/s_text_size"
-                        android:textColor="@color/softBlackColor"
-                        android:layout_marginStart="@dimen/xs_space_size"
-                        android:text="@string/accept_join_term_e" />
-                </LinearLayout>
+                    app:editText_color="@color/xxxgray"
+                    app:editText_hint="Password"/>
 
                 <Button
-                    android:id="@+id/joinBtn"
-                    android:layout_width="match_parent"
+                    android:id="@+id/pwInput_clear"
+                    android:visibility="invisible"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:background="@drawable/ic_delete" />
+
+            </FrameLayout>
+
+            <!--<com.helper.helper.view.widget.CustomEditText-->
+                <!--android:id="@+id/textedit"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="30dp"-->
+                <!--android:singleLine="true"-->
+                <!--android:ems="10" />-->
+
+
+            <LinearLayout
+                android:layout_marginTop="27dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <android.support.v7.widget.AppCompatCheckBox
+                    android:id="@+id/termChkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/join_button_text"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="@dimen/s_text_size"
-                    android:textStyle="bold"
-                    android:background="@color/colorAccent"
-                    android:layout_marginTop="@dimen/s_space_size"
-                    android:layout_marginBottom="@dimen/s_space_size"/>
+                    android:theme="@style/CategoryCardTitleTypo"
+                    android:text="@string/accept_join_term_f"
+                    />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/termText"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/s_space_size"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:textAlignment="center"
-                    android:orientation="horizontal">
+                    android:theme="@style/HyoertextTypo"
+                    android:text="@string/term"
+                    />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/xs_space_size"
-                        android:textSize="@dimen/s_text_size"
-                        android:textColor="@color/softBlackColor"
-                        android:text="@string/suggest_login" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/CategoryCardTitleTypo"
+                    android:text="@string/accept_join_term_e"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/xs_space_size"
-                        android:textStyle="bold"
-                        android:textSize="@dimen/s_text_size"
-                        android:textColor="@color/colorAccent"
-                        android:text="@string/login"
-                        android:onClick="moveToLoginFragment"/>
-                </LinearLayout>
             </LinearLayout>
-        </RelativeLayout>
 
-        <View
-            android:layout_weight="0.1"
-            android:layout_width="0dp"
-            android:layout_height="1dp" />
+
+
+            <Button
+                android:id="@+id/joinBtn"
+                android:layout_marginTop="25dp"
+                android:layout_gravity="center"
+                style="@style/PrimaryButton"
+                android:text="@string/join_next"/>
+        </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/snackBar"
+        android:paddingLeft="15dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/snackbarbkg"
+        android:orientation="horizontal"
+        android:visibility="invisible">
+
+        <ImageView
+            android:id="@+id/snackBarIcon"
+            android:layout_marginRight="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_inf"/>
+
+        <TextView
+            android:id="@+id/snackBarMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/SnackBarTypo"
+            android:textColor="@color/snackbartxt"
+            android:text="@string/invalid_password"/>
+
+
     </LinearLayout>
 </RelativeLayout>

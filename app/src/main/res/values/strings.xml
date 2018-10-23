@@ -3,7 +3,7 @@
     <string name="app_name">Safe &amp; Enjoy, HELPER</string>
     <string name="service_name">HELPER</string>
     <string name="device_bluetooth_name">helper-1</string>
-
+    <string name="google_api">AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k</string>
     <!--Bluetooth-->
     <string name="bluetooth_uuid">94f39d29-7d6d-437d-973b-fba39e49d4ee</string>
 
@@ -19,6 +19,17 @@
     <string name="not_grant_location_permission">위치 서비스가 허용되지 않으면 "트래킹 서비스"와 "사고 대응 시스템"을 정상적으로 이용하실 수 없습니다. [설정-애플리케이션]에서 허용해주세요.</string>
 
     <string name="not_grant_contacts_permission">연락처 권한이 허용되지 않으면 "사고 대응 시스템"을 정상적으로 이용하실 수 없습니다. [설정-애플리케이션]에서 허용해주세요.</string>
+
+    <string name="not_grant_camera_permission">카메라와 저장소 권한이 허용되지 않으면 프로필 설정을 정상적으로 이용하실 수 없습니다. [설정-애플리케이션]에서 허용해주세요.</string>
+
+    <!--StartFragment-->
+    <string name="continue_with_fb">Continue with Facebook</string>
+    <string name="continue_with_kakao">Continue with KaKao</string>
+    <string name="signup_with_email">Sign up with Email</string>
+    <string name="login_question">Already a member?</string>
+    <string name="log_in">Log in</string>
+    <string name="or_divide">OR</string>
+
 
     <!--Info Fragment-->
     <string name="cardTitleSensor">Sensor</string>
@@ -62,6 +73,11 @@
     <string name="invalid_lat_long_used">Invalid latitude or longitude used</string>
 
     <!--Login-->
+    <string name="invalid_email">Not a valid email address</string>
+    <string name="exist_email">Exist an email</string>
+    <string name="invalid_password">Please must contain 8 or more characters, letters, and numbers</string>
+    <string name="info_password">Please contain 8 or more characters, letters, and numbers</string>
+    <string name="check_term">Please check term privacy</string>
     <string name="login_another_service">다른 서비스로 로그인</string>
     <string name="login_or">OR</string>
     <string name="login_email">Email</string>
@@ -79,6 +95,8 @@
     <string name="login_loading_message">"잠시만 기다려주세요..."</string>
 
     <!--Join-->
+    <string name="join_intro_text">Would you like to join us?</string>
+    <string name="join_next">Next</string>
     <string name="join_email_edittext_hint">이메일</string>
     <string name="join_pw_edittext_hint">비밀번호 (영문,숫자,특수문자 8-15자)</string>
     <string name="join_pw_chk_edittext_hint">비밀번호 확인</string>

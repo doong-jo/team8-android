@@ -13,4 +13,9 @@
 
     <!--Request Code-->
     <integer name="REQUEST_ENABLE_BT">1001</integer>
+
+    <!--Shadow-->
+    <integer name="shadow_x">0</integer>
+    <integer name="shadow_y">4</integer>
+    <integer name="shadow_b">5</integer>
 </resources>

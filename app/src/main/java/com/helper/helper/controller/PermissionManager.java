@@ -20,6 +20,7 @@ public class PermissionManager {
     public static final int REQUEST_STORAGE = 1;
     public static final int REQUEST_LOCATION = 2002;
     public static final int READ_PHONE_STATE = 697;
+    public static final int REQUEST_CAMERA_EXTERNAL_STORAGE = 784;
 
     private static String[] PERMISSIONS_LOCATION = {
             Manifest.permission.ACCESS_FINE_LOCATION,

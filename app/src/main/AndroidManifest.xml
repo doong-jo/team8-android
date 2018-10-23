@@ -13,6 +13,12 @@
     <!--디바이스의 상태(전화번호 등)-->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
+    <!--Photo picker-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+
+
     <uses-feature android:name="android.hardware.accelerometer" android:required="true" />
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
@@ -33,15 +39,27 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+
         <!--Google API 추가-->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k" />
 
+        <activity android:name=".view.intro.YoutubeActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
+
         <activity android:name=".view.login.LoginActivity"
             android:screenOrientation="portrait"
             android:noHistory="true"
             android:windowSoftInputMode="adjustResize">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <activity
@@ -49,12 +67,6 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity android:name=".view.contact.ContactActivity"
