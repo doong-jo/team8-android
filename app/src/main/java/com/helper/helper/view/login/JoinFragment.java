@@ -674,6 +674,7 @@ public class JoinFragment extends Fragment {
             JSONObject reqObject = user.getTransformUserToJSON();
             reqObject.remove("emergency");
             reqObject.remove("lastAccess");
+
 //            reqObject.put("lastAccess", new Date().toString());
 
             HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
