@@ -13,6 +13,12 @@
     <!--디바이스의 상태(전화번호 등)-->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
+    <!--Photo picker-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+
+
     <uses-feature android:name="android.hardware.accelerometer" android:required="true" />
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
@@ -32,6 +38,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
 
         <!--Google API 추가-->
         <meta-data

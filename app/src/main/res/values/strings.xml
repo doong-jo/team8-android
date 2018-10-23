@@ -20,6 +20,8 @@
 
     <string name="not_grant_contacts_permission">연락처 권한이 허용되지 않으면 "사고 대응 시스템"을 정상적으로 이용하실 수 없습니다. [설정-애플리케이션]에서 허용해주세요.</string>
 
+    <string name="not_grant_camera_permission">카메라와 저장소 권한이 허용되지 않으면 프로필 설정을 정상적으로 이용하실 수 없습니다. [설정-애플리케이션]에서 허용해주세요.</string>
+
     <!--StartFragment-->
     <string name="continue_with_fb">Continue with Facebook</string>
     <string name="continue_with_kakao">Continue with KaKao</string>
@@ -72,7 +74,8 @@
 
     <!--Login-->
     <string name="invalid_email">Not a valid email address</string>
-    <string name="invalid_password">Please must contain 8 or mor characters, letters, and numbers</string>
+    <string name="exist_email">Exist an email</string>
+    <string name="invalid_password">Please must contain 8 or more characters, letters, and numbers</string>
     <string name="info_password">Please contain 8 or more characters, letters, and numbers</string>
     <string name="check_term">Please check term privacy</string>
     <string name="login_another_service">다른 서비스로 로그인</string>

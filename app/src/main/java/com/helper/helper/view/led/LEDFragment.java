@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+//import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.helper.helper.R;
 import com.helper.helper.view.Info.InfoFragment;
 import com.helper.helper.view.TabPagerAdapter;
@@ -37,15 +37,15 @@ public class LEDFragment extends Fragment {
         };
 
         if (selectable) {
-            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
-            Glide.with(this).load(ind).into(gifimage);
+//            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+//            Glide.with(this).load(ind).into(gifimage);
         } else {
             getActivity().runOnUiThread(
                     new Runnable() {
                         @Override
                         public void run() {
-                            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
-                            Glide.with(getActivity()).load(images[ind]).into(gifimage);
+//                            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+//                            Glide.with(getActivity()).load(images[ind]).into(gifimage);
                         }
                     }
             );
@@ -63,7 +63,7 @@ public class LEDFragment extends Fragment {
 //        ImageView curImg = (ImageView) view.findViewById(R.id.curImg);
 //        GlideDrawableImageViewTarget gifImage0 = new GlideDrawableImageViewTarget(curImg);
 //        Glide.with(this).load(R.drawable.characters).into(gifImage0);
-
+/*
         ImageView img0 = (ImageView) view.findViewById(R.id.img0);
         GlideDrawableImageViewTarget gifImage0 = new GlideDrawableImageViewTarget(img0);
         Glide.with(this).load(R.drawable.bird).into(gifImage0);
@@ -107,7 +107,7 @@ public class LEDFragment extends Fragment {
         ImageView img10 = (ImageView) view.findViewById(R.id.img10);
         GlideDrawableImageViewTarget gifImage10 = new GlideDrawableImageViewTarget(img10);
         Glide.with(this).load(R.drawable.boy).into(gifImage10);
-
+*/
         return view;
     }
 }

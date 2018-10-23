@@ -26,7 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+//import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationCallback;
@@ -93,18 +93,18 @@ public class InfoFragment extends Fragment {
         };
 
         if( selectable ) {
-            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
-            Glide.with(this).load(ind).into(gifimage);
+//            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+//            Glide.with(this).load(ind).into(gifimage);
         } else {
-            getActivity().runOnUiThread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
-                            Glide.with(getActivity()).load(images[ind]).into(gifimage);
-                        }
-                    }
-            );
+//            getActivity().runOnUiThread(
+//                    new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            GlideDrawableImageViewTarget gifimage = new GlideDrawableImageViewTarget(m_curLEDView);
+//                            Glide.with(getActivity()).load(images[ind]).into(gifimage);
+//                        }
+//                    }
+//            );
         }
 
 

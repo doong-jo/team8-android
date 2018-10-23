@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:style="http://schemas.android.com/tools"
     android:background="@color/white"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
@@ -89,6 +90,12 @@
 
             </FrameLayout>
 
+            <!--<com.helper.helper.view.widget.CustomEditText-->
+                <!--android:id="@+id/textedit"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="30dp"-->
+                <!--android:singleLine="true"-->
+                <!--android:ems="10" />-->
 
 
             <LinearLayout
