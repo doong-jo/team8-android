@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.helper.helper">
 
+    <supports-screens android:requiresSmallestWidthDp="360" />
+
     <!--Wi-Fi를 이용한 GPS 신호 확인 권한-->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!--기지국 정보를 이용한 GPS 신호 확인 권한-->

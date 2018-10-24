@@ -10,6 +10,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.Toast;
 
@@ -26,13 +29,42 @@ public class LoginActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        printSecreenInfo();
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
         setContentView(R.layout.activity_login);
 
-        Fragment fragment = new MakeProfileFragment();
+        Fragment fragment = new TestFragment();
 
         getSupportFragmentManager().beginTransaction().add(R.id.fragmentPlace, fragment).commit();
 
         HttpManager.setServerURI(getString(R.string.server_uri));
+    }
+
+    void printSecreenInfo(){
+
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getMetrics(metrics);
+
+
+
+        Log.i(TAG, "density :" +  metrics.density);
+
+        // density interms of dpi
+        Log.i(TAG, "D density :" +  metrics.densityDpi);
+
+        // horizontal pixel resolution
+        Log.i(TAG, "width pix :" +  metrics.widthPixels);
+
+        Log.i(TAG, "height pix :" +  metrics.heightPixels);
+
+        // actual horizontal dpi
+        Log.i(TAG, "xdpi :" +  metrics.xdpi);
+
+        // actual vertical dpi
+        Log.i(TAG, "ydpi :" +  metrics.ydpi);
+
     }
 
 

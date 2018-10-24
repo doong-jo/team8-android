@@ -123,6 +123,7 @@ public class MakeProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case PHOTO_PICK:
+                if( data == null ) { return; }
                 Bundle dataExtras = data.getExtras();
                 Bitmap photo = dataExtras.getParcelable("data");
                 m_previewImage.setImageBitmap(

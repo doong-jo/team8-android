@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 10/23/18 11:43 PM
+  ~ Written by Sungdong Jo
+  ~ Description:
+  -->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="411dp"
+    android:layout_height="640dp"
+    android:background="@color/accent_blue">
+
+</LinearLayout>
