@@ -10,21 +10,21 @@
     <item name="black_alpha_lv7" type="dimen" format="float">0.9</item>
 
     <!--Card-->
-    <dimen name="card_large_widly_width">325dp</dimen>
-    <dimen name="card_large_widly_height">96dp</dimen>
-    <dimen name="card_square_width">128dp</dimen>
-    <dimen name="card_square_height">128dp</dimen>
-    <dimen name="card_medium_width">325dp</dimen>
-    <dimen name="card_medium_height">64dp</dimen>
-    <dimen name="card_category_width">153dp</dimen>
-    <dimen name="card_category_height">118dp</dimen>
+    <dimen name="card_large_widly_width">370.5dp</dimen>
+    <dimen name="card_large_widly_height">109.44dp</dimen>
+    <dimen name="card_square_width">145.92dp</dimen>
+    <dimen name="card_square_height">145.92dp</dimen>
+    <dimen name="card_medium_width">370.5dp</dimen>
+    <dimen name="card_medium_height">72.96dp</dimen>
+    <dimen name="card_category_width">174.42dp</dimen>
+    <dimen name="card_category_height">134.52dp</dimen>
 
     <!--Indicator-->
-    <dimen name="indicator_width">8dp</dimen>
-    <dimen name="indicator_height">8dp</dimen>
+    <dimen name="indicator_width">9.12dp</dimen>
+    <dimen name="indicator_height">9.12dp</dimen>
 
     <!--Snackbar-->
-    <dimen name="snackbar_height">34dp</dimen>
+    <dimen name="snackbar_height">38.76dp</dimen>
 
     <!--Button-->
     <dimen name="button_small_width">192dp</dimen>
@@ -32,23 +32,11 @@
 
     <dimen name="button_large_width">256dp</dimen>
     <dimen name="button_large_height">40dp</dimen>
-    
+
     <dimen name="button_circle_width">56dp</dimen>
 
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="google_polyline_width">12</dimen>
-
-    <dimen name="xx_text_size">48sp</dimen>
-    <dimen name="x_text_size">36sp</dimen>
-    <dimen name="m_text_size">24sp</dimen>
-    <dimen name="s_text_size">16sp</dimen>
-    <dimen name="xs_text_size">8sp</dimen>
-
-    <dimen name="xx_space_size">25dp</dimen>
-    <dimen name="x_space_size">20dp</dimen>
-    <dimen name="m_space_size">15dp</dimen>
-    <dimen name="s_space_size">10dp</dimen>
-    <dimen name="xs_space_size">5dp</dimen>
 </resources>

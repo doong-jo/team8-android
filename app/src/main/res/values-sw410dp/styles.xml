@@ -27,74 +27,74 @@
     <!--Buttons-->
     <style name="PrimaryButton" parent="android:Widget.Button">
         <item name="android:background">@drawable/primary_button</item>
-        <item name="android:layout_width">192dp</item>
-        <item name="android:layout_height">32dp</item>
+        <item name="android:layout_width">218.88dp</item>
+        <item name="android:layout_height">36.48dp</item>
         <item name="android:textAppearance">@style/CategoryCardTitleTypo</item>
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
     <style name="BlockButton" parent="android:Widget.Button">
-        <item name="android:width">192dp</item>
+        <item name="android:width">218.88dp</item>
         <item name="android:color">#DFE0E2</item>
         <item name="android:textColor">#FFFFFF</item>
-        <item name="android:radius">11dp</item>
+        <item name="android:radius">12.54dp</item>
     </style>
 
     <!--Typo-->
     <style name="HeadlineTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_bold</item>
-        <item name="android:textSize">22dp</item>
+        <item name="android:textSize">25.0dp</item>
     </style>
 
     <style name="HyoertextTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_bold</item>
-        <item name="android:textSize">15dp</item>
+        <item name="android:textSize">17.1dp</item>
         <item name="android:textColor">@color/accent_blue</item>
     </style>
 
     <style name="TitleTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_medium</item>
-        <item name="android:textSize">18dp</item>
+        <item name="android:textSize">20.52dp</item>
     </style>
 
     <style name="CategoryCardTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_medium</item>
-        <item name="android:textSize">16dp</item>
+        <item name="android:textSize">18.24dp</item>8
     </style>
 
     <style name="CategoryCardTitleTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_medium</item>
-        <item name="android:textSize">15dp</item>
+        <item name="android:textSize">17.1dp</item>
     </style>
 
     <style name="TopTabBarTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_medium</item>
-        <item name="android:textSize">14dp</item>
+        <item name="android:textSize">15.96dp</item>
     </style>
 
     <style name="OptionBigTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_regular</item>
-        <item name="android:textSize">14dp</item>
+        <item name="android:textSize">15.96dp</item>
     </style>
 
     <style name="OptionTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_regular</item>
-        <item name="android:textSize">13dp</item>
+        <item name="android:textSize">14.82dp</item>
     </style>
 
     <style name="OptionAccentTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_bold</item>
-        <item name="android:textSize">13dp</item>
+        <item name="android:textSize">14.82dp</item>
     </style>
 
     <style name="BodyTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_regular</item>
-        <item name="android:textSize">12dp</item>
+        <item name="android:textSize">13.68dp</item>
     </style>
 
     <style name="SnackBarTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_regular</item>
-        <item name="android:textSize">11dp</item>
+        <item name="android:textSize">12.54dp</item>
     </style>
 
 

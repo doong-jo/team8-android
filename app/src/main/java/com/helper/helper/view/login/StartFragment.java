@@ -18,6 +18,8 @@ import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.helper.helper.R;
+import com.helper.helper.controller.UserManager;
+import com.helper.helper.model.User;
 
 import java.util.HashMap;
 
@@ -101,9 +103,7 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
             @Override
             public void onClick(View view) {
                 LoginActivity activity = (LoginActivity)getActivity();
-                if (activity != null) {
-                    activity.moveToLoginFragment(view);
-                }
+                activity.moveToFragment(new LoginFragment(), true);
             }
         });
 
@@ -111,9 +111,7 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
             @Override
             public void onClick(View view) {
                 LoginActivity activity = (LoginActivity)getActivity();
-                if (activity != null) {
-                    activity.moveToJoinFragment(view);
-                }
+                activity.moveToFragment(new JoinFragment(), true);
             }
         });
         /*************************************************************/

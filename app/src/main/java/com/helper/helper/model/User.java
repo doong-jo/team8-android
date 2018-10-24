@@ -68,6 +68,7 @@ public class User {
         }
     }
 
+
     public User(Builder builder) {
         m_userEmail = builder.m_userEmail;
         m_userPw = builder.m_userPw;
@@ -80,6 +81,18 @@ public class User {
         m_accPosition = new ArrayList<Location>();
         m_ledIndicies = new ArrayList<String>();
         m_trackIndicies = new ArrayList<String>();
+    }
+
+    public void setUserName(String name) {
+        m_userName = name;
+    }
+
+    public void setUserEmail(String userEmail) {
+        m_userEmail = userEmail;
+    }
+
+    public void setUserRidingType(String ridingType) {
+        m_userRidingType = ridingType;
     }
 
     public String getUserEmail() {

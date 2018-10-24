@@ -10,13 +10,9 @@ package com.helper.helper.view.login;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatCheckBox;
@@ -24,11 +20,6 @@ import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.text.method.HideReturnsTransformationMethod;
-import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,8 +28,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -47,17 +36,12 @@ import android.widget.Toast;
 import com.ahmadrosid.library.FloatingLabelEditText;
 import com.helper.helper.R;
 import com.helper.helper.controller.FormManager;
+import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.ValidateCallback;
-import com.helper.helper.view.ScrollingActivity;
 import com.helper.helper.model.User;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.PermissionManager;
-import com.helper.helper.view.widget.CheckableRelativeLayout;
-import com.liuguangqiang.cookie.CookieBar;
-
-import org.apache.commons.validator.Form;
-import org.apache.commons.validator.routines.EmailValidator;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -77,7 +61,6 @@ public class JoinFragment extends Fragment {
     private static final int RESPONSE_EVENT_FOCUS_PW = 839;
     private static final int RESPONSE_EVENT_FOCUS_NEXT = 839;
 
-    private static final int MAX_EMAIL_LENGTH = 40;
     private static final int MAX_PW_LENGTH = 15;
     private static final int EDITTEXT_CONTROL_CLEAR = 229;
     private static final int EDITTEXT_CONTROL_CHECK = 230;
@@ -95,7 +78,6 @@ public class JoinFragment extends Fragment {
     private OnClickListener m_pwInputClearClickListener;
 
     // save original pixel(after convert dp) of editText control marginEnd
-    private int m_editTextControlMarginEnd;
 
     /**************************************************************/
 
@@ -106,8 +88,8 @@ public class JoinFragment extends Fragment {
     @SuppressLint({"ResourceAsColor", "RestrictedApi"})
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_join, container, false);
 
+        View view = inflater.inflate(R.layout.fragment_join, container, false);
 
         /******************* Connect widgtes with layout *******************/
         Button joinBtn = view.findViewById(R.id.joinBtn);
@@ -126,13 +108,6 @@ public class JoinFragment extends Fragment {
         m_pwInput.getmEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         m_pwInput.getmEditText().setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-//        (AppCompatEditText)m_emailInput.getmEditText()
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)m_emailInputClear.getLayoutParams();
-        m_editTextControlMarginEnd = params.getMarginEnd();
-
-        ColorStateList colorStateList = ColorStateList.valueOf(R.color.accent_red);
-        m_emailInput.getmEditText().setBackgroundTintList(colorStateList);
-
 //        m_pwInput.getmEditText().setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_check, 0);
 //        m_pwInput.getmEditText().setCompoundDrawablePadding(10);
 //        m_pwInput.getmEditText().getBackground().setColorFilter(R.color.accent_red, PorterDuff.Mode.SRC_ATOP);
@@ -140,7 +115,6 @@ public class JoinFragment extends Fragment {
 //        AppCompatEditText testEditText = view.findViewById(R.id.testEditText);
 //        ColorStateList colorStateList = ColorStateList.valueOf(R.color.accent_red);
 //        testEditText.setSupportBackgroundTintList(colorStateList);
-
         /*******************************************************************/
 
         /******************* Make Listener in View *******************/
@@ -150,14 +124,12 @@ public class JoinFragment extends Fragment {
                 View focusView = getActivity().getCurrentFocus();
 
                 InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-                if (imm != null) {
+                if (focusView != null) {
                     imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
                 }
 
                 LoginActivity activity = (LoginActivity)getActivity();
-                if (activity != null) {
-                    activity.moveToStartFragment(view);
-                }
+                activity.moveToFragment(new StartFragment(), true);
             }
         });
 
@@ -230,11 +202,12 @@ public class JoinFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if( m_emailInput.getText().length() > MAX_EMAIL_LENGTH) {
-                    String maximumAllowedCharacters = m_emailInput.getmEditText().getText().toString().substring(0, MAX_EMAIL_LENGTH);
+                final int maxEmailLen = getResources().getInteger(R.integer.email_length);
+                if( m_emailInput.getText().length() > maxEmailLen) {
+                    String maximumAllowedCharacters = m_emailInput.getmEditText().getText().toString().substring(0, maxEmailLen);
 
                     m_emailInput.getmEditText().setText(maximumAllowedCharacters);
-                    m_emailInput.getmEditText().setSelection(MAX_EMAIL_LENGTH);
+                    m_emailInput.getmEditText().setSelection(maxEmailLen);
                 }
             }
 
@@ -256,11 +229,13 @@ public class JoinFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int after) {
-                if( m_pwInput.getText().length() > MAX_PW_LENGTH) {
-                    String maximumAllowedCharacters = m_pwInput.getmEditText().getText().toString().substring(0, MAX_PW_LENGTH);
+                final int maxPwLen = getResources().getInteger(R.integer.pw_length);
+
+                if( m_pwInput.getText().length() > maxPwLen) {
+                    String maximumAllowedCharacters = m_pwInput.getmEditText().getText().toString().substring(0, maxPwLen);
 
                     m_pwInput.getmEditText().setText(maximumAllowedCharacters);
-                    m_pwInput.getmEditText().setSelection(MAX_PW_LENGTH);
+                    m_pwInput.getmEditText().setSelection(maxPwLen);
                 }
             }
 
@@ -304,15 +279,17 @@ public class JoinFragment extends Fragment {
                                 @Override
                                 public void onDone(int resultCode) throws JSONException {
                                     if( resultCode == FormManager.RESULT_VALIDATION_SUCCESS) {
-                                        LoginActivity activity = (LoginActivity)getActivity();
-                                        if (activity != null) {
-                                            View focusView = getActivity().getCurrentFocus();
+                                        UserManager.setUserEmail(m_emailInput.getText().toString());
 
-                                            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                                        View focusView = getActivity().getCurrentFocus();
+
+                                        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                                        if (focusView != null) {
                                             imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
-
-                                            activity.moveToMakeProfileFragment(view);
                                         }
+
+                                        LoginActivity activity = (LoginActivity)getActivity();
+                                        activity.moveToFragment(new AddNameFragment(), false);
                                 }
                             };
                     });
@@ -322,13 +299,30 @@ public class JoinFragment extends Fragment {
             }
         });
 
+        m_termChkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                View focusView = getActivity().getCurrentFocus();
+
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                if (focusView != null) {
+                    imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+                }
+            }
+        });
+
         termText.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                LoginActivity activity = (LoginActivity)getActivity();
-                if (activity != null) {
-                    activity.moveToPrivacyTermFragment(view);
+                View focusView = getActivity().getCurrentFocus();
+
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                if (focusView != null) {
+                    imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
                 }
+
+                LoginActivity activity = (LoginActivity)getActivity();
+                activity.moveToFragment(new TermFragment(), false);
             }
         });
 
@@ -510,7 +504,6 @@ public class JoinFragment extends Fragment {
 
         if (resultEmailValidate != FormManager.RESULT_VALIDATION_SUCCESS) {
             setSnackBarStatus(SNACKBAR_INVALID_EMAIL);
-            m_emailInput.setTextColor(R.color.accent_red);
             try {
                 callback.onDone(FormManager.RESULT_VALIDATION_ERROR);
             } catch (JSONException e) {
@@ -529,7 +522,6 @@ public class JoinFragment extends Fragment {
                             @Override
                             public void run() {
                                 setSnackBarStatus(SNACKBAR_EXIST_EAMIL);
-                                m_emailInput.setTextColor(R.color.accent_red);
                             }
                         });
                     } else {
@@ -550,7 +542,6 @@ public class JoinFragment extends Fragment {
                                         }
                                     } else {
                                         setControlEditText(EDITTEXT_CONTROL_CHECK, m_emailInputClear);
-                                        m_pwInput.setTextColor(R.color.accent_red);
                                     }
                                 }
                             });
@@ -602,18 +593,11 @@ public class JoinFragment extends Fragment {
     private void setControlEditText(int typeCode, Button control) {
         control.setVisibility(View.VISIBLE);
 
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)control.getLayoutParams();
-        final int marginEndDp = params.getMarginEnd();
-
         if( typeCode == EDITTEXT_CONTROL_CLEAR ) {
             control.setBackgroundResource(R.drawable.ic_delete);
-            params.setMarginEnd(m_editTextControlMarginEnd);
-            control.setLayoutParams(params);
         } else if ( typeCode == EDITTEXT_CONTROL_CHECK ) {
             control.setBackgroundResource(R.drawable.ic_check);
             control.setOnClickListener(null);
-            params.setMarginEnd(m_editTextControlMarginEnd*2);
-            control.setLayoutParams(params);
         }
     }
 

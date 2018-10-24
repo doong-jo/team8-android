@@ -4,7 +4,7 @@
   ~ Written by Sungdong Jo
   ~ Description:
   -->
-
+<!--360dp 411dp-->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

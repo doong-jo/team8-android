@@ -32,14 +32,20 @@
 
     <!--MakeProfielFragment-->
     <string name="make_profile_title">Add Profile Photo</string>
+    <string name="make_profile_riding_type">Set Your Vehicle Type</string>
     <string name="make_profile_message">Add a profile photo so your firends know it\'s you.</string>
-    <string name="add_a_photo">Add a Photo</string>
     <string name="skip">Skip</string>
+    <string name="edit">Edit</string>
 
     <!--CongrateFragment-->
     <string name="congrate_title">Congratulations!\nYou are in oure TEAM EIGHT</string>
     <string name="start">Start</string>
     <string name="change_username">Change Username</string>
+
+    <!--AddNameFragment-->
+    <string name="add_name_title">Add Your Name</string>
+    <string name="add_name_message">Add your name so friends can find you.</string>
+    <string name="name_field">Name</string>
 
     <!--Info Fragment-->
     <string name="cardTitleSensor">Sensor</string>
@@ -101,14 +107,9 @@
     <!--Join-->
     <string name="join_intro_text">Would you like to join us?</string>
     <string name="join_next">Next</string>
-    <string name="join_email_edittext_hint">이메일</string>
     <string name="join_pw_edittext_hint">비밀번호 (영문,숫자,특수문자 8-15자)</string>
-    <string name="join_pw_chk_edittext_hint">비밀번호 확인</string>
-    <string name="join_name_edittext_hint">이름(2-15자)</string>
-    <string name="join_button_text">계정 만들기</string>
-    <string name="suggest_login">이미 계정이 있으세요?</string>
     <string name="accept_join_term_f">Team 8에서 제공하는</string>
-    <string name="term"><u>서비스 약관</u></string>FF
+    <string name="term"><u>서비스 약관</u></string>
     <string name="accept_join_term_e">에 동의합니다.</string>
 
     <string name="join_loading_title">"회원가입을 완료하는 중입니다."</string>

@@ -20,6 +20,8 @@ import com.helper.helper.R;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.PermissionManager;
+import com.helper.helper.controller.UserManager;
+import com.helper.helper.model.User;
 
 import java.util.ArrayList;
 
@@ -29,14 +31,23 @@ public class LoginActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        User user = new User.Builder()
+                .build();
+
+        UserManager.setUser(user);
+
+        // Solve : bug first touch not working
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
         printSecreenInfo();
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
         setContentView(R.layout.activity_login);
 
-        Fragment fragment = new TestFragment();
+        Fragment fragment = new MakeProfileFragment();
 
-        getSupportFragmentManager().beginTransaction().add(R.id.fragmentPlace, fragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentPlace, fragment).commit();
 
         HttpManager.setServerURI(getString(R.string.server_uri));
     }
@@ -46,8 +57,6 @@ public class LoginActivity extends FragmentActivity {
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
-
-
 
         Log.i(TAG, "density :" +  metrics.density);
 
@@ -67,76 +76,21 @@ public class LoginActivity extends FragmentActivity {
 
     }
 
-
-    public void moveToLoginFragment(View v) {
-        Fragment fragment = new LoginFragment();
+    public void moveToFragment(Fragment targetFragment, boolean popStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
-            fragmentManager.popBackStack();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+        if( popStack ) {
+            for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
+                fragmentManager.popBackStack();
+            }
+            fragmentTransaction.replace(R.id.fragmentPlace, targetFragment);
+        }else {
+            fragmentTransaction.add(R.id.fragmentPlace, targetFragment);
+            fragmentTransaction.addToBackStack(null);
         }
-
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        fragmentTransaction.replace(R.id.fragmentPlace, fragment);
-        fragmentTransaction.commit();
-    }
-
-    public void moveToJoinFragment(View v) {
-        Fragment fragment = new JoinFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
-            fragmentManager.popBackStack();
-        }
-
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        fragmentTransaction.replace(R.id.fragmentPlace, fragment);
-//        fragmentTransaction.add( R.id.fragmentPlace, fragment );
-        fragmentTransaction.addToBackStack(null);
-
-        fragmentTransaction.commit();
-    }
-
-    public void moveToStartFragment(View v) {
-
-        Fragment fragment = new StartFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
-            fragmentManager.popBackStack();
-        }
-
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        fragmentTransaction.replace(R.id.fragmentPlace, fragment);
-        fragmentTransaction.addToBackStack(null);
-
-        fragmentTransaction.commit();
-    }
-
-    public void moveToPrivacyTermFragment(View v) {
-
-        Fragment fragment = new TermFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        fragmentTransaction.add(R.id.fragmentPlace, fragment);
-        fragmentTransaction.addToBackStack(null);
-
-        fragmentTransaction.commit();
-    }
-
-    public void moveToMakeProfileFragment(View v) {
-        Fragment fragment = new MakeProfileFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        fragmentTransaction.add(R.id.fragmentPlace, fragment);
-        fragmentTransaction.addToBackStack(null);
 
         fragmentTransaction.commit();
     }

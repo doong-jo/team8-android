@@ -12,5 +12,4 @@
     android:layout_width="360dp"
     android:layout_height="300dp"
     android:background="@color/accent_blue">
-
 </LinearLayout>

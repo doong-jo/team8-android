@@ -6,10 +6,18 @@
     android:background="@color/white">
 
     <LinearLayout
-        android:layout_marginTop="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/backMakeProfileFragment"
+            android:layout_marginStart="12.54dp"
+            android:layout_marginTop="9.12dp"
+            android:layout_marginBottom="11.4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_back"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -18,32 +26,34 @@
             android:alpha="0.77"
             android:layout_gravity="center"
             android:textAlignment="center"
-            android:text="@string/congrate_title"
+            android:text="@string/add_name_title"
             style="@style/HeadlineTypo"/>
 
-        <ImageView
-            android:id="@+id/previewImage"
-            android:src="@drawable/none_profile_square"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="5dp"
-            android:layout_gravity="center"
-            android:layout_width="86dp"
-            android:layout_height="86dp" />
-
         <TextView
-            android:id="@+id/userName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:alpha="0.49"
             android:layout_gravity="center"
+            android:text="@string/add_name_message"
             style="@style/OptionBigTypo"/>
 
+        <com.helper.helper.view.widget.FloatingEditTextAddonControl
+            android:id="@+id/nameInput"
+            android:layout_marginStart="12.54dp"
+            android:layout_marginTop="31.92dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hint_text="@string/name_field"
+            app:clear_control="true"
+            app:check_control="true" />
+
         <Button
-            android:id="@+id/startBtn"
-            android:layout_marginTop="25dp"
+            android:id="@+id/nextBtn"
+            android:layout_marginTop="28.5dp"
             android:layout_gravity="center"
-            android:text="@string/start"
+            android:text="@string/join_next"
             style="@style/PrimaryButton" />
+
     </LinearLayout>
 </ScrollView>
