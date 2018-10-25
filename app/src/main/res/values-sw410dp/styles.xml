@@ -10,11 +10,11 @@
         <item name="colorAccent">@color/colorAccent</item>
 
         <!--statusBar Background-->
-        <item name="android:statusBarColor">@color/xxgray</item>
+        <item name="android:statusBarColor">@color/xgray</item>
         <!--statusBar TextColor-->
         <item name="android:windowLightStatusBar">true</item>
 
-        <item name="windowActionBar">false</item>
+        <item name="windowActionBar">true</item>
         <item name="windowNoTitle">true</item>
     </style>
 

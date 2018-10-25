@@ -174,12 +174,10 @@ public class BTManager {
             Toast.makeText(m_activity, "디바이스 연결에 성공했습니다.", Toast.LENGTH_SHORT).show();
 
             ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
-            scrollingActivity.updateConnectionLayout(true);
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(m_activity, "디바이스 연결에 실패했습니다.", Toast.LENGTH_SHORT).show();
             ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
-            scrollingActivity.updateConnectionLayout(true);
         }
         m_loadingDlg.dismiss();
     }
@@ -211,7 +209,6 @@ public class BTManager {
                 } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()) ) {
                     Toast.makeText(m_activity, "디비이스를 찾지 못했습니다.", Toast.LENGTH_SHORT).show();
                     ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
-                    scrollingActivity.updateConnectionLayout(true);
                     m_loadingDlg.dismiss();
                 }
             }
