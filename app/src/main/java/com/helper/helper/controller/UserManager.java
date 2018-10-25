@@ -6,6 +6,8 @@
 
 package com.helper.helper.controller;
 
+import android.graphics.Bitmap;
+
 import com.helper.helper.model.User;
 
 import org.json.JSONException;
@@ -13,6 +15,7 @@ import org.json.JSONObject;
 
 public class UserManager {
     private final static String TAG = UserManager.class.getSimpleName() + "/DEV";
+    private static Bitmap m_userProfileBitmap;
     private static User m_user;
 
     public static User getUser() { return m_user; }
@@ -30,6 +33,16 @@ public class UserManager {
                 .build();
     }
 
+    public static void setUserName(String name) { m_user.setUserName(name); }
+
+    public static void setUserEmail(String email) { m_user.setUserEmail(email); }
+
+    public static void setUserPassword(String pw) { m_user.setUserPassword(pw); }
+
+    public static void setRidingType(String ridingType) { m_user.setUserRidingType(ridingType); }
+
+    public static void setUserProfileBitmap(Bitmap bitmap) { m_userProfileBitmap = bitmap; }
+
     public static String getUserEmail() {
         return m_user.getUserEmail();
     }
@@ -38,11 +51,17 @@ public class UserManager {
         return m_user.getUserName();
     }
 
+    public static String getUserPassword() { return m_user.getUserPw(); }
+
     public static String getUserPhone() {
         return m_user.getUserPhone();
     }
 
     public static String getUserRidingType() {
         return m_user.getUserRidingType();
+    }
+
+    public static Bitmap getUserProfileBitmap() {
+        return m_userProfileBitmap;
     }
 }

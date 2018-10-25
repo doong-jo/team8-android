@@ -12,6 +12,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -61,23 +62,7 @@ public class LoginFragment extends Fragment {
         /*******************************************************************/
 
         /******************* Make Listener in View *******************/
-        m_loginBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                tryLogin();
-            }
-        });
 
-        m_pwInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_DONE) {
-                    tryLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
         /*************************************************************/
 
         return view;

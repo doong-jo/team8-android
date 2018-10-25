@@ -1,0 +1,42 @@
+<resources>
+    <!--Alpha-->
+    <item name="black_alpha_lv0" type="dimen" format="float">0.0</item>
+    <item name="black_alpha_lv1" type="dimen" format="float">0.5</item>
+    <item name="black_alpha_lv2" type="dimen" format="float">0.13</item>
+    <item name="black_alpha_lv3" type="dimen" format="float">0.23</item>
+    <item name="black_alpha_lv4" type="dimen" format="float">0.49</item>
+    <item name="black_alpha_lv5" type="dimen" format="float">0.65</item>
+    <item name="black_alpha_lv6" type="dimen" format="float">0.77</item>
+    <item name="black_alpha_lv7" type="dimen" format="float">0.9</item>
+
+    <!--Card-->
+    <dimen name="card_large_widly_width">370.5dp</dimen>
+    <dimen name="card_large_widly_height">109.44dp</dimen>
+    <dimen name="card_square_width">145.92dp</dimen>
+    <dimen name="card_square_height">145.92dp</dimen>
+    <dimen name="card_medium_width">370.5dp</dimen>
+    <dimen name="card_medium_height">72.96dp</dimen>
+    <dimen name="card_category_width">174.42dp</dimen>
+    <dimen name="card_category_height">134.52dp</dimen>
+
+    <!--Indicator-->
+    <dimen name="indicator_width">9.12dp</dimen>
+    <dimen name="indicator_height">9.12dp</dimen>
+
+    <!--Snackbar-->
+    <dimen name="snackbar_height">38.76dp</dimen>
+
+    <!--Button-->
+    <dimen name="button_small_width">192dp</dimen>
+    <dimen name="button_small_height">32dp</dimen>
+
+    <dimen name="button_large_width">256dp</dimen>
+    <dimen name="button_large_height">40dp</dimen>
+
+    <dimen name="button_circle_width">56dp</dimen>
+
+    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+    <dimen name="google_polyline_width">12</dimen>
+</resources>

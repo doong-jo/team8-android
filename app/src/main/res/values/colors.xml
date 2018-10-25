@@ -2,17 +2,19 @@
 <resources>
     <!--State Color-->
     <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="half_black">#4B4B4B</color>
     <color name="gray">#DFE0E2</color>
     <color name="xgray">#CECED0</color>
     <color name="xxgray">#B4B4B5</color>
     <color name="xxxgray">#727272</color>
     <color name="xxxxgray">#575758</color>
     <color name="xxxxxgray">#424242</color>
+    <color name="accent_blue">#136DF5</color>
+    <color name="accent_red">#FF4622</color>
 
-
-
-
-
+    <color name="snackbarbkg">#E7E7E7</color>
+    <color name="snackbartxt">#2D2D2D</color>
 
     <!--toolbar text color-->
     <color name="textColorPrimary">#161616</color>

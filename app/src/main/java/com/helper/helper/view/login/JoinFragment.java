@@ -9,16 +9,17 @@
 package com.helper.helper.view.login;
 
 import android.Manifest;
-import android.app.ProgressDialog;
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.telephony.TelephonyManager;
-import android.util.Log;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,69 +28,221 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ahmadrosid.library.FloatingLabelEditText;
 import com.helper.helper.R;
 import com.helper.helper.controller.FormManager;
+import com.helper.helper.controller.UserManager;
+import com.helper.helper.interfaces.Command;
 import com.helper.helper.interfaces.ValidateCallback;
-import com.helper.helper.view.ScrollingActivity;
 import com.helper.helper.model.User;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.PermissionManager;
+import com.helper.helper.view.widget.FloatingEditTextAddonControl;
+import com.helper.helper.view.widget.SnackBar;
 
-import org.apache.commons.validator.routines.EmailValidator;
 import org.json.JSONArray;
 import org.json.JSONException;
+
 import org.json.JSONObject;
+
+/** Get Phone Number **/
+//        String phone = "";
+//
+//        TelephonyManager tMgr = (TelephonyManager) getActivity().getSystemService(getActivity().TELEPHONY_SERVICE);
+//
+//        PermissionManager.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_PHONE_STATE}, PermissionManager.READ_PHONE_STATE);
+//
+//        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
+//                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED &&
+//                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+//            Toast.makeText(getActivity(), "디바이스 정보를 알 수 없습니다. 허용 권한을 확인해주세요.", Toast.LENGTH_SHORT).show();
+//            return;
+//        } else {
+//            phone = tMgr.getLine1Number();
+//        }
 
 public class JoinFragment extends Fragment {
     private final static String TAG = JoinFragment.class.getSimpleName() + "/DEV";
 
     /******************* Define widgtes in view *******************/
-    private EditText m_emailInput;
-    private EditText m_pwInput;
-    private EditText m_pwConfirmInput;
-    private EditText m_nameInput;
+    private static final int SNACKBAR_INVALID_EMAIL = 225;
+    private static final int SNACKBAR_INVALID_PW = 226;
+    private static final int SNACKBAR_EXIST_EAMIL = 227;
+    private static final int SNACKBAR_INFO_PW = 228;
+    private static final int SNACKBARK_NOT_CHECKED_TERM = 231;
+
     private AppCompatCheckBox m_termChkBox;
+    private SnackBar m_snackBar;
+
+    private FloatingEditTextAddonControl m_emailInputTxt;
+    private FloatingEditTextAddonControl m_pwInputTxt;
+
     /**************************************************************/
 
     public JoinFragment() {
 
     }
 
+    @SuppressLint({"ResourceAsColor", "RestrictedApi"})
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_join, container, false);
 
 
-        /******************* Connect widgtes with layout *******************/
-        Button joinBtn = view.findViewById(R.id.joinBtn);
-        m_emailInput = view.findViewById(R.id.emailInput);
-        m_pwInput = view.findViewById(R.id.pwInput);
-        m_pwConfirmInput = view.findViewById(R.id.pwConfirmInput);
-        m_nameInput = view.findViewById(R.id.nameInput);
-        m_termChkBox = view.findViewById(R.id.termChkBox);
-        /*******************************************************************/
+        // Solve : bug first touch not working
+        getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
-        /******************* Make Listener in View *******************/
-        joinBtn.setOnClickListener(new OnClickListener() {
+        /******************* Connect widgtes with layout *******************/
+        m_emailInputTxt = view.findViewById(R.id.emailInputTxt);
+        m_pwInputTxt = view.findViewById(R.id.pwInputTxt);
+
+        m_emailInputTxt.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        m_emailInputTxt.setImeOption(EditorInfo.IME_ACTION_NEXT);
+
+        m_pwInputTxt.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        m_pwInputTxt.setImeOption(EditorInfo.IME_ACTION_DONE);
+
+        LinearLayout parentLayout = view.findViewById(R.id.parentLayout);
+
+        m_emailInputTxt.setEnterFocusCmd(new Command() {
             @Override
-            public void onClick(View view) {
-                tryJoin();
+            public void execute() {
+                if( m_emailInputTxt.getText().equals("") || FormManager.emailCharValidate(m_emailInputTxt.getText()) == FormManager.RESULT_VALIDATION_SUCCESS ) {
+                    m_snackBar.setVisible(false);
+                }
             }
         });
 
-        m_nameInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        m_emailInputTxt.setLeaveFocusCheckToggleCmd(new Command() {
             @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_DONE) {
-                    tryJoin();
+            public void execute() {
+                final User user = new User.Builder()
+                        .email(m_emailInputTxt.getText())
+                        .build();
+                try {
+                    if( FormManager.emailCharValidate(user.getUserEmail()) != FormManager.RESULT_VALIDATION_SUCCESS ) {
+                        setSnackBarStatus(SNACKBAR_INVALID_EMAIL);
+                        return;
+                    }
+                    getResultExistEmail(user, new ValidateCallback() {
+                        @Override
+                        public void onDone(final int resultCode) {
+                            if( getActivity() == null ) return;
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (resultCode == 1) {
+                                        setSnackBarStatus(SNACKBAR_EXIST_EAMIL);
+                                    }
+                                }
+                            });
+                        }});
+                    } catch (JSONException e) { e.printStackTrace(); }
+                }
+        });
+
+        m_pwInputTxt.setEnterFocusCmd(new Command() {
+            @Override
+            public void execute() {
+                final User user = new User.Builder()
+                        .email(m_emailInputTxt.getText())
+                        .build();
+
+                if( FormManager.emailCharValidate(user.getUserEmail()) != FormManager.RESULT_VALIDATION_SUCCESS ) {
+                    setSnackBarStatus(SNACKBAR_INVALID_EMAIL);
+//                    m_emailInputTxt.setEdixTextColor(Color.parR.color.accent_red);
+                } else {
+                    setSnackBarStatus(SNACKBAR_INFO_PW);
+                }
+            }
+        });
+
+        Button joinBtn = view.findViewById(R.id.joinBtn);
+        m_termChkBox = view.findViewById(R.id.termChkBox);
+        TextView termText = view.findViewById(R.id.termText);
+        ImageView backStartFragment = view.findViewById(R.id.backStartFragment);
+        m_snackBar = view.findViewById(R.id.joinSnackBar);
+        /*******************************************************************/
+
+        /******************* Make Listener in View *******************/
+        m_emailInputTxt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if( i == EditorInfo.IME_ACTION_NEXT ) { m_pwInputTxt.setFocus(true, getActivity()); }
+                return false;
+            }
+        });
+        m_pwInputTxt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if( i == EditorInfo.IME_ACTION_DONE ) {
+                    View focusView = getActivity().getCurrentFocus();
+                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                    if (focusView != null) { imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0); }
                     return true;
                 }
                 return false;
+            }
+        });
+
+        backStartFragment.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                View focusView = getActivity().getCurrentFocus();
+
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                if (focusView != null) { imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0); }
+
+                LoginActivity activity = (LoginActivity)getActivity();
+                activity.moveToFragment(new StartFragment(), true);
+            }
+        });
+
+        joinBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                tryNext();
+            }
+        });
+
+        m_termChkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                View focusView = getActivity().getCurrentFocus();
+
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                if (focusView != null) { imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0); }
+            }
+        });
+
+        termText.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                View focusView = getActivity().getCurrentFocus();
+
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                if (focusView != null) { imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0); }
+
+                LoginActivity activity = (LoginActivity)getActivity();
+                activity.moveToFragment(new TermFragment(), false);
+            }
+        });
+
+        parentLayout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                View focusView = getActivity().getCurrentFocus();
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                if (focusView != null) { imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0); }
             }
         });
         /*************************************************************/
@@ -97,167 +250,110 @@ public class JoinFragment extends Fragment {
         return view;
     }
 
-    private void tryJoin() {
+    private void tryNext() {
         View focusView = getActivity().getCurrentFocus();
-
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+        if (focusView != null) { imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0); }
 
-        String email = m_emailInput.getText().toString();
-        String pw = m_pwInput.getText().toString();
-        String pwConfirm = m_pwConfirmInput.getText().toString();
-        String name = m_nameInput.getText().toString();
-        String phone = "";
-
-        TelephonyManager tMgr = (TelephonyManager) getActivity().getSystemService(getActivity().TELEPHONY_SERVICE);
-
-        PermissionManager.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_PHONE_STATE}, PermissionManager.READ_PHONE_STATE);
-
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getActivity(), "디바이스 정보를 알 수 없습니다. 허용 권한을 확인해주세요.", Toast.LENGTH_SHORT).show();
-            return;
-        } else {
-            phone = tMgr.getLine1Number();
-        }
-
-        final User joinUser = new User.Builder()
-                .email(email)
-                .pw(pw)
-                .name(name)
-                .phone(phone)
+        final User user = new User.Builder()
+                .email(m_emailInputTxt.getText())
+                .pw(m_pwInputTxt.getText())
                 .build();
-
         try {
-            validateJoinForm(joinUser, pwConfirm, new ValidateCallback() {
+            validateCharacterForm(user, new ValidateCallback() {
                 @Override
-                public void onDone(int resultCode) throws JSONException {
-                    if( resultCode == FormManager.RESULT_VALIDATION_SUCCESS && m_termChkBox.isChecked() ) {
-                        getActivity().runOnUiThread(new Runnable() {
+                public void onDone(final int validateCode) {
+                    try {
+                        getResultExistEmail(user, new ValidateCallback() {
                             @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), "가입 유효성 검사 통과!", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                        InsertUserinServer(joinUser, new ValidateCallback() {
-                            @Override
-                            public void onDone(int resultCode) {
-                                if( resultCode == FormManager.RESULT_VALIDATION_SUCCESS ) {
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            new Handler().postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    ProgressDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.join_loading_title), getString(R.string.join_loading_message), true);
-
-                                                    Intent intent = new Intent(getActivity(), ScrollingActivity.class);
-                                                    startActivity(intent);
-                                                }
-                                            }, 1000);
+                            public void onDone(final int resultCode) throws JSONException {
+                                if( getActivity() == null ) return;
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if( resultCode == 1 ) {
+                                            setSnackBarStatus(SNACKBAR_EXIST_EAMIL);
                                         }
-                                    });
-                                } else {
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(getActivity(), "서버 전송 실패.", Toast.LENGTH_SHORT).show();
+                                        else if( validateCode == FormManager.RESULT_VALIDATION_SUCCESS && m_termChkBox.isChecked() ){
+                                            // not exist
+                                            UserManager.setUserEmail(user.getUserEmail());
+                                            UserManager.setUserPassword(user.getUserPw());
+
+                                            LoginActivity activity = (LoginActivity)getActivity();
+                                            activity.moveToFragment(new AddNameFragment(), false);
+                                        } else {
+                                            if( validateCode == FormManager.RESULT_VALIDATION_PW_WRONG ) {
+                                                setSnackBarStatus(SNACKBAR_INVALID_PW);
+                                            } else if ( validateCode == FormManager.RESULT_VALIDATION_EMAIL_WRONG ) {
+                                                setSnackBarStatus(SNACKBAR_INVALID_EMAIL);
+                                            } else if ( !m_termChkBox.isChecked() ) {
+                                                setSnackBarStatus(SNACKBARK_NOT_CHECKED_TERM);
+                                            }
                                         }
-                                    });
-                                }
+                                    }
+                                });
                             }
                         });
-                    } else if( resultCode == FormManager.RESULT_VALIDATION_SUCCESS && !m_termChkBox.isChecked() ) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), "이용약관에 동의해주세요.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    } else {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), "입력을 다시 확인해주세요.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                    } catch (JSONException e) { e.printStackTrace(); }
                 }
             });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    };
-
-    public void validateJoinForm(User user, final String pwConfirm, final ValidateCallback callback) throws JSONException {
-        /** Email **/
-        final String email = user.getUserEmail();
-        final String passwd = user.getUserPw();
-        final String name = user.getUserName();
-
-        /** Description :
-         *  Validate Flow : Validate Email(has httpCallback) {
-         *      Validate Password ? Validate Name(has httpCallback) { return result } : return fail
-         *  }
-         */
-
-        if( FormManager.emailCharValidate(email) != FormManager.RESULT_VALIDATION_SUCCESS ) {
-            return;
-        }
-
-        /** Find exist an email **/
-        if( HttpManager.useCollection("user") ) {
-            JSONObject reqObject = new JSONObject();
-            reqObject.put("email", email);
-
-            HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
-                @Override
-                public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
-                    int arrLen = existIdjsonArray.length();
-                    if( arrLen == 0 ) {
-                        /** Validate password **/
-                        int passwdResult = FormManager.passwordValidate(passwd, pwConfirm);
-                        if(passwdResult != FormManager.RESULT_VALIDATION_SUCCESS) {
-                            callback.onDone(passwdResult);
-                        } else {
-                            FormManager.nameValidate(name, new ValidateCallback() {
-                                @Override
-                                public void onDone(int resultCode) throws JSONException {
-                                    callback.onDone(resultCode);
-                                }
-                            });
-                        }
-                    } else {
-                        /** email exist **/
-                        callback.onDone(FormManager.RESULT_VALIDATION_EMAIL_EXIST);
-                    }
-                }
-
-                @Override
-                public void onError(String err) {
-                    Log.d(TAG, "JoinFragment onError: " + err);
-                }
-            });
-        }
+        } catch (JSONException e) { e.printStackTrace(); }
     }
 
-    public void InsertUserinServer(User user, final ValidateCallback callback) throws JSONException {
+    private void setSnackBarStatus(int visibleCode) {
+        m_snackBar.setVisible(true);
+        switch (visibleCode) {
+            case SNACKBAR_INVALID_EMAIL:
+                m_snackBar.setText(getString(R.string.invalid_email));
+                m_snackBar.setIcon(R.drawable.ic_warning);
+                break;
+
+            case SNACKBAR_EXIST_EAMIL:
+                m_snackBar.setText(getString(R.string.exist_email));
+                m_snackBar.setIcon(R.drawable.ic_warning);
+                break;
+
+            case SNACKBAR_INVALID_PW:
+                m_snackBar.setText(getString(R.string.invalid_password));
+                m_snackBar.setIcon(R.drawable.ic_warning);
+                break;
+
+            case SNACKBAR_INFO_PW:
+                m_snackBar.setText(getString(R.string.info_password));
+                m_snackBar.setIcon(R.drawable.ic_inf);
+                break;
+
+            case SNACKBARK_NOT_CHECKED_TERM:
+                m_snackBar.setText(getString(R.string.check_term));
+                m_snackBar.setIcon(R.drawable.ic_warning);
+                break;
+            
+        }
+    }
+    
+    private void validateCharacterForm(User user, final ValidateCallback callback) throws JSONException {
+        final String email = user.getUserEmail();
+        final String passwd = user.getUserPw();
+
+        if( FormManager.emailCharValidate(email) != FormManager.RESULT_VALIDATION_SUCCESS ) {  callback.onDone(FormManager.RESULT_VALIDATION_EMAIL_WRONG); }
+        else if ( FormManager.passwordValidate(passwd) != FormManager.RESULT_VALIDATION_SUCCESS ) {callback.onDone(FormManager.RESULT_VALIDATION_PW_WRONG); }
+        else { callback.onDone(FormManager.RESULT_VALIDATION_SUCCESS); }
+    }
+
+    private void getResultExistEmail(User user, final ValidateCallback callback) throws  JSONException {
         if( HttpManager.useCollection("user") ) {
 
             JSONObject reqObject = user.getTransformUserToJSON();
-//            reqObject.put("lastAccess", new Date().toString());
+            reqObject.remove("emergency");
+            reqObject.remove("lastAccess");
 
-            HttpManager.requestHttp(reqObject, "POST", new HttpCallback() {
+            HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
                 @Override
                 public void onSuccess(JSONArray jsonArray) throws JSONException {
-                    JSONObject resultObj = (JSONObject)jsonArray.get(0);
-                    boolean result = resultObj.getBoolean("result");
-                    if( result ) {
-                        callback.onDone(FormManager.RESULT_VALIDATION_SUCCESS);
+                    if( jsonArray.length() != 0  ) {
+                        callback.onDone(1);
                     } else {
-                        callback.onDone(FormManager.RESULT_VALIDATION_ERROR);
+                        callback.onDone(0);
                     }
                 }
 
@@ -269,8 +365,4 @@ public class JoinFragment extends Fragment {
         }
     }
 
-//    public void createUser(User formUser) {
-//        return
-//                new User.Builder()
-//    }
 }

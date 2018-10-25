@@ -37,7 +37,11 @@ public class User {
         private String m_userName;
 
         public Builder() {
+            m_userEmail = "";
+            m_userPhone = "";
             m_userPw = "";
+            m_userPhone = "";
+            m_userName = "";
         }
         public Builder email(String emailStr) {
             this.m_userEmail = emailStr;
@@ -64,18 +68,33 @@ public class User {
         }
     }
 
+
     public User(Builder builder) {
         m_userEmail = builder.m_userEmail;
         m_userPw = builder.m_userPw;
         m_userPhone = builder.m_userPhone;
         m_userName = builder.m_userName;
-        m_userRidingType = RidingType.BICYCLE.value;
+        m_userRidingType = "";
         m_userLastAccess = new Date();
         m_userEmergency = false;
         m_lastPosition = new Location("");
         m_accPosition = new ArrayList<Location>();
         m_ledIndicies = new ArrayList<String>();
         m_trackIndicies = new ArrayList<String>();
+    }
+
+    public void setUserName(String name) {
+        m_userName = name;
+    }
+
+    public void setUserEmail(String userEmail) {
+        m_userEmail = userEmail;
+    }
+
+    public void setUserPassword(String userPassword) { m_userPw = userPassword; }
+
+    public void setUserRidingType(String ridingType) {
+        m_userRidingType = ridingType;
     }
 
     public String getUserEmail() {
@@ -100,13 +119,21 @@ public class User {
         JSONObject obj = new JSONObject();
 
         try {
-            obj.put("email", m_userEmail);
-            obj.put("passwd", m_userPw);
-            obj.put("name", m_userName);
-            obj.put("phone", m_userPhone);
-            obj.put("riding_type", m_userRidingType);
-            obj.put("emergency", m_userEmergency);
-            obj.put("lastAccess", m_userLastAccess);
+            if( !m_userEmail.equals("")) {
+                obj.put("email", m_userEmail);
+            }
+            if( !m_userPw.equals("")) {
+                obj.put("passwd", m_userPw);
+            }
+            if( !m_userName.equals("") ) {
+                obj.put("name", m_userName);
+            }
+            if( !m_userPhone.equals("")) {
+                obj.put("phone", m_userPhone);
+            }
+            if( !m_userRidingType.equals("")) {
+                obj.put("riding_type", m_userRidingType);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

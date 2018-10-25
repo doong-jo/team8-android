@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -41,8 +39,7 @@ import com.helper.helper.R;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.model.TrackingData;
 import com.helper.helper.model.TrackingRecordedListItem;
-import com.helper.helper.view.Info.InfoFragment;
-import com.helper.helper.view.TabPagerAdapter;
+
 
 public class TrackingFragment extends Fragment
         implements OnMapReadyCallback,
@@ -113,39 +110,39 @@ public class TrackingFragment extends Fragment
         m_recyclerView.setAdapter(m_recordedListAdapter);
 //        m_recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        SwipeableRecyclerViewTouchListener swipeTouchListener =
-                new SwipeableRecyclerViewTouchListener(m_recyclerView,
-                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
-                            @Override
-                            public boolean canSwipeLeft(int position) {
-                                return true;
-                            }
-
-                            @Override
-                            public boolean canSwipeRight(int position) {
-                                return true;
-                            }
-
-                            @Override
-                            public void onDismissedBySwipeLeft(RecyclerView m_recyclerView, int[] reverseSortedPositions) {
-                                for (int position : reverseSortedPositions) {
-                                    m_recordedItemList.remove(position);
-                                    m_recordedListAdapter.notifyItemRemoved(position);
-                                }
-                                m_recordedListAdapter.notifyDataSetChanged();
-                            }
-
-                            @Override
-                            public void onDismissedBySwipeRight(RecyclerView m_recyclerView, int[] reverseSortedPositions) {
-                                for (int position : reverseSortedPositions) {
-                                    m_recordedItemList.remove(position);
-                                    m_recordedListAdapter.notifyItemRemoved(position);
-                                }
-                                m_recordedListAdapter.notifyDataSetChanged();
-                            }
-                        });
-
-        m_recyclerView.addOnItemTouchListener(swipeTouchListener);
+//        SwipeableRecyclerViewTouchListener swipeTouchListener =
+//                new SwipeableRecyclerViewTouchListener(m_recyclerView,
+//                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
+//                            @Override
+//                            public boolean canSwipeLeft(int position) {
+//                                return true;
+//                            }
+//
+//                            @Override
+//                            public boolean canSwipeRight(int position) {
+//                                return true;
+//                            }
+//
+//                            @Override
+//                            public void onDismissedBySwipeLeft(RecyclerView m_recyclerView, int[] reverseSortedPositions) {
+//                                for (int position : reverseSortedPositions) {
+//                                    m_recordedItemList.remove(position);
+//                                    m_recordedListAdapter.notifyItemRemoved(position);
+//                                }
+//                                m_recordedListAdapter.notifyDataSetChanged();
+//                            }
+//
+//                            @Override
+//                            public void onDismissedBySwipeRight(RecyclerView m_recyclerView, int[] reverseSortedPositions) {
+//                                for (int position : reverseSortedPositions) {
+//                                    m_recordedItemList.remove(position);
+//                                    m_recordedListAdapter.notifyItemRemoved(position);
+//                                }
+//                                m_recordedListAdapter.notifyDataSetChanged();
+//                            }
+//                        });
+//
+//        m_recyclerView.addOnItemTouchListener(swipeTouchListener);
 
         return view;
     }

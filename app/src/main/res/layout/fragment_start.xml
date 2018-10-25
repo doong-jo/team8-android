@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="343dp">
+        <com.daimajia.slider.library.SliderLayout
+            android:id="@+id/slider"
+            android:layout_width="match_parent"
+            android:layout_height="343dp"
+            android:layout_alignParentTop="true"
+            />
+
+        <com.daimajia.slider.library.Indicators.PagerIndicator
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/custom_indicator"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            app:selected_drawable="@drawable/indicator_selected"
+            app:selected_color="@color/accent_blue"
+            app:selected_width="@dimen/indicator_width"
+            app:selected_height="@dimen/indicator_height"
+            app:selected_padding_left="7dp"
+            app:selected_padding_right="7dp"
+
+            app:unselected_drawable="@drawable/indicator_unselected"
+            app:unselected_color="@color/white"
+            app:unselected_width="@dimen/indicator_width"
+            app:unselected_height="@dimen/indicator_width"
+            app:unselected_padding_left="7dp"
+            app:unselected_padding_right="7dp"
+            android:gravity="center"
+            />
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <View
+            android:layout_weight="0.22"
+            android:layout_width="0dp"
+            android:layout_height="1dp" />
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_marginTop="33dp"
+            android:layout_width="0dp"
+            android:layout_weight="0.58"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/continueWithFacebook"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="18dp"
+                    android:src="@drawable/ic_facebook" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="@dimen/black_alpha_lv4"
+                    android:text="@string/continue_with_fb"
+                    android:textColor="@color/black"
+                    style="@style/CategoryCardTitleTypo" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/continueWithKakao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="left"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/continueWithFacebook">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="18dp"
+                    android:src="@drawable/ic_kakaotalk" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="@dimen/black_alpha_lv4"
+                    android:text="@string/continue_with_kakao"
+                    android:textColor="@color/black"
+                    style="@style/CategoryCardTitleTypo" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/or_divide"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:alpha="@dimen/black_alpha_lv4"
+                android:gravity="center"
+                android:text="@string/or_divide"
+                android:textColor="@color/black"
+                style="@style/BodyTypo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/continueWithKakao" />
+
+            <LinearLayout
+                android:id="@+id/signupWithEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="23dp"
+                android:gravity="left"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/or_divide">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="18dp"
+                    android:src="@drawable/ic_mail" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="@dimen/black_alpha_lv4"
+                    android:text="@string/signup_with_email"
+                    android:textColor="@color/black"
+                    style="@style/CategoryCardTitleTypo" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="62dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/signupWithEmail">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:alpha="@dimen/black_alpha_lv4"
+                    android:text="@string/login_question"
+                    android:textColor="@color/black"
+                    style="@style/OptionTypo" />
+
+                <TextView
+                    android:id="@+id/loginText"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="@dimen/black_alpha_lv4"
+                    android:text="@string/log_in"
+                    android:textColor="@color/black"
+                    style="@style/OptionAccentTypo" />
+
+            </LinearLayout>
+
+        </android.support.constraint.ConstraintLayout>
+
+        <View
+            android:layout_weight="0.2"
+            android:layout_width="0dp"
+            android:layout_height="1dp" />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>
