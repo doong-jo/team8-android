@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.helper.helper.R;
 import com.helper.helper.controller.CircleTransform;
@@ -23,6 +25,7 @@ import com.helper.helper.controller.FormManager;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.PermissionManager;
 import com.helper.helper.controller.UserManager;
+import com.helper.helper.enums.RidingType;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.User;
@@ -36,6 +39,7 @@ public class MakeProfileFragment extends Fragment {
     private static final int PHOTO_PICK = 772;
     private ImageView m_previewImage;
     private ImageView m_beforeImgView;
+    private boolean m_bIsSetImage;
 
     public MakeProfileFragment() {
 
@@ -78,15 +82,27 @@ public class MakeProfileFragment extends Fragment {
 
         /******************* Make Listener in View *******************/
 
-        for (ImageView imgView :
+        for (final ImageView imgView :
                 vehicleImgs) {
             imgView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    String ridingType = (String)imgView.getTag();
+                    UserManager.setRidingType(ridingType);
+
                     toggleImageColorChanger((ImageView)view);
                 }
             });
         }
+
+        // Default riding_type is bicycle
+        toggleImageColorChanger(vehicleImgs[0]);
+        m_beforeImgView = vehicleImgs[0];
+        RidingType type;
+        type = RidingType.BICYCLE;
+
+        UserManager.setRidingType(type.value);
+
         m_previewImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,19 +121,46 @@ public class MakeProfileFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 LoginActivity activity = (LoginActivity)getActivity();
-                activity.moveToFragment(new JoinFragment(), false);
+                activity.moveToFragment(new AddNameFragment(), false);
             }
         });
 
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                View focusView = getActivity().getCurrentFocus();
-                LoginActivity activity = (LoginActivity)getActivity();
-                activity.moveToFragment(new CongrateFragment(), true);
+//                UserManager.setRidingType();
+                JSONObject jsonObject = UserManager.getUser().getTransformUserToJSON();
+
+                try {
+                    HttpManager.requestHttp(jsonObject, "POST", new HttpCallback() {
+                        @Override
+                        public void onSuccess(JSONArray jsonArray) throws JSONException {
+                            JSONObject obj = (JSONObject)jsonArray.get(0);
+
+                            if( obj.getBoolean("result") ) {
+
+                                LoginActivity activity = (LoginActivity)getActivity();
+                                if( activity != null ) { activity.moveToFragment(new CongrateFragment(), true); }
+                            } else {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getActivity(), "회원가입에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onError(String err) throws JSONException {
+
+                        }
+                    });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
-
 
         /*************************************************************/
 
@@ -161,13 +204,16 @@ public class MakeProfileFragment extends Fragment {
         switch (requestCode) {
             case PHOTO_PICK:
                 if( data == null ) { return; }
+                m_bIsSetImage = true;
                 Bundle dataExtras = data.getExtras();
                 Bitmap photo = dataExtras.getParcelable("data");
-                UserManager.setUserProfileBitmap(photo);
 
+                Bitmap circleBitmap = new CircleTransform().transform(photo);
                 m_previewImage.setImageBitmap(
-                        new CircleTransform().transform(photo)
+                        circleBitmap
                 );
+
+                UserManager.setUserProfileBitmap(circleBitmap);
                 break;
         }
     }

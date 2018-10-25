@@ -1,4 +1,4 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -13,6 +13,7 @@
         <ImageView
             android:id="@+id/backMakeProfileFragment"
             android:layout_marginStart="12.54dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginTop="9.12dp"
             android:layout_marginBottom="11.4dp"
             android:layout_width="wrap_content"
@@ -45,8 +46,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:hint_text="@string/name_field"
-            app:clear_control="true"
-            app:check_control="true" />
+            app:check_control="true"
+            app:text_length="@integer/name_length" />
 
         <Button
             android:id="@+id/nextBtn"
@@ -56,4 +57,11 @@
             style="@style/PrimaryButton" />
 
     </LinearLayout>
-</ScrollView>
+
+    <com.helper.helper.view.widget.SnackBar
+        android:id="@+id/addNameSnackBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

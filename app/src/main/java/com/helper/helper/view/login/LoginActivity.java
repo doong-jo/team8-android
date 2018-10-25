@@ -45,7 +45,7 @@ public class LoginActivity extends FragmentActivity {
 
         setContentView(R.layout.activity_login);
 
-        Fragment fragment = new MakeProfileFragment();
+        Fragment fragment = new StartFragment();
 
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentPlace, fragment).commit();
 

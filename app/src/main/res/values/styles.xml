@@ -2,10 +2,10 @@
 
     <!-- Base application theme. -->
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
 
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
-        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimary">@color/white</item>
         <item name="colorPrimaryDark">@color/xxxgray</item>
         <item name="colorAccent">@color/colorAccent</item>
 
@@ -14,7 +14,7 @@
         <!--statusBar TextColor-->
         <item name="android:windowLightStatusBar">true</item>
 
-        <item name="windowActionBar">false</item>
+        <item name="windowActionBar">false</item>x
         <item name="windowNoTitle">true</item>
     </style>
 
@@ -49,6 +49,12 @@
     <style name="HyoertextTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_bold</item>
         <item name="android:textSize">15dp</item>
+        <item name="android:textColor">@color/accent_blue</item>
+    </style>
+
+    <style name="HyoertextSmallTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:textSize">12dp</item>
         <item name="android:textColor">@color/accent_blue</item>
     </style>
 
@@ -98,7 +104,7 @@
     </style>
 
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 

@@ -91,6 +91,8 @@ public class User {
         m_userEmail = userEmail;
     }
 
+    public void setUserPassword(String userPassword) { m_userPw = userPassword; }
+
     public void setUserRidingType(String ridingType) {
         m_userRidingType = ridingType;
     }
@@ -128,9 +130,6 @@ public class User {
             }
             if( !m_userPhone.equals("")) {
                 obj.put("phone", m_userPhone);
-            }
-            if( !m_userName.equals("")) {
-                obj.put("name", m_userPhone);
             }
             if( !m_userRidingType.equals("")) {
                 obj.put("riding_type", m_userRidingType);

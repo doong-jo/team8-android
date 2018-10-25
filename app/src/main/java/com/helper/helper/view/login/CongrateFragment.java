@@ -9,11 +9,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.helper.helper.R;
 import com.helper.helper.controller.CircleTransform;
+import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.UserManager;
+import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.view.ScrollingActivity;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class CongrateFragment extends Fragment {
     private final static String TAG = JoinFragment.class.getSimpleName() + "/DEV";
@@ -46,9 +53,8 @@ public class CongrateFragment extends Fragment {
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(LoginActivity.this, ScrollingActivity.class);
-//            intent.putExtra("text",String.valueOf(editText.getText()));
-//                startActivity(intent);
+                Intent intent = new Intent(getActivity(), ScrollingActivity.class);
+                startActivity(intent);
             }
         });
         /*************************************************************/

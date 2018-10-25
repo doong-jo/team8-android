@@ -78,23 +78,26 @@
                 android:src="@drawable/ic_bicycle"
                 android:adjustViewBounds="true"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:tag="@string/riding_type_bicycle" />
 
             <ImageView
                 android:id="@+id/motorcycle"
-                android:layout_marginStart="30.78dp"
-                android:layout_marginEnd="30.78dp"
+                android:layout_marginStart="27dp"
+                android:layout_marginEnd="27dp"
                 android:src="@drawable/ic_motorcycle"
                 android:adjustViewBounds="true"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:tag="@string/riding_type_motorcycle"/>
 
             <ImageView
                 android:id="@+id/kickboard"
                 android:src="@drawable/ic_kickboard"
                 android:adjustViewBounds="true"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:tag="@string/riding_type_smart_mobility"/>
 
         </LinearLayout>
 

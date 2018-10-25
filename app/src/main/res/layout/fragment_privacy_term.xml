@@ -22,6 +22,7 @@
                 android:textColor="@color/softBlackColor" />
         </LinearLayout>
         <Button
+            android:id="@+id/acceptBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/confirm_privacy_term"
@@ -30,8 +31,7 @@
             android:textStyle="bold"
             android:background="@color/colorAccent"
             android:layout_marginTop="@dimen/s_space_size"
-            android:layout_marginBottom="@dimen/s_space_size"
-            android:onClick="moveToJoinFragment"/>
+            android:layout_marginBottom="@dimen/s_space_size"/>
     </LinearLayout>
 
 

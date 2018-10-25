@@ -1,4 +1,4 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -6,7 +6,6 @@
     android:background="@color/white">
 
     <LinearLayout
-        android:id="@+id/parentLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -18,6 +17,7 @@
 
 
         <LinearLayout
+            android:id="@+id/parentLayout"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.97"
@@ -39,71 +39,31 @@
                 android:text="@string/join_intro_text"
                 android:alpha="@dimen/black_alpha_lv7"/>
 
-            <FrameLayout
+            <com.helper.helper.view.widget.FloatingEditTextAddonControl
+                android:id="@+id/emailInputTxt"
                 android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <com.ahmadrosid.library.FloatingLabelEditText
-                    android:id="@+id/emailInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nextFocusDown="@id/pwInput"
-                    android:focusableInTouchMode="true"
-                    android:focusable="false"
-                    app:editText_color="@color/xxxgray"
-                    app:editText_hint="Email"/>
-
-                <Button
-                    android:id="@+id/emailInput_clear"
-                    android:visibility="invisible"
-                    android:layout_marginTop="2dp"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_gravity="end|center_vertical"
-                    android:background="@drawable/ic_delete" />
-
-            </FrameLayout>
+                android:layout_height="wrap_content"
+                app:hint_text="@string/join_email"
+                app:clear_control="true"
+                app:text_length="@integer/email_length" />
 
 
-            <FrameLayout
+            <com.helper.helper.view.widget.FloatingEditTextAddonControl
+                android:id="@+id/pwInputTxt"
                 android:layout_marginTop="37dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <com.ahmadrosid.library.FloatingLabelEditText
-                    android:id="@+id/pwInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:editText_color="@color/xxxgray"
-                    app:editText_hint="Password"/>
-
-                <Button
-                    android:id="@+id/pwInput_clear"
-                    android:visibility="invisible"
-                    android:layout_marginTop="5dp"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_gravity="end|center_vertical"
-                    android:background="@drawable/ic_delete" />
-
-            </FrameLayout>
-
-            <!--<com.helper.helper.view.widget.CustomEditText-->
-                <!--android:id="@+id/textedit"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="30dp"-->
-                <!--android:singleLine="true"-->
-                <!--android:ems="10" />-->
-
+                android:layout_height="wrap_content"
+                app:hint_text="@string/join_password"
+                app:clear_control="true"
+                app:text_length="@integer/pw_length" />
 
             <LinearLayout
                 android:layout_marginTop="27dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
                 <android.support.v7.widget.AppCompatCheckBox
                     android:id="@+id/termChkBox"
                     android:layout_width="wrap_content"
@@ -112,7 +72,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/CategoryCardTitleTypo"
+                    style="@style/BodyTypo"
                     android:text="@string/accept_join_term_f"
                     />
 
@@ -122,14 +82,14 @@
                     android:layout_marginRight="5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/HyoertextTypo"
+                    style="@style/HyoertextSmallTypo"
                     android:text="@string/term"
                     />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/CategoryCardTitleTypo"
+                    style="@style/BodyTypo"
                     android:text="@string/accept_join_term_e"/>
 
             </LinearLayout>
@@ -145,32 +105,10 @@
         </LinearLayout>
 
     </LinearLayout>
-    <LinearLayout
-        android:id="@+id/snackBar"
-        android:paddingStart="15dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+
+    <com.helper.helper.view.widget.SnackBar
+        android:id="@+id/joinSnackBar"
         android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:background="@color/snackbarbkg"
-        android:orientation="horizontal"
-        android:visibility="invisible">
-
-        <ImageView
-            android:id="@+id/snackBarIcon"
-            android:layout_marginEnd="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_inf"/>
-
-        <TextView
-            android:id="@+id/snackBarMsg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/SnackBarTypo"
-            android:textColor="@color/snackbartxt"
-            android:text="@string/invalid_password"/>
-
-
-    </LinearLayout>
-</ScrollView>
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+</RelativeLayout>

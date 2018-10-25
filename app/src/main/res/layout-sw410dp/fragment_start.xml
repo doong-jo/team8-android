@@ -9,11 +9,11 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="343dp">
+        android:layout_height="391.02dp">
         <com.daimajia.slider.library.SliderLayout
             android:id="@+id/slider"
             android:layout_width="match_parent"
-            android:layout_height="343dp"
+            android:layout_height="391.02dp"
             android:layout_alignParentTop="true"
             />
 
@@ -24,20 +24,20 @@
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="18dp"
+            android:layout_marginBottom="20.52dp"
             app:selected_drawable="@drawable/indicator_selected"
             app:selected_color="@color/accent_blue"
             app:selected_width="@dimen/indicator_width"
             app:selected_height="@dimen/indicator_height"
-            app:selected_padding_left="7dp"
-            app:selected_padding_right="7dp"
+            app:selected_padding_left="7.98dp"
+            app:selected_padding_right="7.98dp"
 
             app:unselected_drawable="@drawable/indicator_unselected"
             app:unselected_color="@color/white"
             app:unselected_width="@dimen/indicator_width"
             app:unselected_height="@dimen/indicator_width"
-            app:unselected_padding_left="7dp"
-            app:unselected_padding_right="7dp"
+            app:unselected_padding_left="7.98dp"
+            app:unselected_padding_right="7.98dp"
             android:gravity="center"
             />
 
@@ -56,7 +56,7 @@
             android:layout_height="1dp" />
 
         <android.support.constraint.ConstraintLayout
-            android:layout_marginTop="33dp"
+            android:layout_marginTop="37.62dp"
             android:layout_width="0dp"
             android:layout_weight="0.58"
             android:layout_height="match_parent">
@@ -71,7 +71,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="18dp"
+                    android:layout_marginRight="20.52dp"
                     android:src="@drawable/ic_facebook" />
 
                 <TextView
@@ -88,7 +88,7 @@
                 android:id="@+id/continueWithKakao"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="27.36dp"
                 android:gravity="left"
                 android:orientation="horizontal"
                 app:layout_constraintTop_toBottomOf="@id/continueWithFacebook">
@@ -96,7 +96,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="18dp"
+                    android:layout_marginRight="20.52dp"
                     android:src="@drawable/ic_kakaotalk" />
 
                 <TextView
@@ -113,7 +113,7 @@
                 android:id="@+id/or_divide"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
+                android:layout_marginTop="31.92dp"
                 android:alpha="@dimen/black_alpha_lv4"
                 android:gravity="center"
                 android:text="@string/or_divide"
@@ -128,7 +128,7 @@
                 android:id="@+id/signupWithEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="23dp"
+                android:layout_marginTop="26.22dp"
                 android:gravity="left"
                 android:orientation="horizontal"
                 app:layout_constraintTop_toBottomOf="@id/or_divide">
@@ -136,7 +136,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="18dp"
+                    android:layout_marginRight="20.52dp"
                     android:src="@drawable/ic_mail" />
 
                 <TextView
@@ -153,7 +153,7 @@
                 android:id="@+id/login"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="62dp"
+                android:layout_marginTop="70.68dp"
                 android:gravity="center"
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -172,8 +172,8 @@
 
                 <TextView
                     android:id="@+id/loginText"
-                    android:layout_marginStart="3dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="3.42dp"
+                    android:layout_marginEnd="11.4dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:alpha="@dimen/black_alpha_lv4"

@@ -37,6 +37,8 @@ public class UserManager {
 
     public static void setUserEmail(String email) { m_user.setUserEmail(email); }
 
+    public static void setUserPassword(String pw) { m_user.setUserPassword(pw); }
+
     public static void setRidingType(String ridingType) { m_user.setUserRidingType(ridingType); }
 
     public static void setUserProfileBitmap(Bitmap bitmap) { m_userProfileBitmap = bitmap; }
@@ -48,6 +50,8 @@ public class UserManager {
     public static String getUserName() {
         return m_user.getUserName();
     }
+
+    public static String getUserPassword() { return m_user.getUserPw(); }
 
     public static String getUserPhone() {
         return m_user.getUserPhone();

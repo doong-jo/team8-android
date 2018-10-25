@@ -1,4 +1,4 @@
-package com.helper.helper.controller.location;
+package com.helper.helper.controller;
 
 import android.app.IntentService;
 import android.content.Intent;
