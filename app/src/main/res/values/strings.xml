@@ -1,7 +1,7 @@
 <resources>
     <!--app base-->
-    <string name="app_name">Safe &amp; Enjoy, HELPER</string>
-    <string name="service_name">HELPER</string>
+    <string name="app_name">TEAM EIGHT</string>
+    <string name="service_name">TEAM EIGHT</string>
     <string name="device_bluetooth_name">helper-1</string>
     <string name="google_api">AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k</string>
     <!--Bluetooth-->
@@ -29,9 +29,40 @@
     <string name="login_question">Already a member?</string>
     <string name="log_in">Log in</string>
     <string name="or_divide">OR</string>
+    <string name="intro_service_url">http://175.123.140.145/images/intro_service_</string>
 
+    <!--MakeProfielFragment-->
+    <string name="riding_type_bicycle">bicycle</string>
+    <string name="riding_type_motorcycle">motorcycle</string>
+    <string name="riding_type_smart_mobility">smart_mobility</string>
+
+    <string name="make_profile_title">Add Profile Photo</string>
+    <string name="make_profile_riding_type">Set Your Vehicle Type</string>
+    <string name="make_profile_message">Add a profile photo so your firends know it\'s you.</string>
+    <string name="skip">Skip</string>
+    <string name="edit">Edit</string>
+
+    <!--CongrateFragment-->
+    <string name="congrate_title">Congratulations!\nYou are in oure TEAM EIGHT</string>
+    <string name="start">Start</string>
+    <string name="change_username">Change Username</string>
+
+    <!--AddNameFragment-->
+    <string name="add_name_title">Add Your Name</string>
+    <string name="add_name_message">Add your name so friends can find you.</string>
+    <string name="info_name">Please contain \'2\-6\' characters, not special characters</string>
+    <string name="invalid_name">Please must contain \'2\-6\' characters, not special characters</string>
+    <string name="exist_name">Exist a name</string>
+    <string name="name_field">Name</string>
+
+    <!--Navigation-->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!--Info Fragment-->
+    <string name="my_leds">My LEDs</string>
+    <string name="led_setting">LED setting</string>
+
     <string name="cardTitleSensor">Sensor</string>
     <string name="cardTitleBattery">Battery</string>
     <string name="cardTitleBrightnessAndSpeed">Brightness &amp; Speed</string>
@@ -97,14 +128,11 @@
     <!--Join-->
     <string name="join_intro_text">Would you like to join us?</string>
     <string name="join_next">Next</string>
-    <string name="join_email_edittext_hint">이메일</string>
+    <string name="join_email">Email</string>
+    <string name="join_password">Password</string>
     <string name="join_pw_edittext_hint">비밀번호 (영문,숫자,특수문자 8-15자)</string>
-    <string name="join_pw_chk_edittext_hint">비밀번호 확인</string>
-    <string name="join_name_edittext_hint">이름(2-15자)</string>
-    <string name="join_button_text">계정 만들기</string>
-    <string name="suggest_login">이미 계정이 있으세요?</string>
     <string name="accept_join_term_f">Team 8에서 제공하는</string>
-    <string name="term"><u>서비스 약관</u></string>FF
+    <string name="term"><u>서비스 약관</u></string>
     <string name="accept_join_term_e">에 동의합니다.</string>
 
     <string name="join_loading_title">"회원가입을 완료하는 중입니다."</string>

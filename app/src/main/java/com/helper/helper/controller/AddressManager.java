@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 
 import com.helper.helper.Constants;
-import com.helper.helper.controller.location.FetchAddressIntentService;
 
 public class AddressManager {
     public static AddressResultReceiver m_resultAddressReceiver;

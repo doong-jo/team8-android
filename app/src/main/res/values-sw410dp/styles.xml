@@ -1,0 +1,149 @@
+<resources>
+
+    <!-- Base application theme. -->
+
+    <style name="MyTheme" parent="Theme.AppCompat">
+    </style>
+
+    <style name="MyDrawerArrowToggle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@color/half_black</item>
+    </style>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryDark">@color/xxxgray</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="drawerArrowStyle">@style/MyDrawerArrowToggle</item>
+
+
+        <!--statusBar Background-->
+        <item name="android:statusBarColor">@color/xgray</item>
+        <!--statusBar TextColor-->
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBar">
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorPrimary</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!--Buttons-->
+    <style name="PrimaryButton" parent="android:Widget.Button">
+        <item name="android:background">@drawable/primary_button</item>
+        <item name="android:layout_width">218.88dp</item>
+        <item name="android:layout_height">36.48dp</item>
+        <item name="android:textAppearance">@style/CategoryCardTitleTypo</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="BlockButton" parent="android:Widget.Button">
+        <item name="android:width">218.88dp</item>
+        <item name="android:color">#DFE0E2</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:radius">12.54dp</item>
+    </style>
+
+    <!--Typo-->
+    <style name="HeadlineTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:textSize">25.0dp</item>
+    </style>
+
+    <style name="HyoertextTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:textSize">17.1dp</item>
+        <item name="android:textColor">@color/accent_blue</item>
+    </style>
+
+    <style name="HyoertextSmallTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:textSize">13.68dp</item>
+        <item name="android:textColor">@color/accent_blue</item>
+    </style>
+
+    <style name="TitleTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textSize">20.52dp</item>
+    </style>
+
+    <style name="CategoryCardTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textSize">18.24dp</item>8
+    </style>
+
+    <style name="CategoryCardTitleTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textSize">17.1dp</item>
+    </style>
+
+    <style name="TopTabBarTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textSize">15.96dp</item>
+    </style>
+
+    <style name="OptionBigTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textSize">15.96dp</item>
+    </style>
+
+    <style name="OptionTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textSize">14.82dp</item>
+    </style>
+
+    <style name="OptionAccentTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:textSize">14.82dp</item>
+    </style>
+
+    <style name="BodyTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textSize">13.68dp</item>
+    </style>
+
+    <style name="SnackBarTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textSize">12.54dp</item>
+    </style>
+
+    <style name="wideCard" parent="CardView">
+        <item name="android:layout_width">370.5dp</item>
+        <item name="android:layout_height">109.44dp</item>
+        <item name="cardElevation">11.4dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">20.52dp</item>
+    </style>
+
+    <style name="ledCard" parent="CardView">
+        <item name="android:layout_width">160.74dp</item>
+        <item name="android:layout_height">160.74dp</item>
+        <item name="android:layout_marginTop">11.4dp</item>
+        <item name="cardElevation">11.4dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">20.52dp</item>
+    </style>
+
+    <style name="wideSettingCard" parent="CardView">
+        <item name="android:layout_width">370.5dp</item>
+        <item name="android:layout_height">128.82dp</item>
+        <item name="cardElevation">11.4dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">20.52dp</item>
+    </style>
+
+    <style name="ledCardLayout">
+        <item name="android:layout_width">183.54dp</item>
+        <item name="android:layout_height">194.94dp</item>
+    </style>
+
+</resources>

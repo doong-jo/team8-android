@@ -9,11 +9,11 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="336dp">
+        android:layout_height="343dp">
         <com.daimajia.slider.library.SliderLayout
             android:id="@+id/slider"
             android:layout_width="match_parent"
-            android:layout_height="336dp"
+            android:layout_height="343dp"
             android:layout_alignParentTop="true"
             />
 
@@ -56,6 +56,7 @@
             android:layout_height="1dp" />
 
         <android.support.constraint.ConstraintLayout
+            android:layout_marginTop="33dp"
             android:layout_width="0dp"
             android:layout_weight="0.58"
             android:layout_height="match_parent">
@@ -64,10 +65,8 @@
                 android:id="@+id/continueWithFacebook"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="33dp"
                 android:gravity="left"
-                android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="parent">
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -81,7 +80,7 @@
                     android:alpha="@dimen/black_alpha_lv4"
                     android:text="@string/continue_with_fb"
                     android:textColor="@color/black"
-                    android:theme="@style/CategoryCardTitleTypo" />
+                    style="@style/CategoryCardTitleTypo" />
 
             </LinearLayout>
 
@@ -89,7 +88,7 @@
                 android:id="@+id/continueWithKakao"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
+                android:layout_marginTop="24dp"
                 android:gravity="left"
                 android:orientation="horizontal"
                 app:layout_constraintTop_toBottomOf="@id/continueWithFacebook">
@@ -106,7 +105,7 @@
                     android:alpha="@dimen/black_alpha_lv4"
                     android:text="@string/continue_with_kakao"
                     android:textColor="@color/black"
-                    android:theme="@style/CategoryCardTitleTypo" />
+                    style="@style/CategoryCardTitleTypo" />
 
             </LinearLayout>
 
@@ -114,12 +113,12 @@
                 android:id="@+id/or_divide"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="31dp"
+                android:layout_marginTop="28dp"
                 android:alpha="@dimen/black_alpha_lv4"
                 android:gravity="center"
                 android:text="@string/or_divide"
                 android:textColor="@color/black"
-                android:theme="@style/BodyTypo"
+                style="@style/BodyTypo"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
@@ -129,7 +128,7 @@
                 android:id="@+id/signupWithEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="23dp"
                 android:gravity="left"
                 android:orientation="horizontal"
                 app:layout_constraintTop_toBottomOf="@id/or_divide">
@@ -146,7 +145,7 @@
                     android:alpha="@dimen/black_alpha_lv4"
                     android:text="@string/signup_with_email"
                     android:textColor="@color/black"
-                    android:theme="@style/CategoryCardTitleTypo" />
+                    style="@style/CategoryCardTitleTypo" />
 
             </LinearLayout>
 
@@ -165,20 +164,22 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="3dp"
+
                     android:alpha="@dimen/black_alpha_lv4"
                     android:text="@string/login_question"
                     android:textColor="@color/black"
-                    android:theme="@style/OptionTypo" />
+                    style="@style/OptionTypo" />
 
                 <TextView
                     android:id="@+id/loginText"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:alpha="@dimen/black_alpha_lv4"
                     android:text="@string/log_in"
                     android:textColor="@color/black"
-                    android:theme="@style/OptionAccentTypo" />
+                    style="@style/OptionAccentTypo" />
 
             </LinearLayout>
 

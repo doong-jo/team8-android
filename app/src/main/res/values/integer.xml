@@ -9,10 +9,7 @@
     <!--Input length-->
     <integer name="email_length">30</integer>
     <integer name="pw_length">15</integer>
-    <integer name="name_length">15</integer>
-
-    <!--Request Code-->
-    <integer name="REQUEST_ENABLE_BT">1001</integer>
+    <integer name="name_length">6</integer>
 
     <!--Shadow-->
     <integer name="shadow_x">0</integer>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FloatingEditTextAddonControl">
+        <attr name="clear_control" format="reference|boolean" />
+        <attr name="check_control" format="reference|boolean" />
+        <attr name="hint_text" format="reference|integer" />
+        <attr name="text_length" format="reference|integer" />
+    </declare-styleable>
+</resources>

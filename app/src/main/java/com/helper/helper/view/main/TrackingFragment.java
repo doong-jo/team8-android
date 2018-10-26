@@ -1,11 +1,10 @@
-package com.helper.helper.view.tracking;
+package com.helper.helper.view.main;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-//import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -41,8 +39,7 @@ import com.helper.helper.R;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.model.TrackingData;
 import com.helper.helper.model.TrackingRecordedListItem;
-import com.helper.helper.view.Info.InfoFragment;
-import com.helper.helper.view.TabPagerAdapter;
+
 
 public class TrackingFragment extends Fragment
         implements OnMapReadyCallback,

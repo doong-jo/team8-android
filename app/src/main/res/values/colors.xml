@@ -3,6 +3,8 @@
     <!--State Color-->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="half_black">#4B4B4B</color>
+    <color name="shadow_color">#adadad</color>
     <color name="gray">#DFE0E2</color>
     <color name="xgray">#CECED0</color>
     <color name="xxgray">#B4B4B5</color>
@@ -22,6 +24,8 @@
     <!--status bar background-->
     <color name="colorPrimaryDark">#FAFAFA</color>
     <color name="colorAccent">#2f6eff</color>
+
+    <color name="tab_indicator">#3A3A3A</color>
 
     <color name="tabBackgroundColor">#FAFAFA</color>
     <color name="loginBackgroundColor">#F5F5F5</color>

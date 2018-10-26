@@ -2,22 +2,19 @@
 
     <!-- Base application theme. -->
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="android:windowLightStatusBar">true</item>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryDark">@color/xxxgray</item>
         <item name="colorAccent">@color/colorAccent</item>
 
-        <item name="colorControlNormal">@color/xxxgray</item>
-        <item name="colorControlActivated">@color/xxxgray</item>
-        <item name="colorControlHighlight">@color/xxxgray</item>
-    </style>
+        <!--statusBar Background-->
+        <item name="android:statusBarColor">@color/xgray</item>
+        <!--statusBar TextColor-->
+        <item name="android:windowLightStatusBar">true</item>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="android:textColorPrimary">@color/textColorPrimary</item>
-        <item name="windowActionBar">false</item>
+        <item name="windowActionBar">true</item>x
         <item name="windowNoTitle">true</item>
     </style>
 
@@ -26,6 +23,10 @@
         <item name="android:textColorSecondary">@color/textColorPrimary</item>
         <item name="android:textColor">@color/textColorPrimary</item>
     </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <!--Buttons-->
     <style name="PrimaryButton" parent="android:Widget.Button">
@@ -44,6 +45,8 @@
     </style>
 
     <!--Typo-->
+
+    <!--Bold-->
     <style name="HeadlineTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_bold</item>
         <item name="android:textSize">22dp</item>
@@ -55,6 +58,18 @@
         <item name="android:textColor">@color/accent_blue</item>
     </style>
 
+    <style name="HyoertextSmallTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:textColor">@color/accent_blue</item>
+    </style>
+
+    <style name="OptionAccentTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:textSize">13dp</item>
+    </style>
+
+    <!--Medium-->
     <style name="TitleTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_medium</item>
         <item name="android:textSize">18dp</item>
@@ -75,13 +90,19 @@
         <item name="android:textSize">14dp</item>
     </style>
 
-    <style name="OptionTypo" parent="android:Widget.TextView">
+    <!--Regular-->
+    <style name="ToolbarTitleTypo" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/roboto_regular</item>
-        <item name="android:textSize">13dp</item>
+        <item name="android:textSize">19dp</item>
     </style>
 
-    <style name="OptionAccentTypo" parent="android:Widget.TextView">
-        <item name="android:fontFamily">@font/roboto_bold</item>
+    <style name="OptionBigTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textSize">14dp</item>
+    </style>
+
+    <style name="OptionTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_regular</item>
         <item name="android:textSize">13dp</item>
     </style>
 
@@ -95,9 +116,34 @@
         <item name="android:textSize">11dp</item>
     </style>
 
+    <style name="wideCard" parent="CardView">
+        <item name="android:layout_width">325dp</item>
+        <item name="android:layout_height">96dp</item>
+        <item name="cardElevation">10dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">18dp</item>
+    </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="ledCard" parent="CardView">
+        <item name="android:layout_width">141dp</item>
+        <item name="android:layout_height">141dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="cardElevation">10dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">18dp</item>
+    </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="wideSettingCard" parent="CardView">
+        <item name="android:layout_width">325dp</item>
+        <item name="android:layout_height">113dp</item>
+        <item name="cardElevation">10dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">18dp</item>
+    </style>
+
+    <style name="ledCardLayout">
+        <item name="android:layout_width">161dp</item>
+        <item name="android:layout_height">171dp</item>
+    </style>
 
 </resources>

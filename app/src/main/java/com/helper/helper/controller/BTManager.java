@@ -10,26 +10,16 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.location.Location;
-import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
-import com.helper.helper.Constants;
 import com.helper.helper.R;
-import com.helper.helper.controller.ble.BluetoothLeService;
 import com.helper.helper.interfaces.BluetoothReadCallback;
-import com.helper.helper.view.Info.InfoFragment;
 import com.helper.helper.view.ScrollingActivity;
 
 import org.json.JSONException;
@@ -38,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,7 +67,6 @@ public class BTManager {
     private static boolean m_IsReadProcessing = false;
     private static Activity m_activity;
     private static BluetoothAdapter m_bluetoothAdapter;
-    private static BluetoothLeService m_bluetoothLeService;
     private static BluetoothDevice m_pairedDevice;
     private static BluetoothSocket m_bluetoothSocket;
     private static InputStream m_bluetoothInput;
@@ -115,19 +103,6 @@ public class BTManager {
         /** create bluetooth read thread (not running)**/
         m_bluetoothReadthread = new BluetoothReadThread();
     }
-
-    private final static ServiceConnection m_serviceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            m_bluetoothLeService = null;
-        }
-    };
 
     private static void bluetoothSignalHandler(String signalMsg) {
         if ( signalMsg.equals("EMERGENCY") ) {
@@ -189,12 +164,10 @@ public class BTManager {
             Toast.makeText(m_activity, "디바이스 연결에 성공했습니다.", Toast.LENGTH_SHORT).show();
 
             ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
-            scrollingActivity.updateConnectionLayout(true);
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(m_activity, "디바이스 연결에 실패했습니다.", Toast.LENGTH_SHORT).show();
             ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
-            scrollingActivity.updateConnectionLayout(true);
         }
         m_loadingDlg.dismiss();
     }
@@ -226,7 +199,6 @@ public class BTManager {
                 } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()) ) {
                     Toast.makeText(m_activity, "디비이스를 찾지 못했습니다.", Toast.LENGTH_SHORT).show();
                     ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
-                    scrollingActivity.updateConnectionLayout(true);
                     m_loadingDlg.dismiss();
                 }
             }

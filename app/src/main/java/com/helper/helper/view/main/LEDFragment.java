@@ -1,4 +1,4 @@
-package com.helper.helper.view.led;
+package com.helper.helper.view.main;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,11 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 //import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.helper.helper.R;
-import com.helper.helper.view.Info.InfoFragment;
-import com.helper.helper.view.TabPagerAdapter;
 
 public class LEDFragment extends Fragment {
 

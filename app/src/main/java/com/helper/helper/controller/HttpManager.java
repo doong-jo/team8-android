@@ -171,7 +171,6 @@ public class HttpManager {
                                     m_resultJsonArray = new JSONArray(readResponse);
                                 } else {
                                     m_resultJsonArray = new JSONArray("[{result:"+readResponse+"}]");
-                                    callback.onSuccess(m_resultJsonArray);
                                 }
 
                                 callback.onSuccess(m_resultJsonArray);

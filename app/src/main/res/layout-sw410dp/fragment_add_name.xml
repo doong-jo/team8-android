@@ -1,0 +1,67 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:style="http://schemas.android.com/tools"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/backMakeProfileFragment"
+            android:layout_marginStart="12.54dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="9.12dp"
+            android:layout_marginBottom="11.4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_back"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:alpha="0.77"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:text="@string/add_name_title"
+            style="@style/HeadlineTypo"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:alpha="0.49"
+            android:layout_gravity="center"
+            android:text="@string/add_name_message"
+            style="@style/OptionBigTypo"/>
+
+        <com.helper.helper.view.widget.FloatingEditTextAddonControl
+            android:id="@+id/nameInput"
+            android:layout_marginStart="12.54dp"
+            android:layout_marginTop="31.92dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hint_text="@string/name_field"
+            app:check_control="true"
+            app:text_length="@integer/name_length" />
+
+        <Button
+            android:id="@+id/nextBtn"
+            android:layout_marginTop="28.5dp"
+            android:layout_gravity="center"
+            android:text="@string/join_next"
+            style="@style/PrimaryButton" />
+
+    </LinearLayout>
+
+    <com.helper.helper.view.widget.SnackBar
+        android:id="@+id/addNameSnackBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

@@ -1,0 +1,115 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:style="http://schemas.android.com/tools"
+    android:background="@color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout
+        android:id="@+id/parentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:weightSum="1">
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="0.03" />
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.97"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/backStartFragment"
+                android:layout_marginTop="9.12dp"
+                android:layout_marginBottom="11.4dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_back"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/HeadlineTypo"
+                android:textColor="@color/black"
+                android:text="@string/join_intro_text"
+                android:alpha="@dimen/black_alpha_lv7"/>
+
+            <com.helper.helper.view.widget.FloatingEditTextAddonControl
+                android:id="@+id/emailInputTxt"
+                android:layout_marginTop="11.4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hint_text="@string/join_email"
+                app:clear_control="true"
+                app:check_control="true"
+                app:text_length="@integer/email_length" />
+
+
+            <com.helper.helper.view.widget.FloatingEditTextAddonControl
+                android:id="@+id/pwInputTxt"
+                android:layout_marginTop="42.18dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hint_text="@string/join_password"
+                app:clear_control="true"
+                app:check_control="true"
+                app:text_length="@integer/pw_length" />
+
+            <LinearLayout
+                android:layout_marginTop="30.78dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <android.support.v7.widget.AppCompatCheckBox
+                    android:id="@+id/termChkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/BodyTypo"
+                    android:text="@string/accept_join_term_f"
+                    />
+
+                <TextView
+                    android:id="@+id/termText"
+                    android:layout_marginLeft="5.7dp"
+                    android:layout_marginRight="5.7dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/HyoertextSmallTypo"
+                    android:text="@string/term"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/BodyTypo"
+                    android:text="@string/accept_join_term_e"/>
+
+            </LinearLayout>
+
+
+
+            <Button
+                android:id="@+id/joinBtn"
+                android:layout_marginTop="28.5dp"
+                android:layout_gravity="center"
+                style="@style/PrimaryButton"
+                android:text="@string/join_next"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <com.helper.helper.view.widget.SnackBar
+        android:id="@+id/joinSnackBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+</RelativeLayout>

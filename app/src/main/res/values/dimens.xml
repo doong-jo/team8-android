@@ -23,16 +23,6 @@
     <dimen name="indicator_width">8dp</dimen>
     <dimen name="indicator_height">8dp</dimen>
 
-    <!--Typo-->
-    <dimen name="typo_headline_size">22dp</dimen>
-    <dimen name="typo_title_size">18dp</dimen>
-    <dimen name="typo_xxlsize">16dp</dimen>
-    <dimen name="typo_xlsize">15dp</dimen>
-    <dimen name="typo_lsize">14dp</dimen>
-    <dimen name="typo_msize">12dp</dimen>
-    <dimen name="typo_xssize">11dp</dimen>
-    <dimen name="typo_xxssize">10dp</dimen>
-
     <!--Snackbar-->
     <dimen name="snackbar_height">34dp</dimen>
 

@@ -68,6 +68,7 @@ public class User {
         }
     }
 
+
     public User(Builder builder) {
         m_userEmail = builder.m_userEmail;
         m_userPw = builder.m_userPw;
@@ -80,6 +81,20 @@ public class User {
         m_accPosition = new ArrayList<Location>();
         m_ledIndicies = new ArrayList<String>();
         m_trackIndicies = new ArrayList<String>();
+    }
+
+    public void setUserName(String name) {
+        m_userName = name;
+    }
+
+    public void setUserEmail(String userEmail) {
+        m_userEmail = userEmail;
+    }
+
+    public void setUserPassword(String userPassword) { m_userPw = userPassword; }
+
+    public void setUserRidingType(String ridingType) {
+        m_userRidingType = ridingType;
     }
 
     public String getUserEmail() {
@@ -115,9 +130,6 @@ public class User {
             }
             if( !m_userPhone.equals("")) {
                 obj.put("phone", m_userPhone);
-            }
-            if( !m_userName.equals("")) {
-                obj.put("name", m_userPhone);
             }
             if( !m_userRidingType.equals("")) {
                 obj.put("riding_type", m_userRidingType);

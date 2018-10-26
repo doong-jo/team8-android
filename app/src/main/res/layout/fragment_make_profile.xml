@@ -2,6 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:style="http://schemas.android.com/tools"
     android:background="@color/white">
 
     <LinearLayout
@@ -9,18 +10,104 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <ImageView
+            android:id="@+id/backJoinFragment"
+            android:layout_marginStart="11dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_back"/>
+
         <TextView
+            android:layout_marginBottom="2dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:alpha="0.77"
+            android:layout_gravity="center"
+            android:text="@string/make_profile_title"
+            style="@style/HeadlineTypo"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:alpha="0.49"
+            android:layout_gravity="center"
+            android:text="@string/make_profile_message"
+            style="@style/OptionBigTypo"/>
+
+        <ImageView
+            android:layout_marginTop="15dp"
+            android:id="@+id/previewImage"
+            android:src="@drawable/ic_user"
+            android:layout_marginBottom="5dp"
+            android:layout_gravity="center"
+            android:layout_width="86dp"
+            android:layout_height="86dp" />
+
+        <TextView
+            android:id="@+id/hyperTextEdit"
+            android:layout_marginTop="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/edit"
+            style="@style/HyoertextTypo"/>
+
+        <TextView
+            android:layout_marginTop="84dp"
+            android:layout_marginBottom="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:alpha="0.77"
+            android:layout_gravity="center"
+            android:text="@string/make_profile_riding_type"
+            style="@style/HeadlineTypo"/>
+
+        <LinearLayout
+            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textAlignment="center"
-            android:text="MakeProfileFragment"/>
+            android:layout_height="70dp">
+
+            <ImageView
+                android:id="@+id/bicycle"
+                android:src="@drawable/ic_bicycle"
+                android:adjustViewBounds="true"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:tag="@string/riding_type_bicycle" />
+
+            <ImageView
+                android:id="@+id/motorcycle"
+                android:layout_marginStart="27dp"
+                android:layout_marginEnd="27dp"
+                android:src="@drawable/ic_motorcycle"
+                android:adjustViewBounds="true"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:tag="@string/riding_type_motorcycle"/>
+
+            <ImageView
+                android:id="@+id/kickboard"
+                android:src="@drawable/ic_kickboard"
+                android:adjustViewBounds="true"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:tag="@string/riding_type_smart_mobility"/>
+            
+        </LinearLayout>
+
 
         <Button
-            android:id="@+id/addPhotoBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="ADD PHOTO"/>
-
+            android:id="@+id/nextBtn"
+            android:layout_marginTop="50dp"
+            android:layout_gravity="center"
+            android:text="@string/join_next"
+            style="@style/PrimaryButton" />
     </LinearLayout>
 
 

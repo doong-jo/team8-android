@@ -18,6 +18,8 @@ import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.helper.helper.R;
+import com.helper.helper.controller.UserManager;
+import com.helper.helper.model.User;
 
 import java.util.HashMap;
 
@@ -40,6 +42,10 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
         View view = inflater.inflate( R.layout.fragment_start, container, false );
 
+        // Solve : bug first touch not working
+        getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
         /******************* Connect widgtes with layout *******************/
         m_slider = (SliderLayout)view.findViewById(R.id.slider);
         m_loginText = (TextView)view.findViewById(R.id.loginText);
@@ -47,44 +53,25 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
         /*******************************************************************/
 
         /******************* Slider *******************/
-        HashMap<String,Integer> file_maps = new HashMap<String, Integer>();
-        file_maps.put("서비스 소개1",R.drawable.naver);
-        file_maps.put("서비스 소개2",R.drawable.naver);
-        file_maps.put("서비스 소개3",R.drawable.naver);
 
+        String[] imgUrlArr = new String[]{
+                getString(R.string.intro_service_url) + "1.png",
+                getString(R.string.intro_service_url) + "2.png",
+                getString(R.string.intro_service_url) + "3.png",
+        };
 
-        int[] imgs = new int[]{R.drawable.naver, R.drawable.naver, R.drawable.naver};
-
-        for (int i = 0; i < imgs.length; i++) {
+        for (int i = 0; i < imgUrlArr.length; i++) {
 
             DefaultSliderView defaultSliderView = new DefaultSliderView(getContext());
             defaultSliderView
-                    .image(imgs[i])
-                    .setScaleType(BaseSliderView.ScaleType.Fit)
+                    .image(imgUrlArr[i])
+                    .setScaleType(BaseSliderView.ScaleType.CenterCrop)
                     .setOnSliderClickListener(this);
 
             defaultSliderView.bundle(new Bundle());
 
             m_slider.addSlider(defaultSliderView);
         }
-
-        //Building TextSlider
-//        for(String name : file_maps.keySet()){
-//            TextSliderView textSliderView = new TextSliderView(getContext());
-//            // initialize a SliderLayout
-//            textSliderView
-////                    .description(name)
-//                    .image(file_maps.get(name))
-//                    .setScaleType(BaseSliderView.ScaleType.Fit)
-//                    .setOnSliderClickListener(this);
-//
-//            //add your extra information
-//            textSliderView.bundle(new Bundle());
-////            textSliderView.getBundle()
-////                    .putString("extra",name);
-//
-//            m_slider.addSlider(textSliderView);
-//        }
 
         m_slider.setPresetTransformer(SliderLayout.Transformer.Default);
         m_slider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
@@ -101,9 +88,7 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
             @Override
             public void onClick(View view) {
                 LoginActivity activity = (LoginActivity)getActivity();
-                if (activity != null) {
-                    activity.moveToLoginFragment(view);
-                }
+                activity.moveToFragment(new LoginFragment(), false);
             }
         });
 
@@ -111,9 +96,7 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
             @Override
             public void onClick(View view) {
                 LoginActivity activity = (LoginActivity)getActivity();
-                if (activity != null) {
-                    activity.moveToJoinFragment(view);
-                }
+                activity.moveToFragment(new JoinFragment(), false);
             }
         });
         /*************************************************************/

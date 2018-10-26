@@ -7,9 +7,6 @@
 package com.helper.helper.view;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,20 +18,18 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.telephony.SmsManager;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,32 +40,18 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
-import com.helper.helper.Constants;
 import com.helper.helper.R;
 import com.helper.helper.controller.AddressManager;
 import com.helper.helper.controller.BTManager;
 import com.helper.helper.controller.GoogleMapManager;
-import com.helper.helper.interfaces.BluetoothReadCallback;
-import com.helper.helper.view.Info.InfoFragment;
+import com.helper.helper.view.main.InfoFragment;
 import com.helper.helper.view.contact.ContactActivity;
-import com.helper.helper.model.User;
-import com.helper.helper.view.led.LEDFragment;
 import com.helper.helper.controller.GyroManager;
-import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.PermissionManager;
-import com.helper.helper.controller.UserManager;
 import com.snatik.storage.Storage;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 import static android.support.design.widget.TabLayout.*;
 
@@ -79,7 +60,8 @@ public class ScrollingActivity extends AppCompatActivity
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener,
+        NavigationView.OnNavigationItemSelectedListener{
     private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
     private static final int TAB_STATUS = 0;
     private static final int TAB_LED = 1;
@@ -92,7 +74,6 @@ public class ScrollingActivity extends AppCompatActivity
 
     private InfoFragment m_infoFrag;
 
-    private boolean m_IsRecorded = false;
 
     public void setMapPosition(double latitude, double longitude, Location curLocation) {
         AddressManager.startAddressIntentService(this, curLocation);
@@ -108,12 +89,33 @@ public class ScrollingActivity extends AppCompatActivity
 
         /******************* Connect widgtes with layout *******************/
         setContentView(R.layout.activity_scrolling);
+//        getSupportActionBar().setDisplayShowTitleEnabled(false);
+//        getSupportActionBar().setTitle("asdf");
+
+        /** ToolBar **/
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+
+        setSupportActionBar(toolbar);
+        mTitle.setText(toolbar.getTitle());
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        /** Navigation **/
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         /** Tab **/
         m_tabLayout = findViewById(R.id.tabLayout);
-        m_tabLayout.addTab(m_tabLayout.newTab().setText("Status"));
+        m_tabLayout.addTab(m_tabLayout.newTab().setText("MY EIGHT"));
         m_tabLayout.addTab(m_tabLayout.newTab().setText("LED"));
-        m_tabLayout.addTab(m_tabLayout.newTab().setText("Tracking"));
+        m_tabLayout.addTab(m_tabLayout.newTab().setText("TRACKING"));
 
         m_pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), m_tabLayout.getTabCount());
 
@@ -128,11 +130,11 @@ public class ScrollingActivity extends AppCompatActivity
 
                 if (tab.getPosition() == TAB_STATUS) {
 
-                    if (m_IsRecorded) {
-                        ((FloatingActionButton) m_infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_solid, getApplicationContext().getTheme()));
-                    } else {
-                        ((FloatingActionButton) m_infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_circle_solid, getApplicationContext().getTheme()));
-                    }
+//                    if (m_IsRecorded) {
+//                        ((FloatingActionButton) m_infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_solid, getApplicationContext().getTheme()));
+//                    } else {
+//                        ((FloatingActionButton) m_infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_circle_solid, getApplicationContext().getTheme()));
+//                    }
                 } else if (tab.getPosition() == TAB_TRACKING) {
 
 
@@ -150,20 +152,11 @@ public class ScrollingActivity extends AppCompatActivity
             }
         });
 
-        TextView connectToggle = (TextView) findViewById(R.id.connect_toggle_text);
-        /** ToolBar **/
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
         /*******************************************************************/
 
         /******************* Make Listener in View *******************/
-        connectToggle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Already pass activity -> null
-                BTManager.initBluetooth(null);
-            }
-        });
+
         /*************************************************************/
 
 
@@ -207,7 +200,7 @@ public class ScrollingActivity extends AppCompatActivity
         GoogleMapManager.initGoogleMap(this);
 
         /** Bluetooth  **/
-        BTManager.initBluetooth(this);
+//        BTManager.initBluetooth(this);
 
         /** Gyro **/
         GyroManager.m_sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -216,72 +209,15 @@ public class ScrollingActivity extends AppCompatActivity
         /* Sensor end */
     }
 
-    /** UI **/
-    private void moveToLEDDash(View v) {
-        m_viewPager.setCurrentItem(TAB_LED);
-    }
-
-    private void moveToTrackingDash(View v) {
-        m_viewPager.setCurrentItem(TAB_TRACKING);
-    }
-
-    public void updateConnectionLayout(boolean IsConnected) {
-        LinearLayout connectLayout = (LinearLayout) findViewById(R.id.connect_layout);
-        TextView connectDiscription = (TextView) findViewById(R.id.connect_desc_text);
-        TextView connectToggle = (TextView) findViewById(R.id.connect_toggle_text);
-
-        if (IsConnected) {
-            connectDiscription.setText(getString(R.string.connect_state));
-            connectToggle.setText("");
-            connectToggle.setOnClickListener(null);
-        } else {
-            connectDiscription.setText(getString(R.string.disconnect_state));
-            connectToggle.setText(getString(R.string.connect_device));
-            connectToggle.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    BTManager.initBluetooth(getParent());
-                }
-            });
-        }
-
-    }
-
-    /** Top-Right Menu **/
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_scrolling, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_item_guideline) {
-            return true;
-        } else if (item.getItemId() == R.id.menu_item_emergency_contacts) {
-            Toast.makeText(this, "Open Emergency contacts activity", Toast.LENGTH_SHORT).show();
-
-            Intent intent = new Intent(ScrollingActivity.this, ContactActivity.class);
-//            intent.putExtra("text",String.valueOf(editText.getText()));
-            startActivity(intent);
-
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     /** Result handler **/
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case BTManager.SUCCESS_BLUETOOTH_CONNECT:
                 Toast.makeText(this, "디바이스 블루투스 연결 성공", Toast.LENGTH_SHORT).show();
-                updateConnectionLayout(true);
                 break;
 
             case BTManager.FAIL_BLUETOOTH_CONNECT:
-                updateConnectionLayout(true);
                 break;
 
             case BTManager.REQUEST_ENABLE_BT:
@@ -467,6 +403,70 @@ public class ScrollingActivity extends AppCompatActivity
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
+
+    /** Navigation **/
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        /** Top-Right control **/
+        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+//        if (id == R.id.nav_camera) {
+//            // Handle the camera action
+//        } else if (id == R.id.nav_gallery) {
+//
+//        } else if (id == R.id.nav_slideshow) {
+//
+//        } else if (id == R.id.nav_manage) {
+//
+//        } else if (id == R.id.nav_share) {
+//
+//        } else if (id == R.id.nav_send) {
+//
+//        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
 
     }
 
