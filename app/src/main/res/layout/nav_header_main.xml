@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="134.9dp"
+    xmlns:style="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:gravity="bottom">
+
+    <ImageView
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/imageView"
+        android:layout_width="51dp"
+        android:layout_height="51dp"
+        android:contentDescription="Navigation header"
+        app:srcCompat="@drawable/ic_user" />
+
+    <TextView
+        android:textAlignment="center"
+        android:id="@+id/navUserName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15.7dp"
+        android:text="Jisoo Lah"
+        style="@style/HeadlineTypo" />
+
+</LinearLayout>
