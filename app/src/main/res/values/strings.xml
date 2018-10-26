@@ -55,6 +55,10 @@
     <string name="exist_name">Exist a name</string>
     <string name="name_field">Name</string>
 
+    <!--Navigation-->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
     <!--Info Fragment-->
     <string name="my_leds">My LEDs</string>
     <string name="led_setting">LED setting</string>
