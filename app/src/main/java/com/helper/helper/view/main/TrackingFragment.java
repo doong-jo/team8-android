@@ -1,4 +1,4 @@
-package com.helper.helper.view.tracking;
+package com.helper.helper.view.main;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;

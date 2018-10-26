@@ -56,6 +56,9 @@
     <string name="name_field">Name</string>
 
     <!--Info Fragment-->
+    <string name="my_leds">My LEDs</string>
+    <string name="led_setting">LED setting</string>
+
     <string name="cardTitleSensor">Sensor</string>
     <string name="cardTitleBattery">Battery</string>
     <string name="cardTitleBrightnessAndSpeed">Brightness &amp; Speed</string>

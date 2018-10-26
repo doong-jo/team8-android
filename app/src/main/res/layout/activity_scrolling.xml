@@ -18,19 +18,29 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/ic_menu"
-            app:titleTextAppearance="@drawable/ic_user"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:theme="@style/AppTheme.AppBar" />
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textColor="@color/black"
+                android:alpha="0.9"
+                style="@style/ToolbarTitleTypo"
+                android:layout_gravity="center" />
+        </android.support.v7.widget.Toolbar>
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabBackground="@color/tabBackgroundColor"
-            app:tabIndicatorColor="@color/colorAccent"
-            app:tabRippleColor="@color/colorAccent"
-            app:tabSelectedTextColor="@color/colorAccent"
-            app:tabTextColor="@color/textColorPrimary" />
+            app:tabBackground="@color/white"
+            app:tabIndicatorColor="@color/tab_indicator"
+            app:tabRippleColor="@color/tab_indicator"
+            app:tabSelectedTextColor="@color/tab_indicator"
+            app:tabTextAppearance="@style/TopTabBarTypo"
+            app:tabIndicatorHeight="4dp"
+            app:tabTextColor="@color/xxxgray" />
 
     </android.support.design.widget.AppBarLayout>
 

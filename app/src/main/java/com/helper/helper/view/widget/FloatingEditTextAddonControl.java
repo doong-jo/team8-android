@@ -49,7 +49,6 @@ public class FloatingEditTextAddonControl extends FrameLayout {
 
         initView();
         getAttrs(attrs);
-
     }
 
     public FloatingEditTextAddonControl(Context context, AttributeSet attrs, int defStyle) {

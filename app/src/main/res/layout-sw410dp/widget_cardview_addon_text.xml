@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:style="http://schemas.android.com/tools"
+    >
+
+    <LinearLayout
+        style="@style/ledCardLayout"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.CardView
+            android:layout_gravity="center"
+            android:id="@+id/cardView"
+            style="@style/ledCard">
+
+            <ImageView
+                android:src="@drawable/bird"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:gravity="center"
+            android:id="@+id/cardText"
+            android:layout_marginTop="5.7dp"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            style="@style/OptionTypo"
+            android:text="Bird"/>
+
+    </LinearLayout>
+
+
+</android.support.constraint.ConstraintLayout>

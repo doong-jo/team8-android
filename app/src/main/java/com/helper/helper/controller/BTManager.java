@@ -10,25 +10,16 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.location.Location;
-import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
-import com.helper.helper.Constants;
 import com.helper.helper.R;
 import com.helper.helper.interfaces.BluetoothReadCallback;
-import com.helper.helper.view.Info.InfoFragment;
 import com.helper.helper.view.ScrollingActivity;
 
 import org.json.JSONException;
@@ -37,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
