@@ -1,7 +1,7 @@
 <resources>
     <!--app base-->
-    <string name="app_name">Safe &amp; Enjoy, HELPER</string>
-    <string name="service_name">HELPER</string>
+    <string name="app_name">TEAM EIGHT</string>
+    <string name="service_name">TEAM EIGHT</string>
     <string name="device_bluetooth_name">helper-1</string>
     <string name="google_api">AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k</string>
     <!--Bluetooth-->
@@ -56,6 +56,9 @@
     <string name="name_field">Name</string>
 
     <!--Info Fragment-->
+    <string name="my_leds">My LEDs</string>
+    <string name="led_setting">LED setting</string>
+
     <string name="cardTitleSensor">Sensor</string>
     <string name="cardTitleBattery">Battery</string>
     <string name="cardTitleBrightnessAndSpeed">Brightness &amp; Speed</string>

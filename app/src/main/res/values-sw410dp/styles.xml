@@ -10,11 +10,11 @@
         <item name="colorAccent">@color/colorAccent</item>
 
         <!--statusBar Background-->
-        <item name="android:statusBarColor">@color/xxgray</item>
+        <item name="android:statusBarColor">@color/xgray</item>
         <!--statusBar TextColor-->
         <item name="android:windowLightStatusBar">true</item>
 
-        <item name="windowActionBar">false</item>
+        <item name="windowActionBar">true</item>
         <item name="windowNoTitle">true</item>
     </style>
 
@@ -23,6 +23,10 @@
         <item name="android:textColorSecondary">@color/textColorPrimary</item>
         <item name="android:textColor">@color/textColorPrimary</item>
     </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <!--Buttons-->
     <style name="PrimaryButton" parent="android:Widget.Button">
@@ -103,9 +107,34 @@
         <item name="android:textSize">12.54dp</item>
     </style>
 
+    <style name="wideCard" parent="CardView">
+        <item name="android:layout_width">370.5dp</item>
+        <item name="android:layout_height">109.44dp</item>
+        <item name="cardElevation">11.4dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">20.52dp</item>
+    </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="ledCard" parent="CardView">
+        <item name="android:layout_width">160.74dp</item>
+        <item name="android:layout_height">160.74dp</item>
+        <item name="android:layout_marginTop">11.4dp</item>
+        <item name="cardElevation">11.4dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">20.52dp</item>
+    </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="wideSettingCard" parent="CardView">
+        <item name="android:layout_width">370.5dp</item>
+        <item name="android:layout_height">128.82dp</item>
+        <item name="cardElevation">11.4dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">20.52dp</item>
+    </style>
+
+    <style name="ledCardLayout">
+        <item name="android:layout_width">183.54dp</item>
+        <item name="android:layout_height">194.94dp</item>
+    </style>
 
 </resources>

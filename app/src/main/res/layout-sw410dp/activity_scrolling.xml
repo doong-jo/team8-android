@@ -39,7 +39,7 @@
             app:tabRippleColor="@color/tab_indicator"
             app:tabSelectedTextColor="@color/tab_indicator"
             app:tabTextAppearance="@style/TopTabBarTypo"
-            app:tabIndicatorHeight="4dp"
+            app:tabIndicatorHeight="4.56dp"
             app:tabTextColor="@color/xxxgray" />
 
     </android.support.design.widget.AppBarLayout>
