@@ -10,10 +10,13 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.location.Location;
+import android.os.Looper;
 import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,11 +26,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.helper.helper.view.main.InfoFragment;
 
+import java.util.List;
+
 public class GoogleMapManager {
     private final static String TAG = InfoFragment.class.getSimpleName() + "/DEV";
     public static final LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
-    private static final int UPDATE_INTERVAL_MS = 1500;
-    private static final int FASTEST_UPDATE_INTERVAL_MS = 1000;
+    private static final int UPDATE_INTERVAL_MS = 3000;
+    private static final int FASTEST_UPDATE_INTERVAL_MS = 3000;
 
     private static GoogleApiClient m_googleApiClient;
     private static GoogleMap m_googleMap;
@@ -35,6 +40,33 @@ public class GoogleMapManager {
     private static LocationRequest m_locationReq;
     private static Location m_curLocation;
     private static Activity m_activity;
+    private static LocationCallback m_locatinCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            List<Location> locationList = locationResult.getLocations();
+            if (locationList.size() > 0) {
+                //The last location in the list is the newest
+                Location location = locationList.get(locationList.size() - 1);
+                setCurrentLocation(location, "myLocation", "location");
+//                Log.i("MapsActivity", "Location: " + location.getLatitude() + " " + location.getLongitude());
+//                mLastLocation = location;
+//                if (mCurrLocationMarker != null) {
+//                    mCurrLocationMarker.remove();
+//                }
+//
+//                //Place current location marker
+//                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+//                MarkerOptions markerOptions = new MarkerOptions();
+//                markerOptions.position(latLng);
+//                markerOptions.title("Current Position");
+//                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+//                mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
+//
+//                //move map camera
+//                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11));
+            }
+        }
+    };
 
     public static GoogleMap getGoogleMap() { return m_googleMap; }
 
@@ -75,6 +107,8 @@ public class GoogleMapManager {
         m_locationReq.setInterval(UPDATE_INTERVAL_MS);//3000
         m_locationReq.setFastestInterval(FASTEST_UPDATE_INTERVAL_MS);//1500
         m_locationReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        requsetLocation();
     }
 
 
@@ -83,34 +117,34 @@ public class GoogleMapManager {
 
         m_curLocation = location;
 
-        if (location != null) {
-            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+//        if (location != null) {
+//            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(currentLocation);
-            markerOptions.title(markerTitle);
-            markerOptions.snippet(markerSnippet);
-            markerOptions.draggable(true);
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-//            m_curLocationMarker = this.m_googleMap.addMarker(markerOptions);
+//            MarkerOptions markerOptions = new MarkerOptions();
+//            markerOptions.position(currentLocation);
+//            markerOptions.title(markerTitle);
+//            markerOptions.snippet(markerSnippet);
+//            markerOptions.draggable(true);
+//            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+////            m_curLocationMarker = this.m_googleMap.addMarker(markerOptions);
+//
+//            m_googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
+//            return;
+//        }
 
-            m_googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
-            return;
-        }
-
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(DEFAULT_LOCATION);
-        markerOptions.title(markerTitle);
-        markerOptions.snippet(markerSnippet);
-        markerOptions.draggable(true);
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-//        m_curLocationMarker = this.m_googleMap.addMarker(markerOptions);
-
-        m_googleMap.moveCamera(CameraUpdateFactory.newLatLng(DEFAULT_LOCATION));
+//        MarkerOptions markerOptions = new MarkerOptions();
+//        markerOptions.position(DEFAULT_LOCATION);
+//        markerOptions.title(markerTitle);
+//        markerOptions.snippet(markerSnippet);
+//        markerOptions.draggable(true);
+//        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+////        m_curLocationMarker = this.m_googleMap.addMarker(markerOptions);
+//
+//        m_googleMap.moveCamera(CameraUpdateFactory.newLatLng(DEFAULT_LOCATION));
     }
 
     @SuppressLint("MissingPermission")
-    public void requsetLocation() {
+    public static void requsetLocation() {
         if (!PermissionManager.checkPermissions(m_activity, Manifest.permission.ACCESS_FINE_LOCATION) &&
                 !PermissionManager.checkPermissions(m_activity, Manifest.permission.ACCESS_COARSE_LOCATION)) {
             return;
@@ -127,7 +161,7 @@ public class GoogleMapManager {
             }
         });
 
-//        LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(m_locationReq, mLocationCallback, Looper.myLooper());
+        LocationServices.getFusedLocationProviderClient(m_activity).requestLocationUpdates(m_locationReq, m_locatinCallback, Looper.myLooper());
     }
 
     /** Override googlemap **/

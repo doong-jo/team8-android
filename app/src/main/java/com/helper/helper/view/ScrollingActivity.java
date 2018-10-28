@@ -43,7 +43,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.R;
 import com.helper.helper.controller.AddressManager;
 import com.helper.helper.controller.BTManager;
+import com.helper.helper.controller.EmergencyManager;
 import com.helper.helper.controller.GoogleMapManager;
+import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.view.main.InfoFragment;
 import com.helper.helper.view.contact.ContactActivity;
@@ -373,7 +375,20 @@ public class ScrollingActivity extends AppCompatActivity
                     @Override
                     public void onDone(int resultCode) throws JSONException {
                         if( resultCode == GyroManager.DETECT_ACCIDENT ) {
+                            final Location accLocation = GoogleMapManager.getCurLocation();
 
+                            EmergencyManager.setAccLocation(accLocation);
+                            EmergencyManager.startValidationAccident(new ValidateCallback() {
+                                @Override
+                                public void onDone(int resultCode) throws JSONException {
+                                    if (resultCode == EmergencyManager.EMERGENCY_VALIDATE_LOCATION_WATING_FINISH &&
+                                            EmergencyManager.validateLocation(GoogleMapManager.getCurLocation())) {
+                                        // insert data to server
+//                                        EmergencyManager.insertAccidentinServer(UserManager.getUser(), accLocation);
+
+                                    }
+                                }
+                            });
                         }
                     }
                 });
