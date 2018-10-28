@@ -30,7 +30,7 @@
     <string name="log_in">Log in</string>
     <string name="or_divide">OR</string>
     <string name="intro_service_url">http://175.123.140.145/images/intro_service_</string>
-
+    <string name="not_match_login">Email or password do not match.</string>
     <!--MakeProfielFragment-->
     <string name="riding_type_bicycle">bicycle</string>
     <string name="riding_type_motorcycle">motorcycle</string>

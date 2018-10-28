@@ -34,12 +34,6 @@ public class LoginActivity extends FragmentActivity {
         User user = new User.Builder()
                 .build();
 
-        Fragment fragment = new LoginFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add( R.id.fragmentPlace, fragment );
-        fragmentTransaction.commit();
-
         UserManager.setUser(user);
 
         // Solve : bug first touch not working
@@ -51,8 +45,7 @@ public class LoginActivity extends FragmentActivity {
 
         setContentView(R.layout.activity_login);
 
-        Fragment fragment = new StartFragment();
-
+        Fragment fragment = new LoginFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentPlace, fragment).commit();
 
         HttpManager.setServerURI(getString(R.string.server_uri));

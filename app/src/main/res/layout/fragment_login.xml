@@ -143,25 +143,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <com.ahmadrosid.library.FloatingLabelEditText
+                    <com.helper.helper.view.widget.FloatingEditTextAddonControl
                         android:id="@+id/loginEmailInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:nextFocusDown="@id/loginPwInput"
-                        android:focusableInTouchMode="true"
-                        android:focusable="false"
-                        app:editText_color="@color/xxxgray"
-                        app:editText_hint="Email"/>
+                        app:hint_text="@string/join_email"
+                        app:clear_control="true"
+                        app:check_control="true"
+                        app:text_length="@integer/email_length" />
 
-                    <Button
-                        android:id="@+id/loginEmailInput_clear"
-                        android:visibility="invisible"
-                        android:layout_marginTop="5dp"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="15dp"
-                        android:layout_gravity="end|center_vertical"
-                        android:background="@drawable/ic_delete" />
+
 
                 </FrameLayout>
 
@@ -171,25 +162,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <com.ahmadrosid.library.FloatingLabelEditText
+                    <com.helper.helper.view.widget.FloatingEditTextAddonControl
                         android:id="@+id/loginPwInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:nextFocusDown="@id/loginPwInput"
-                        android:focusableInTouchMode="true"
-                        android:focusable="false"
-                        app:editText_color="@color/xxxgray"
-                        app:editText_hint="Password"/>
-
-                    <Button
-                        android:id="@+id/loginPwInput_clear"
-                        android:visibility="invisible"
-                        android:layout_marginTop="5dp"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="15dp"
-                        android:layout_gravity="end|center_vertical"
-                        android:background="@drawable/ic_delete" />
+                        app:hint_text="@string/join_password"
+                        app:clear_control="true"
+                        app:check_control="true"
+                        app:text_length="@integer/pw_length" />
 
                 </FrameLayout>
 
@@ -220,18 +200,11 @@
                         android:src="@drawable/ic_right" />
                 </LinearLayout>
 
-                <Button
-                    android:id="@+id/loginBtn"
-                    android:layout_width="192dp"
+                <com.helper.helper.view.widget.LoadingButton
+                    android:id="@+id/loginLoadingBtn"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="24dp"
-                    android:background="@drawable/primary_button"
-                    android:text="@string/login"
-                    android:textColor="@color/colorPrimary"
-                    android:theme="@style/CategoryCardTitleTypo"
+                    android:layout_width="wrap_content"
                     />
-
             </LinearLayout>
         </RelativeLayout>
 
@@ -240,4 +213,10 @@
             android:layout_height="1dp"
             android:layout_weight="0.1" />
     </LinearLayout>
+
+    <com.helper.helper.view.widget.SnackBar
+        android:id="@+id/loginSnackBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
 </RelativeLayout>
