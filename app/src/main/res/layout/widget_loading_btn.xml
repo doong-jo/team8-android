@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/loadingBtnLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <Button
+        android:id="@+id/loadingBtn"
+        android:layout_centerInParent="true"
+        style="@style/PrimaryButton" />
+
+    <ImageView
+        android:id="@+id/loadingIcon"
+        android:src="@drawable/ic_spinner_solid"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:translationZ="3dp"
+        />
+
+</RelativeLayout>

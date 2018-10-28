@@ -45,8 +45,7 @@ public class LoginActivity extends FragmentActivity {
 
         setContentView(R.layout.activity_login);
 
-        Fragment fragment = new StartFragment();
-
+        Fragment fragment = new LoginFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentPlace, fragment).commit();
 
         HttpManager.setServerURI(getString(R.string.server_uri));

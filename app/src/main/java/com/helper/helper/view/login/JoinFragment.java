@@ -1,4 +1,3 @@
-
 /*
  * Created by Sungdong Jo on 10/9/18 5:02 PM
  * Copyright (c) 2018 . All rights reserved.
@@ -146,8 +145,8 @@ public class JoinFragment extends Fragment {
                                 }
                             });
                         }});
-                    } catch (JSONException e) { e.printStackTrace(); }
-                }
+                } catch (JSONException e) { e.printStackTrace(); }
+            }
         });
 
         m_pwInputTxt.setEnterFocusCmd(new Command() {
@@ -327,10 +326,10 @@ public class JoinFragment extends Fragment {
                 m_snackBar.setText(getString(R.string.check_term));
                 m_snackBar.setIcon(R.drawable.ic_warning);
                 break;
-            
+
         }
     }
-    
+
     private void validateCharacterForm(User user, final ValidateCallback callback) throws JSONException {
         final String email = user.getUserEmail();
         final String passwd = user.getUserPw();
@@ -346,6 +345,7 @@ public class JoinFragment extends Fragment {
             JSONObject reqObject = user.getTransformUserToJSON();
             reqObject.remove("emergency");
             reqObject.remove("lastAccess");
+
 
             HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
                 @Override
