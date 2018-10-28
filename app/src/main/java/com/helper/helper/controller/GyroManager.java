@@ -6,13 +6,21 @@
 
 package com.helper.helper.controller;
 
+import android.app.Activity;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.util.Log;
+import android.widget.Toast;
 
 public class GyroManager {
+    private final static String TAG = GyroManager.class.getSimpleName() + "/DEV";
+
     public static SensorManager m_sensorManager = null;
     public static Sensor m_sensorAccel = null;
     public static Sensor m_sensorMag = null;
+
+    private static long m_shockStateLastTime;
 
     public static float m_fPivotAzimuth = 0.0f;
     public static float m_fPivotPitch = 0.0f;
@@ -24,13 +32,15 @@ public class GyroManager {
     private static final int PITCH_PIVOT = 5;
     private static final int ROLL_PIVOT = 20;
 
-    private static final int SHAKE_THRESHOLD = 5000;
+    private static final int SHAKE_THRESHOLD = 30;
     private static final int ORIENTATION_LEFT = 944;
     private static final int ORIENTATION_RIGHT = 344;
     private static final int ORIENTATION_NONE = 892;
     private static final int EMERGENCY = 121;
 
-    /** Gyro **/
+    /**
+     * Gyro
+     **/
 //    private SensorManager m_sensorManager;
 //    private Sensor m_sensorAccel;
 //    private Sensor m_sensorMag;
@@ -40,7 +50,6 @@ public class GyroManager {
 //    private float m_beforeAccelX;
 //    private float m_beforeAccelY;
 //    private float m_beforeAccelZ;
-
     public static float getPivotRoll() {
         return m_fPivotRoll;
     }
@@ -73,8 +82,7 @@ public class GyroManager {
         m_fTimerStartTime = timerStartTime;
     }
 
-    public static float[] getOrientation(float[] gravity, float[] geomagnetic)
-    {
+    public static float[] getOrientation(float[] gravity, float[] geomagnetic) {
 //        float[] R = new float[9];
 //        float[] values = new float[3];
 //
@@ -91,9 +99,8 @@ public class GyroManager {
         SensorManager.getOrientation(rotation, result);
 
 
-
         // Radian 값을 Degree 값으로 변환한다.
-        result[0] = (float)Math.toDegrees(result[0]);
+        result[0] = (float) Math.toDegrees(result[0]);
 
         // 0 이하의 값인 경우 360을 더한다.*
 //        if(result[0] < 0) result[0] += 360;
@@ -101,25 +108,34 @@ public class GyroManager {
         //방위(azimuth) 값
         result[0] = result[0];
         //경사도(pitch) 값
-        result[1] = (float)Math.toDegrees(result[1]);
+        result[1] = (float) Math.toDegrees(result[1]);
         //좌우회전(roll) 값
-        result[2] = (float)Math.toDegrees(result[2]);
+        result[2] = (float) Math.toDegrees(result[2]);
 
         return result;
     }
-}
 
-
-
-    /*
-    public void shockStateDetector(float accelX, float accelY, float accelZ) {
+    public static void shockStateDetector(Activity activity, SensorEvent sensor) {
         long currentTime = System.currentTimeMillis();
         long gabOfTime = (currentTime - m_shockStateLastTime);
         float speed = 0;
+        float accelX = sensor.values[0];
+        float accelY = sensor.values[1];
+        float accelZ = sensor.values[2];
+
         if (gabOfTime > 100) {
             m_shockStateLastTime = currentTime;
 
-            speed = Math.abs(accelX + accelY + accelZ - m_beforeAccelX - m_beforeAccelY - m_beforeAccelZ) / gabOfTime * 10000;
+            double result = Math.sqrt( (accelX * accelX) + (accelY * accelY) + (accelZ * accelZ) );
+
+            if( result > SHAKE_THRESHOLD ) {
+                Log.d(TAG, "shockStateDetector: Shock!!!");
+                Toast.makeText(activity, "Detect shock", Toast.LENGTH_SHORT).show();
+            }
+
+//            Log.d(TAG, "shockStateDetector: result : " + result);
+
+//            speed = Math.abs(accelX + accelY + accelZ - m_beforeAccelX - m_beforeAccelY - m_beforeAccelZ) / gabOfTime * 10000;
 
 //            if(count++ < 3 ) {
 //                sum_speed += speed;
@@ -137,36 +153,36 @@ public class GyroManager {
 //                    showMsgl("취소 " + speed);
 //                    return;
 //                }
-            if (speed > SHAKE_THRESHOLD) {
-                Log.d(TAG, "shockStateDetector: ");
-                try {
-                    String strSMS1 = getString(R.string.sms_content) + "\n\n" + m_strAddressOutput;
-                    String strSMS2 = "https://google.com/maps?q=" + m_strLatitude + "," + m_strLogitude;
-
-                    List<ContactItem> contactItems;
-                    try {
-                        contactItems = FileManager.readXmlEmergencyContacts(this);
-
-                        for (ContactItem item :
-                                contactItems) {
-                            sendSMS(item.getPhoneNumber(), strSMS1);
-                            sendSMS(item.getPhoneNumber(), strSMS2);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+//            if (speed > SHAKE_THRESHOLD) {
+//                Log.d(TAG, "shockStateDetector: ");
+//                try {
+//                    String strSMS1 = getString(R.string.sms_content) + "\n\n" + m_strAddressOutput;
+//                    String strSMS2 = "https://google.com/maps?q=" + m_strLatitude + "," + m_strLogitude;
+//
+//                    List<ContactItem> contactItems;
+//                    try {
+//                        contactItems = FileManager.readXmlEmergencyContacts(this);
+//
+//                        for (ContactItem item :
+//                                contactItems) {
+//                            sendSMS(item.getPhoneNumber(), strSMS1);
+//                            sendSMS(item.getPhoneNumber(), strSMS2);
+//                        }
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
 
 //                    sendSMS("+8201034823161", strSMS1);
 //                    sendSMS("+8201034823161", strSMS2);
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
-                }
+//                } catch (RuntimeException e) {
+//                    e.printStackTrace();
+//                }
 //                if(!bProcessing) {
 //                    bProcessing = true;
 //                    hanSensor.sendEmptyMessage(0);
 //                    showMsgl("충격 발생 " + speed);
 
-            }
+//            }
 //                else { // 2차 충격
 //                    bProcessing = true;
 //                    hanSensor.removeMessages(1); // 다이얼로그 연장
@@ -176,13 +192,15 @@ public class GyroManager {
 //            }
 
 
-            m_beforeAccelX = accelX;
-            m_beforeAccelY = accelY;
-            m_beforeAccelZ = accelZ;
+//            m_beforeAccelX = accelX;
+//            m_beforeAccelY = accelY;
+//            m_beforeAccelZ = accelZ;
 
         }
     }
+}
 
+    /*
     public void changeLeftOrRightLEDOfRoll(float roll) {
         String writeStr = "";
 
