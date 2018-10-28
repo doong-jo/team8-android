@@ -365,7 +365,7 @@ public class ScrollingActivity extends AppCompatActivity
     /** GyroSensor **/
     public void onSensorChanged(SensorEvent sensorEvent) {
         if( sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
-            GyroManager.shockStateDetector(sensorEvent);
+            GyroManager.shockStateDetector(this, sensorEvent);
         }
 
 

@@ -6,10 +6,12 @@
 
 package com.helper.helper.controller;
 
+import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.util.Log;
+import android.widget.Toast;
 
 public class GyroManager {
     private final static String TAG = GyroManager.class.getSimpleName() + "/DEV";
@@ -113,7 +115,7 @@ public class GyroManager {
         return result;
     }
 
-    public static void shockStateDetector(SensorEvent sensor) {
+    public static void shockStateDetector(Activity activity, SensorEvent sensor) {
         long currentTime = System.currentTimeMillis();
         long gabOfTime = (currentTime - m_shockStateLastTime);
         float speed = 0;
@@ -128,6 +130,7 @@ public class GyroManager {
 
             if( result > SHAKE_THRESHOLD ) {
                 Log.d(TAG, "shockStateDetector: Shock!!!");
+                Toast.makeText(activity, "Detect shock", Toast.LENGTH_SHORT).show();
             }
 
 //            Log.d(TAG, "shockStateDetector: result : " + result);
