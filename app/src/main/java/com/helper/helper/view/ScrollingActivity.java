@@ -43,13 +43,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.R;
 import com.helper.helper.controller.AddressManager;
 import com.helper.helper.controller.BTManager;
+import com.helper.helper.controller.EmergencyManager;
 import com.helper.helper.controller.GoogleMapManager;
+import com.helper.helper.controller.UserManager;
+import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.view.main.InfoFragment;
 import com.helper.helper.view.contact.ContactActivity;
 import com.helper.helper.controller.GyroManager;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.PermissionManager;
 import com.snatik.storage.Storage;
+
+import org.json.JSONException;
 
 import java.io.File;
 
@@ -74,6 +79,7 @@ public class ScrollingActivity extends AppCompatActivity
 
     private InfoFragment m_infoFrag;
 
+    private NavigationView m_navigationView;
 
     public void setMapPosition(double latitude, double longitude, Location curLocation) {
         AddressManager.startAddressIntentService(this, curLocation);
@@ -108,8 +114,8 @@ public class ScrollingActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        m_navigationView = (NavigationView) findViewById(R.id.nav_view);
+        m_navigationView.setNavigationItemSelectedListener(this);
 
         /** Tab **/
         m_tabLayout = findViewById(R.id.tabLayout);
@@ -363,8 +369,34 @@ public class ScrollingActivity extends AppCompatActivity
 
     /** GyroSensor **/
     public void onSensorChanged(SensorEvent sensorEvent) {
-        //Disabled Sensor
-        return;
+        if( sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
+            try {
+                GyroManager.shockStateDetector(this, sensorEvent, new ValidateCallback() {
+                    @Override
+                    public void onDone(int resultCode) throws JSONException {
+                        if( resultCode == GyroManager.DETECT_ACCIDENT ) {
+                            final Location accLocation = GoogleMapManager.getCurLocation();
+
+                            EmergencyManager.setAccLocation(accLocation);
+                            EmergencyManager.startValidationAccident(new ValidateCallback() {
+                                @Override
+                                public void onDone(int resultCode) throws JSONException {
+                                    if (resultCode == EmergencyManager.EMERGENCY_VALIDATE_LOCATION_WATING_FINISH &&
+                                            EmergencyManager.validateLocation(GoogleMapManager.getCurLocation())) {
+                                        // insert data to server
+//                                        EmergencyManager.insertAccidentinServer(UserManager.getUser(), accLocation);
+
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
 
 //        if (!m_bInitialize) { return; }
 //
@@ -445,20 +477,20 @@ public class ScrollingActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        m_navigationView.getMenu().findItem(id).setCheckable(false);
+        m_navigationView.getMenu().findItem(id).setChecked(false);
 
-//        if (id == R.id.nav_camera) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
-//
-//        } else if (id == R.id.nav_slideshow) {
-//
-//        } else if (id == R.id.nav_manage) {
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
+        switch (id) {
+            case R.id.nav_trackingRecords:
+
+                break;
+
+            case R.id.nav_emergencyContacts:
+                Intent intent = new Intent(this, ContactActivity.class);
+                startActivity(intent);
+
+                break;
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

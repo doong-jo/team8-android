@@ -3,6 +3,7 @@ package com.helper.helper.view.contact;
 import java.util.List;
 
 import android.content.Context;
+import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +55,7 @@ public class ItemListAdapter extends ArrayAdapter<ContactItem> {
 
         // Restore the checked state properly
         final ListView lv = (ListView) parent;
-        holder.layout.setChecked(lv.isItemChecked(position));
+//        holder.layout.setChecked(lv.isItemChecked(position));
 
         return convertView;
     }
@@ -80,11 +81,11 @@ public class ItemListAdapter extends ArrayAdapter<ContactItem> {
         public ViewHolder(View root) {
             name = (TextView) root.findViewById(R.id.itemName);
             phoneNumber = (TextView) root.findViewById(R.id.itemPhoneNumber);
-            layout = (CheckableRelativeLayout) root.findViewById(R.id.layout);
+            layout = root.findViewById(R.id.layout);
         }
 
         public TextView name;
         public TextView phoneNumber;
-        public CheckableRelativeLayout layout;
+        public ConstraintLayout layout;
     }
 }

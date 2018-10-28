@@ -20,6 +20,7 @@
         android:textColor="@color/textColorPrimary"
         android:focusable="false" />
 
+
     <TextView android:id="@+id/itemPhoneNumber"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
@@ -29,7 +30,6 @@
         android:textSize="15dp"
         android:textColor="@color/textColorPrimary"
         android:focusable="false" />
-
 
 
     <com.helper.helper.view.widget.InertCheckBox
