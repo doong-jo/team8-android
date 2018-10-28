@@ -116,6 +116,12 @@
         <item name="android:textSize">11dp</item>
     </style>
 
+    <!--Light-->
+    <style name="LightTypo" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/roboto_light</item>
+        <item name="android:textSize">11dp</item>
+    </style>
+
     <style name="wideCard" parent="CardView">
         <item name="android:layout_width">325dp</item>
         <item name="android:layout_height">96dp</item>

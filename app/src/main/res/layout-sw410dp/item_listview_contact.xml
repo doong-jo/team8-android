@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="18.24dp"
+    android:paddingTop="9.12dp"
+    android:paddingBottom="9.12dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    
+    <ImageView
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:id="@+id/userProfile"
+        android:src="@drawable/ic_user"
+        android:layout_width="54.72dp"
+        android:layout_height="54.72dp" />
+    
+    <LinearLayout
+        app:layout_constraintLeft_toRightOf="@id/userProfile"
+        android:layout_marginStart="26.22dp"
+        android:layout_width="wrap_content"
+        android:layout_height="54.72dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/itemName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2.28dp"
+            android:textColor="@color/contact_txt_clr"
+            style="@style/TopTabBarTypo"/>
+
+        <TextView
+            android:id="@+id/itemPhoneNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/contact_txt_clr"
+            style="@style/LightTypo"/>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

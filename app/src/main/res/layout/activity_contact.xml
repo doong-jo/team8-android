@@ -1,89 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="16dp">
 
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout
+        android:id="@+id/topLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <!--<Button android:id="@+id/toggleChoiceModeButton"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="0.33"-->
-            <!--android:layout_margin="2dp"-->
-            <!--android:onClick="onButtonClick"-->
-            <!--android:text="Toggle Choice Mode" />-->
-
-        <!--<Button android:id="@+id/viewCheckedIdsButton"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="0.33"-->
-            <!--android:layout_marginTop="2dp"-->
-            <!--android:layout_marginBottom="2dp"-->
-            <!--android:onClick="onButtonClick"-->
-            <!--android:text="Selected IDs" />-->
-
-        <!--<Button android:id="@+id/viewCheckedItemsButton"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_margin="2dp"-->
-            <!--android:layout_weight="0.33"-->
-            <!--android:onClick="onButtonClick"-->
-            <!--android:text="Selected Items" />-->
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/backMainActivity"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_margin="10dp">
+            android:src="@drawable/ic_back"/>
 
-            <ImageView
-                android:src="@drawable/ic_heartbeat_solid"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"/>
+        <TextView
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/contact_title"
+            android:textColor="@color/black"
+            android:alpha="0.77"
+            style="@style/CategoryCardTitleTypo"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="5dp"
-                android:textStyle="bold"
-                android:textSize="20dp"
-                android:textColor="@color/textColorPrimary"
-                android:text="Emergency contacts"/>
+    </RelativeLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="end" >
-
-                <ImageView
-                    android:src="@drawable/ic_user_minus_solid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:onClick="removeContactsClick"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!--<Button-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:background="@color/colorAccent"-->
-            <!--android:textColor="@color/colorPrimary"-->
-            <!--android:textStyle="bold"-->
-            <!--android:onClick="showInternalContacts"-->
-            <!--android:text="Add Contact"/>-->
+    <LinearLayout
+        app:layout_constraintTop_toBottomOf="@id/topLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/textViewNoContactsList"
@@ -97,21 +51,23 @@
             android:text="@string/no_emergency_contacts_list"/>
 
         <ListView
+            app:layout_constraintTop_toBottomOf="@id/topLayout"
             android:id="@+id/android:list"
             android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="0dp"/>
+            android:layout_height="0dp"
+            android:divider="@color/white"/>
 
 
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         android:id="@+id/addContactFab"
         android:src="@drawable/ic_plus_solid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
         android:layout_margin="@dimen/fab_margin"
         android:onClick="showInternalContacts"/>
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>
