@@ -4,6 +4,7 @@ allprojects {
     repositories {
         jcenter()
         maven { url "https://jitpack.io" }
+        mavenCentral()
     }
 }
 
@@ -77,8 +78,8 @@ dependencies {
     //    Cookie
     implementation 'com.liuguangqiang.cookie:library:1.0.0'
 
-    //    Photo picker
-    implementation 'me.iwf.photopicker:PhotoPicker:0.9.12@aar'
+    //    Alert Dialog
+    implementation 'com.github.f0ris.sweetalert:library:1.5.1'
 
 //    compile 'com.android.support:appcompat-v7:23.4.0'
 //    compile 'com.android.support:recyclerview-v7:23.4.0'
