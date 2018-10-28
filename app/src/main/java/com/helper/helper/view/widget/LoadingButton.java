@@ -40,6 +40,7 @@ public class LoadingButton extends  RelativeLayout {
         String infService = Context.LAYOUT_INFLATER_SERVICE;
         LayoutInflater li = (LayoutInflater) getContext().getSystemService(infService);
         View v = li.inflate(R.layout.widget_loading_btn, this, false);
+        addView(v);
 
         m_layout = findViewById(R.id.loadingBtnLayout);
         m_button = findViewById(R.id.loadingBtn);
@@ -48,10 +49,12 @@ public class LoadingButton extends  RelativeLayout {
 
     private void getAttrs(AttributeSet attrs){
         TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.LoadingButton);
+        setTypeArray(typedArray);
     }
 
     private void getAttrs(AttributeSet attrs, int defStyle){
         TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.LoadingButton, defStyle, 0);
+        setTypeArray(typedArray);
     }
 
 
@@ -66,10 +69,16 @@ public class LoadingButton extends  RelativeLayout {
                     getContext().getApplicationContext(), R.anim.rotate_anim);
                 m_icon.startAnimation(anim);
         }
-        else{m_icon.setVisibility(View.INVISIBLE);}
+        else{ m_icon.setVisibility(View.INVISIBLE); }
     }
 
-    public void setText(String text){m_button.setText(text);}
-    public void setIcon(int resId){m_icon.setImageResource(resId);}
+    public void setText(String text) { m_button.setText(text); }
 
+    public void setIcon(int resId) {
+        m_icon.setImageResource(resId);
+    }
+
+    public void setButtonOnClickListener(OnClickListener listener) {
+        m_button.setOnClickListener(listener);
+    }
 }

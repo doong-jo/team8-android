@@ -27,6 +27,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -79,12 +80,16 @@ public class LoginFragment extends Fragment {
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
+        // Solve : bug first touch not working
+        getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
         View view = inflater.inflate( R.layout.fragment_login, container, false );
 
         /******************* Connect widgtes with layout *******************/
         m_emailInputTxt = view.findViewById(R.id.loginEmailInput);
         m_pwInputTxt = view.findViewById(R.id.loginPwInput);
-        m_loginBtn = view.findViewById(R.id.loadingBtn);
+        m_loginBtn = view.findViewById(R.id.loginLoadingBtn);
 
         m_emailInputTxt.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         m_emailInputTxt.setImeOption(EditorInfo.IME_ACTION_NEXT);
@@ -94,59 +99,15 @@ public class LoginFragment extends Fragment {
 
         m_snackBar = view.findViewById(R.id.loginSnackBar);
 
-
-
+        ImageView backStartFragment = view.findViewById(R.id.backStartFragment);
 
         /*******************************************************************/
 
         setLoginBtnStatus(DEFAULT_LOGIN);
 
         /******************* Make Listener in View *******************/
-//        m_emailInput.getmEditText().setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                if( !hasFocus ) {
-//                    m_emailInputClear.setVisibility(View.INVISIBLE);
-//                    return;
-//                }
-//
-//                if( !m_emailInput.getmEditText().getText().equals("") ) {
-//                    m_emailInputClear.setOnClickListener(m_emailInputClearClickListener);
-//                    setControlEditText(EDITTEXT_CONTROL_CLEAR, m_emailInputClear);
-//                }
-//            }
-//
-//        });
 
-
-//        m_emailInput.getmEditText().addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                if( m_emailInput.getText().length() > MAX_EMAIL_LENGTH) {
-//                    String maximumAllowedCharacters = m_emailInput.getmEditText().getText().toString().substring(0, MAX_EMAIL_LENGTH);
-//
-//                    m_emailInput.getmEditText().setText(maximumAllowedCharacters);
-//                    m_emailInput.getmEditText().setSelection(MAX_EMAIL_LENGTH);
-//                }
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable editable) {
-//                if( !m_emailInput.getmEditText().getText().toString().equals("") ) {
-//                    m_emailInputClear.setVisibility(View.VISIBLE);
-//                } else {
-//                    m_emailInputClear.setVisibility(View.INVISIBLE);
-//                }
-//            }
-//        });
-
-
-        m_loginBtn.setOnClickListener(new OnClickListener() {
+        m_loginBtn.setButtonOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 tryLogin();
@@ -183,6 +144,15 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        backStartFragment.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LoginActivity activity = (LoginActivity)getActivity();
+                if( activity != null ) {
+                    activity.moveToFragment(new StartFragment(), true);
+                }
+            }
+        });
         /*************************************************************/
 
         return view;
@@ -195,8 +165,8 @@ public class LoginFragment extends Fragment {
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
 
-        String email = m_emailInputTxt.getText().toString();
-        String pw = m_pwInputTxt.getText().toString();
+        String email = m_emailInputTxt.getText();
+        String pw = m_pwInputTxt.getText();
 
 
         if(FormManager.emailCharValidate(email) == FormManager.RESULT_VALIDATION_EMAIL_WRONG) {
@@ -239,7 +209,8 @@ public class LoginFragment extends Fragment {
                                         @Override
                                         public void run() {
 //                                            ProgressDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.login_loading_title), getString(R.string.login_loading_message), true);
-                                            setLoginBtnStatus(DEFAULT_LOGIN);
+                                            setLoginBtnStatus(DELAY_LOGIN);
+                                            m_snackBar.setVisible(false);
 
                                             Intent intent=new Intent(getActivity(),ScrollingActivity.class);
                                             startActivity(intent);
@@ -285,15 +256,13 @@ public class LoginFragment extends Fragment {
     }
 
     private void setLoginBtnStatus(int visibleCode){
-        m_loginBtn.setIcon(R.drawable.ic_spinner_solid);
-
         switch(visibleCode){
             case DELAY_LOGIN:
                 m_loginBtn.setText("");
                 m_loginBtn.setLoadingIconVisible(true);
                 break;
             case DEFAULT_LOGIN:
-                m_loginBtn.setText("Log In");
+                m_loginBtn.setText(getString(R.string.login));
                 m_loginBtn.setLoadingIconVisible(false);
         }
     }

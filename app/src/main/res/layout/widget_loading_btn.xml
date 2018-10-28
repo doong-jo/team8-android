@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/loadingBtnLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
     <Button
         android:id="@+id/loadingBtn"
-        android:layout_width="192dp"
-        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/primary_button"
-        android:textColor="@color/colorPrimary"
-        android:theme="@style/CategoryCardTitleTypo" />
+        style="@style/PrimaryButton" />
 
     <ImageView
         android:id="@+id/loadingIcon"
+        android:src="@drawable/ic_spinner_solid"
+        android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
-        android:layout_marginLeft="88dp"
+        android:translationZ="3dp"
         />
 
 </RelativeLayout>

@@ -6,9 +6,4 @@
         <attr name="hint_text" format="reference|integer" />
         <attr name="text_length" format="reference|integer" />
     </declare-styleable>
-
-    <declare-styleable name="LoadingButton">
-        <attr name="loading_icon" format="reference|integer" />
-        <attr name="button_text" format="reference|string"/>
-    </declare-styleable>
 </resources>
