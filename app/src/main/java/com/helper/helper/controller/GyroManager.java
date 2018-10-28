@@ -13,8 +13,15 @@ import android.hardware.SensorManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.helper.helper.interfaces.ValidateCallback;
+
+import org.json.JSONException;
+
 public class GyroManager {
     private final static String TAG = GyroManager.class.getSimpleName() + "/DEV";
+
+    public static final int DETECT_ACCIDENT = 537;
+    public static final int DETECT_NONE = 622;
 
     public static SensorManager m_sensorManager = null;
     public static Sensor m_sensorAccel = null;
@@ -115,7 +122,7 @@ public class GyroManager {
         return result;
     }
 
-    public static void shockStateDetector(Activity activity, SensorEvent sensor) {
+    public static void shockStateDetector(Activity activity, SensorEvent sensor, ValidateCallback callback) throws JSONException {
         long currentTime = System.currentTimeMillis();
         long gabOfTime = (currentTime - m_shockStateLastTime);
         float speed = 0;
@@ -131,6 +138,10 @@ public class GyroManager {
             if( result > SHAKE_THRESHOLD ) {
                 Log.d(TAG, "shockStateDetector: Shock!!!");
                 Toast.makeText(activity, "Detect shock", Toast.LENGTH_SHORT).show();
+
+                callback.onDone(DETECT_ACCIDENT);
+            } else {
+                callback.onDone(DETECT_NONE);
             }
 
 //            Log.d(TAG, "shockStateDetector: result : " + result);
