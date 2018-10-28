@@ -452,11 +452,11 @@ public class ScrollingActivity extends AppCompatActivity
         switch (id) {
             case R.id.nav_trackingRecords:
 
-                Intent intent = new Intent(this, ContactActivity.class);
-                startActivity(intent);
                 break;
 
             case R.id.nav_emergencyContacts:
+                Intent intent = new Intent(this, ContactActivity.class);
+                startActivity(intent);
 
                 break;
         }
