@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.helper.helper.R;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.model.ContactItem;
+import com.helper.helper.view.ScrollingActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +34,16 @@ public class ContactActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
+
+        ImageView backMainImg = findViewById(R.id.backMainActivity);
+
+
+        backMainImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         // Create the adapter to render our data
         // --

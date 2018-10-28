@@ -446,6 +446,18 @@ public class ScrollingActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+
+        switch (id) {
+            case R.id.nav_trackingRecords:
+                Intent intent = new Intent(this, ContactActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.nav_emergencyContacts:
+
+                break;
+        }
+
 //        if (id == R.id.nav_camera) {
 //            // Handle the camera action
 //        } else if (id == R.id.nav_gallery) {
@@ -460,8 +472,10 @@ public class ScrollingActivity extends AppCompatActivity
 //
 //        }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+//        item.setChecked(false);
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        drawer.closeDrawer(GravityCompat.START);
+
         return true;
     }
 
