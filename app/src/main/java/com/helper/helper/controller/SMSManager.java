@@ -12,7 +12,10 @@ import android.content.Intent;
 import android.telephony.SmsManager;
 import android.util.Log;
 
+import com.helper.helper.model.ContactItem;
 import com.helper.helper.view.ScrollingActivity;
+
+import java.util.List;
 
 public class SMSManager {
 
@@ -20,6 +23,8 @@ public class SMSManager {
     private static final String DELIVERED = "SMS_DELIVERED_ACTION";
 
     private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
+
+    private static List<ContactItem> m_emergencyContactsList;
 
     public static void sendMessage(Context context, String receiveNumber, String message) {
         PendingIntent sentPI = PendingIntent.getBroadcast(context, 0, new Intent(SENT), 0);
@@ -32,6 +37,14 @@ public class SMSManager {
         }
         sms.sendTextMessage(receiveNumber, "ME", message, sentPI, deliveredPI);
         //sms.sendTextMessage(num, null, txt, null, null);
+    }
+
+    public static void setEmergencyContactsList(List<ContactItem> list) {
+        m_emergencyContactsList = list;
+    }
+
+    public static List<ContactItem> getEmergencyContactsList() {
+        return m_emergencyContactsList;
     }
 }
 

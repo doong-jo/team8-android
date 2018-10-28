@@ -74,6 +74,7 @@ public class ScrollingActivity extends AppCompatActivity
 
     private InfoFragment m_infoFrag;
 
+    private NavigationView m_navigationView;
 
     public void setMapPosition(double latitude, double longitude, Location curLocation) {
         AddressManager.startAddressIntentService(this, curLocation);
@@ -108,8 +109,8 @@ public class ScrollingActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        m_navigationView = (NavigationView) findViewById(R.id.nav_view);
+        m_navigationView.setNavigationItemSelectedListener(this);
 
         /** Tab **/
         m_tabLayout = findViewById(R.id.tabLayout);
@@ -445,10 +446,12 @@ public class ScrollingActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        m_navigationView.getMenu().findItem(id).setCheckable(false);
+        m_navigationView.getMenu().findItem(id).setChecked(false);
 
         switch (id) {
             case R.id.nav_trackingRecords:
+
                 Intent intent = new Intent(this, ContactActivity.class);
                 startActivity(intent);
                 break;
@@ -471,6 +474,7 @@ public class ScrollingActivity extends AppCompatActivity
 //        } else if (id == R.id.nav_send) {
 //
 //        }
+
 
 //        item.setChecked(false);
 //        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -31,16 +31,6 @@
             android:alpha="0.77"
             style="@style/CategoryCardTitleTypo"/>
 
-
-        <!--<ImageView-->
-            <!--android:id="@+id/backMainActivity"-->
-            <!--android:layout_marginTop="9.12dp"-->
-            <!--android:layout_marginBottom="11.4dp"-->
-            <!--android:layout_marginEnd="10dp"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:src="@drawable/ic_back"/>-->
-        <!---->
     </RelativeLayout>
 
     <LinearLayout
@@ -48,16 +38,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
-        <!--<Button-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:background="@color/colorAccent"-->
-            <!--android:textColor="@color/colorPrimary"-->
-            <!--android:textStyle="bold"-->
-            <!--android:onClick="showInternalContacts"-->
-            <!--android:text="Add Contact"/>-->
 
         <TextView
             android:id="@+id/textViewNoContactsList"
