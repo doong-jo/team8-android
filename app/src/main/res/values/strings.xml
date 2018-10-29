@@ -30,7 +30,7 @@
     <string name="log_in">Log in</string>
     <string name="or_divide">OR</string>
     <string name="intro_service_url">http://175.123.140.145/images/intro_service_</string>
-
+    <string name="not_match_login">Email or password do not match.</string>
     <!--MakeProfielFragment-->
     <string name="riding_type_bicycle">bicycle</string>
     <string name="riding_type_motorcycle">motorcycle</string>
@@ -112,15 +112,14 @@
     <string name="invalid_password">Please must contain 8 or more characters, letters, and numbers</string>
     <string name="info_password">Please contain 8 or more characters, letters, and numbers</string>
     <string name="check_term">Please check term privacy</string>
-    <string name="login_another_service">다른 서비스로 로그인</string>
-    <string name="login_or">또는</string>
-    <string name="login_id_edittext_hint">이메일</string>
-    <string name="login_pw_edittext_hint">비밀번호</string>
-    <string name="login">로그인</string>
-    <string name="suggest_join">계정이 없으신가요?</string>
-    <string name="join_us">회원가입</string>
-    <string name="login_loading_title">"사용자 정보를 불러오는 중입니다."</string>
-    <string name="login_loading_message">"잠시만 기다려주세요..."</string>
+    <string name="login_or">OR</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_forgot">Forgot password</string>
+    <string name="login_facebook">Continue with Facebook</string>
+    <string name="login_kakao">Continue with Kakao</string>
+    <string name="login_welcome">Welcome back!</string>
+    <string name="login">Log in</string>
 
     <!--Join-->
     <string name="join_intro_text">Would you like to join us?</string>

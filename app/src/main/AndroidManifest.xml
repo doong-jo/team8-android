@@ -54,23 +54,24 @@
 
         </activity>
 
+        <!--android:windowSoftInputMode="adjustResize"-->
         <activity android:name=".view.login.LoginActivity"
             android:screenOrientation="portrait"
             android:noHistory="false"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
-
-        <activity
-            android:name=".view.ScrollingActivity"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait">
+            >
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".view.ScrollingActivity"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity android:name=".view.contact.ContactActivity"
