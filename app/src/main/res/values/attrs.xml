@@ -6,4 +6,12 @@
         <attr name="hint_text" format="reference|integer" />
         <attr name="text_length" format="reference|integer" />
     </declare-styleable>
+
+    <declare-styleable name="SnackBar">
+
+    </declare-styleable>
+
+    <declare-styleable name="LoadingButton">
+
+    </declare-styleable>
 </resources>
