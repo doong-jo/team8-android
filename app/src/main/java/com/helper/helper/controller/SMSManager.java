@@ -9,9 +9,11 @@ package com.helper.helper.controller;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.telephony.SmsManager;
 import android.util.Log;
 
+import com.helper.helper.R;
 import com.helper.helper.model.ContactItem;
 import com.helper.helper.view.ScrollingActivity;
 
@@ -24,7 +26,17 @@ public class SMSManager {
 
     private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
 
-    private static List<ContactItem> m_emergencyContactsList;
+
+    public static void sendEmergencyMessages(Context context, List<ContactItem> list, Location location, String address) {
+        String strMessage = context.getString(R.string.sms_content) + "\n\n" + address;
+        String strGoogleMap = "https://google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude();
+
+        for (ContactItem contact :
+                list) {
+            sendMessage(context, contact.getPhoneNumber(), strMessage);
+            sendMessage(context, contact.getPhoneNumber(), strGoogleMap);
+        }
+    }
 
     public static void sendMessage(Context context, String receiveNumber, String message) {
         PendingIntent sentPI = PendingIntent.getBroadcast(context, 0, new Intent(SENT), 0);
@@ -37,14 +49,6 @@ public class SMSManager {
         }
         sms.sendTextMessage(receiveNumber, "ME", message, sentPI, deliveredPI);
         //sms.sendTextMessage(num, null, txt, null, null);
-    }
-
-    public static void setEmergencyContactsList(List<ContactItem> list) {
-        m_emergencyContactsList = list;
-    }
-
-    public static List<ContactItem> getEmergencyContactsList() {
-        return m_emergencyContactsList;
     }
 }
 

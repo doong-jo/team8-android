@@ -29,13 +29,25 @@ import java.util.Locale;
 
 public class EmergencyManager {
     private final static String TAG = EmergencyManager.class.getSimpleName() + "/DEV";
-    private static final int EMERGENCY_LOCATION_WATING_TIME = 240000; // 4min
+    private static final int EMERGENCY_LOCATION_WATING_TIME = 10000; // 4min 240000
     private static final int EMERGENCY_LOCATION_DISTANCE_RANGE = 50; // 50m
+    private static final int EMERGENCY_WATING_RESPONSE_TIME = 30000; // 30S
 
-    public static final int EMERGENCY_VALIDATE_LOCATION_WATING_FINISH = 901;
+    public static final int EMERGENCY_VALIDATE_LOCATION_WAITNG_FINISH = 901;
+    public static final int EMERGENCY_WAITING_USER_RESPONSE = 231;
 
     private static Location m_accLocation;
     private static boolean m_bIsAccidentProcessing;
+    private static List<ContactItem> m_emergencyContacts;
+
+
+    public static void setEmergencycontacts(List<ContactItem> list) {
+        m_emergencyContacts = list;
+    }
+
+    public static List<ContactItem> getEmergencyContacts() {
+        return m_emergencyContacts;
+    }
 
     public static void setAccLocation(Location accLocation) {
         m_accLocation = accLocation;
@@ -53,7 +65,7 @@ public class EmergencyManager {
             @Override
             public void run() {
                 try {
-                    callback.onDone(EMERGENCY_VALIDATE_LOCATION_WATING_FINISH);
+                    callback.onDone(EMERGENCY_VALIDATE_LOCATION_WAITNG_FINISH);
                     m_bIsAccidentProcessing = false;
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -64,7 +76,22 @@ public class EmergencyManager {
         m_bIsAccidentProcessing = true;
     }
 
+    public static void startWaitingUserResponse(final ValidateCallback callback) {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    callback.onDone(EMERGENCY_WAITING_USER_RESPONSE);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, EMERGENCY_WATING_RESPONSE_TIME);
+    }
+
     public static boolean validateLocation(Location curLocation) {
+        double distance = curLocation.distanceTo(m_accLocation);
         if( curLocation.distanceTo(m_accLocation) < EMERGENCY_LOCATION_DISTANCE_RANGE ) {
             return true;
         }

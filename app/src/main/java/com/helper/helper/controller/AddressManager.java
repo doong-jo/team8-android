@@ -17,10 +17,10 @@ import com.helper.helper.Constants;
 
 public class AddressManager {
     public static AddressResultReceiver m_resultAddressReceiver;
-    private static String strAddrOutput;
+    private static String m_strAddrOutput;
 
     public static String getConvertLocationToAddress() {
-        return strAddrOutput;
+        return m_strAddrOutput;
     }
 
     public static class AddressResultReceiver extends ResultReceiver {
@@ -33,8 +33,8 @@ public class AddressManager {
          */
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
-            strAddrOutput = resultData.getString(Constants.RESULT_DATA_KEY);
-            strAddrOutput = strAddrOutput.replaceAll("대한민국 ", "");
+            m_strAddrOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            m_strAddrOutput = m_strAddrOutput.replaceAll("대한민국 ", "");
         }
     }
 

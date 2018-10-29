@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.helper.helper.R;
+import com.helper.helper.controller.EmergencyManager;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.SMSManager;
 import com.helper.helper.model.ContactItem;
@@ -64,7 +65,7 @@ public class ContactActivity extends ListActivity {
 
         try {
             listViewData = FileManager.readXmlEmergencyContacts(this);
-            SMSManager.setEmergencyContactsList(listViewData);
+            EmergencyManager.setEmergencycontacts(listViewData);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -123,8 +124,8 @@ public class ContactActivity extends ListActivity {
 
         toggleShowNotExistsContactsText();
 
+        EmergencyManager.setEmergencycontacts(listViewData);
         try {
-            SMSManager.setEmergencyContactsList(listViewData);
             FileManager.writeXmlEmergencyContacts(this, listViewData);
         } catch (IOException e) {
             Log.e(TAG, "removeSeletedItems: Can not write Emergency contacts into xml", e);
