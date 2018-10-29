@@ -50,6 +50,7 @@ dependencies {
     //    Google API
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation 'com.google.android.gms:play-services-places:16.0.0'
     implementation 'com.google.apis:google-api-services-youtube:v3-rev205-1.25.0'
 
     //    Glide(GIF)
