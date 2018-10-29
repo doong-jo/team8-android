@@ -18,6 +18,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -46,7 +47,9 @@ import com.helper.helper.R;
 import com.helper.helper.controller.AddressManager;
 import com.helper.helper.controller.BTManager;
 import com.helper.helper.controller.EmergencyManager;
+import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.GoogleMapManager;
+import com.helper.helper.controller.SMSManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.view.main.InfoFragment;
@@ -59,6 +62,7 @@ import com.snatik.storage.Storage;
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.IOException;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -101,6 +105,15 @@ public class ScrollingActivity extends AppCompatActivity
         setContentView(R.layout.activity_scrolling);
 //        getSupportActionBar().setDisplayShowTitleEnabled(false);
 //        getSupportActionBar().setTitle("asdf");
+
+        /** Set Emergency Contacts **/
+        if ( EmergencyManager.getEmergencyContacts() == null ) {
+            try {
+                EmergencyManager.setEmergencycontacts(FileManager.readXmlEmergencyContacts(this));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         /** ToolBar **/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -162,25 +175,10 @@ public class ScrollingActivity extends AppCompatActivity
             }
         });
 
-        /** Dialog **/
-        m_accDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
-                .setTitleText("Are you Ok?")
-                .setContentText("사고를 인지하였습니다.\n시간(30s) 내에 응답이 없을 시 비상연락처에 사고정보가 전달됩니다.")
-                .setConfirmText("전달해주세요")
-                .setCancelText("괜찮아요")
-                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sDialog) {
-//                                            sDialog.dismissWithAnimation();
-                        sDialog
-                                .setTitleText("전달되었습니다!")
-                                .setContentText("ㅇㅇㅇ이 곧 도착합니다!")
-                                .setConfirmText("OK")
-                                .setConfirmClickListener(null)
-                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
-                    }
-                });
 
+        final Activity activity = this;
+        /** Dialog **/
+        m_accDialog = resetAccDialog();
 
         /*******************************************************************/
 
@@ -236,6 +234,50 @@ public class ScrollingActivity extends AppCompatActivity
         GyroManager.m_sensorAccel = GyroManager.m_sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         GyroManager.m_sensorMag = GyroManager.m_sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         /* Sensor end */
+    }
+
+    private SweetAlertDialog resetAccDialog() {
+        return
+            new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("Are you Ok?")
+                    .setContentText("사고를 인지하였습니다.\n시간(30s) 내에 응답이 없을 시 비상연락처에 사고정보가 전달됩니다.")
+                    .setConfirmText("전달해주세요")
+                    .setCancelText("괜찮아요")
+                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(final SweetAlertDialog sDialog) {
+                            startAlertEmergencyContacts();
+                        }
+                    });
+    }
+
+    private void startAlertEmergencyContacts() {
+        SMSManager.sendEmergencyMessages(
+                this,
+                EmergencyManager.getEmergencyContacts(),
+                EmergencyManager.getAccLocation(),
+                AddressManager.getConvertLocationToAddress());
+
+        m_accDialog
+                .setTitleText("전달되었습니다!")
+                .setContentText("ㅇㅇㅇ이 곧 도착합니다!")
+                .setConfirmText("OK")
+                .showCancelButton(false)
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        m_accDialog.dismissWithAnimation();
+                    }
+                })
+                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                m_accDialog.dismissWithAnimation();
+            }
+        }, 3000);
     }
 
     /** Result handler **/
@@ -400,22 +442,35 @@ public class ScrollingActivity extends AppCompatActivity
                     public void onDone(int resultCode) throws JSONException {
                         if( resultCode == GyroManager.DETECT_ACCIDENT ) {
 
-                            activity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-
-                                }
-                            });
-
+                            if ( !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ||
+                                    !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_FINE_LOCATION) ) {
+                                Toast.makeText(activity, "사고를 인지했지만 위치 정보 권한이 허용되지 않아 제대로 동작하지 않습니다.", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
 
                             final Location accLocation = GoogleMapManager.getCurLocation();
-
+                            AddressManager.startAddressIntentService(activity, accLocation);
                             EmergencyManager.setAccLocation(accLocation);
+
                             EmergencyManager.startValidationAccident(new ValidateCallback() {
                                 @Override
                                 public void onDone(int resultCode) throws JSONException {
-                                    if (resultCode == EmergencyManager.EMERGENCY_VALIDATE_LOCATION_WATING_FINISH &&
+                                    if (resultCode == EmergencyManager.EMERGENCY_VALIDATE_LOCATION_WAITNG_FINISH &&
                                             EmergencyManager.validateLocation(GoogleMapManager.getCurLocation())) {
+
+                                        m_accDialog = resetAccDialog();
+                                        m_accDialog.show();
+                                        EmergencyManager.startWaitingUserResponse(new ValidateCallback() {
+                                            @Override
+                                            public void onDone(int resultCode) {
+                                                if( resultCode == EmergencyManager.EMERGENCY_WAITING_USER_RESPONSE ) {
+                                                    if( m_accDialog.isShowing() ) {
+                                                        startAlertEmergencyContacts();
+                                                    }
+                                                }
+                                            }
+                                        });
+
                                         // insert data to server
 //                                        EmergencyManager.insertAccidentinServer(UserManager.getUser(), accLocation);
 
