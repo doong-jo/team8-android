@@ -52,6 +52,7 @@ import com.helper.helper.controller.GoogleMapManager;
 import com.helper.helper.controller.SMSManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.ValidateCallback;
+import com.helper.helper.view.assist.AssistActivity;
 import com.helper.helper.view.main.InfoFragment;
 import com.helper.helper.view.contact.ContactActivity;
 import com.helper.helper.controller.GyroManager;
@@ -557,15 +558,21 @@ public class ScrollingActivity extends AppCompatActivity
         m_navigationView.getMenu().findItem(id).setCheckable(false);
         m_navigationView.getMenu().findItem(id).setChecked(false);
 
+        Intent intent;
         switch (id) {
             case R.id.nav_trackingRecords:
 
                 break;
 
             case R.id.nav_emergencyContacts:
-                Intent intent = new Intent(this, ContactActivity.class);
+                intent = new Intent(this, ContactActivity.class);
                 startActivity(intent);
 
+                break;
+
+            case R.id.nav_assistPlaces:
+                intent = new Intent(this, AssistActivity.class);
+                startActivity(intent);
                 break;
         }
 
