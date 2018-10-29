@@ -7,9 +7,11 @@
 package com.helper.helper.view;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -58,6 +60,8 @@ import org.json.JSONException;
 
 import java.io.File;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import static android.support.design.widget.TabLayout.*;
 
 public class ScrollingActivity extends AppCompatActivity
@@ -77,9 +81,9 @@ public class ScrollingActivity extends AppCompatActivity
     private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
 
-    private InfoFragment m_infoFrag;
-
     private NavigationView m_navigationView;
+
+    private SweetAlertDialog m_accDialog;
 
     public void setMapPosition(double latitude, double longitude, Location curLocation) {
         AddressManager.startAddressIntentService(this, curLocation);
@@ -157,6 +161,25 @@ public class ScrollingActivity extends AppCompatActivity
 
             }
         });
+
+        /** Dialog **/
+        m_accDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Are you Ok?")
+                .setContentText("사고를 인지하였습니다.\n시간(30s) 내에 응답이 없을 시 비상연락처에 사고정보가 전달됩니다.")
+                .setConfirmText("전달해주세요")
+                .setCancelText("괜찮아요")
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+//                                            sDialog.dismissWithAnimation();
+                        sDialog
+                                .setTitleText("전달되었습니다!")
+                                .setContentText("ㅇㅇㅇ이 곧 도착합니다!")
+                                .setConfirmText("OK")
+                                .setConfirmClickListener(null)
+                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                    }
+                });
 
 
         /*******************************************************************/
@@ -370,11 +393,21 @@ public class ScrollingActivity extends AppCompatActivity
     /** GyroSensor **/
     public void onSensorChanged(SensorEvent sensorEvent) {
         if( sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
+            final Activity activity = this;
             try {
                 GyroManager.shockStateDetector(this, sensorEvent, new ValidateCallback() {
                     @Override
                     public void onDone(int resultCode) throws JSONException {
                         if( resultCode == GyroManager.DETECT_ACCIDENT ) {
+
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                }
+                            });
+
+
                             final Location accLocation = GoogleMapManager.getCurLocation();
 
                             EmergencyManager.setAccLocation(accLocation);
