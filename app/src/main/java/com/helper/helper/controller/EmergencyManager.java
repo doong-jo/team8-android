@@ -99,6 +99,7 @@ public class EmergencyManager {
         return false;
     }
 
+    // Only use Bluetooth (deprecated)
     public static void startEmergencyProcess(Context context) throws JSONException {
         /** Send SMS to EmergencyContacts **/
         List<ContactItem> contactItems;
@@ -120,10 +121,10 @@ public class EmergencyManager {
         }
 
         /** Insert data in server **/
-        insertAccidentinServer(UserManager.getUser(), accLocation);
+//        insertAccidentinServer(UserManager.getUser(), accLocation);
     }
 
-    public static void insertAccidentinServer(User user, Location accLocation) throws JSONException {
+    public static void insertAccidentinServer(User user, Location accLocation, boolean bIsAlerted) throws JSONException {
         JSONObject locationObject = new JSONObject();
         locationObject.put("latitude", accLocation.getLatitude());
         locationObject.put("longitude", accLocation.getLongitude());
@@ -132,13 +133,13 @@ public class EmergencyManager {
             JSONObject reqObject = new JSONObject();
             reqObject.put("user_id", user.getUserEmail());
             reqObject.put("riding_type", user.getUserRidingType());
+            reqObject.put("has_alerted", bIsAlerted);
 
             Date occDate = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.KOREA);
+            String dateStr = sdf.format(occDate);
 
-            String str = sdf.format(occDate);
-
-            reqObject.put("occured_date", sdf.format(occDate));
+            reqObject.put("occured_date", dateStr);
             reqObject.put("position", locationObject);
 
 

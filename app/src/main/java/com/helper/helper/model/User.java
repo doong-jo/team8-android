@@ -35,6 +35,7 @@ public class User {
         private String m_userPw;
         private String m_userPhone;
         private String m_userName;
+        private String m_userRidingType;
 
         public Builder() {
             m_userEmail = "";
@@ -42,6 +43,7 @@ public class User {
             m_userPw = "";
             m_userPhone = "";
             m_userName = "";
+            m_userRidingType = "";
         }
         public Builder email(String emailStr) {
             this.m_userEmail = emailStr;
@@ -63,6 +65,11 @@ public class User {
             return this;
         }
 
+        public Builder ridingType(String ridingTypeStr) {
+            this.m_userRidingType = ridingTypeStr;
+            return this;
+        }
+
         public User build() {
             return new User(this);
         }
@@ -74,7 +81,7 @@ public class User {
         m_userPw = builder.m_userPw;
         m_userPhone = builder.m_userPhone;
         m_userName = builder.m_userName;
-        m_userRidingType = "";
+        m_userRidingType = builder.m_userRidingType;
         m_userLastAccess = new Date();
         m_userEmergency = false;
         m_lastPosition = new Location("");

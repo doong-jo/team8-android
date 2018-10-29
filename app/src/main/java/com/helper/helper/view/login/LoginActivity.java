@@ -31,10 +31,6 @@ public class LoginActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        User user = new User.Builder()
-                .build();
-
-        UserManager.setUser(user);
 
         // Solve : bug first touch not working
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -45,7 +41,7 @@ public class LoginActivity extends FragmentActivity {
 
         setContentView(R.layout.activity_login);
 
-        Fragment fragment = new LoginFragment();
+        Fragment fragment = new StartFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentPlace, fragment).commit();
 
         HttpManager.setServerURI(getString(R.string.server_uri));

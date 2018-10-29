@@ -27,9 +27,9 @@ public class UserManager {
     public static void setUser(final JSONObject jsonObject) throws JSONException {
         m_user = new User.Builder()
                 .email(jsonObject.getString("email"))
-                .pw(jsonObject.getString("passwd"))
                 .name(jsonObject.getString("name"))
                 .phone(jsonObject.getString("phone"))
+                .ridingType(jsonObject.getString("riding_type"))
                 .build();
     }
 
