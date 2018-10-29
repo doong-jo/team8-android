@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.ahmadrosid.library.FloatingLabelEditText;
 import com.helper.helper.R;
+import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.FormManager;
 import com.helper.helper.interfaces.Command;
 import com.helper.helper.interfaces.ValidateCallback;
@@ -48,6 +49,8 @@ import com.helper.helper.view.widget.SnackBar;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class LoginFragment extends Fragment {
     private final static String TAG = LoginFragment.class.getSimpleName() + "/DEV";
@@ -179,8 +182,6 @@ public class LoginFragment extends Fragment {
             return;
         }
 
-        //sdong001@gmail.com
-        //team12345
         if( HttpManager.useCollection("user") ) {
             JSONObject reqObject = new JSONObject();
             try {
@@ -199,8 +200,20 @@ public class LoginFragment extends Fragment {
 
                         /** account exist **/
                         if( arrLen != 0 ) {
+                            JSONObject object = existIdjsonArray.getJSONObject(0);
+                            User user = new User.Builder()
+                                    .email(object.getString("email"))
+                                    .name(object.getString("name"))
+                                    .ridingType(object.getString("riding_type"))
+                                    .build();
+
                             UserManager.setUser(existIdjsonArray.getJSONObject(0));
 
+                            try {
+                                FileManager.writeXmlUserInfo(getActivity(), user);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
 
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override

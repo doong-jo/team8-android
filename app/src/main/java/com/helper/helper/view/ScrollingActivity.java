@@ -89,10 +89,6 @@ public class ScrollingActivity extends AppCompatActivity
 
     private SweetAlertDialog m_accDialog;
 
-    public void setMapPosition(double latitude, double longitude, Location curLocation) {
-        AddressManager.startAddressIntentService(this, curLocation);
-    }
-
     public ViewPager getViewPager() {
         return m_viewPager;
     }
@@ -113,6 +109,13 @@ public class ScrollingActivity extends AppCompatActivity
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        /** Set User Info **/
+        try {
+            UserManager.setUser(FileManager.readXmlUserInfo(this));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         /** ToolBar **/
@@ -247,6 +250,11 @@ public class ScrollingActivity extends AppCompatActivity
                         @Override
                         public void onClick(final SweetAlertDialog sDialog) {
                             startAlertEmergencyContacts();
+                            try {
+                                EmergencyManager.insertAccidentinServer(UserManager.getUser(), EmergencyManager.getAccLocation(), true);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
     }
@@ -257,6 +265,8 @@ public class ScrollingActivity extends AppCompatActivity
                 EmergencyManager.getEmergencyContacts(),
                 EmergencyManager.getAccLocation(),
                 AddressManager.getConvertLocationToAddress());
+
+
 
         m_accDialog
                 .setTitleText("전달되었습니다!")
@@ -437,11 +447,13 @@ public class ScrollingActivity extends AppCompatActivity
         if( sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
             final Activity activity = this;
             try {
+                /** shock detect **/
                 GyroManager.shockStateDetector(this, sensorEvent, new ValidateCallback() {
                     @Override
                     public void onDone(int resultCode) throws JSONException {
                         if( resultCode == GyroManager.DETECT_ACCIDENT ) {
 
+                            /** permission (location) **/
                             if ( !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ||
                                     !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_FINE_LOCATION) ) {
                                 Toast.makeText(activity, "사고를 인지했지만 위치 정보 권한이 허용되지 않아 제대로 동작하지 않습니다.", Toast.LENGTH_SHORT).show();
@@ -455,25 +467,32 @@ public class ScrollingActivity extends AppCompatActivity
                             EmergencyManager.startValidationAccident(new ValidateCallback() {
                                 @Override
                                 public void onDone(int resultCode) throws JSONException {
+                                    /** Consider accident **/
                                     if (resultCode == EmergencyManager.EMERGENCY_VALIDATE_LOCATION_WAITNG_FINISH &&
                                             EmergencyManager.validateLocation(GoogleMapManager.getCurLocation())) {
 
+                                        EmergencyManager.insertAccidentinServer(UserManager.getUser(), accLocation, false);
+
                                         m_accDialog = resetAccDialog();
                                         m_accDialog.show();
+
                                         EmergencyManager.startWaitingUserResponse(new ValidateCallback() {
                                             @Override
                                             public void onDone(int resultCode) {
                                                 if( resultCode == EmergencyManager.EMERGENCY_WAITING_USER_RESPONSE ) {
                                                     if( m_accDialog.isShowing() ) {
                                                         startAlertEmergencyContacts();
+                                                        try {
+                                                            EmergencyManager.insertAccidentinServer(UserManager.getUser(), accLocation, true);
+                                                        } catch (JSONException e) {
+                                                            e.printStackTrace();
+                                                        }
                                                     }
                                                 }
                                             }
                                         });
-
                                         // insert data to server
 //                                        EmergencyManager.insertAccidentinServer(UserManager.getUser(), accLocation);
-
                                     }
                                 }
                             });
@@ -484,8 +503,6 @@ public class ScrollingActivity extends AppCompatActivity
                 e.printStackTrace();
             }
         }
-
-
 //        if (!m_bInitialize) { return; }
 //
 //        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {

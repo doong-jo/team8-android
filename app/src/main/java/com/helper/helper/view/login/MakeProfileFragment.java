@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.helper.helper.R;
 import com.helper.helper.controller.CircleTransform;
+import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.FormManager;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.PermissionManager;
@@ -33,6 +34,8 @@ import com.helper.helper.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class MakeProfileFragment extends Fragment {
     private final static String TAG = MakeProfileFragment.class.getSimpleName() + "/DEV";
@@ -139,6 +142,13 @@ public class MakeProfileFragment extends Fragment {
 
                             if( obj.getBoolean("result") ) {
 
+                                try {
+                                    FileManager.writeUserProfile(getActivity(), UserManager.getUserProfileBitmap());
+                                    FileManager.writeXmlUserInfo(getActivity(), UserManager.getUser());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
                                 LoginActivity activity = (LoginActivity)getActivity();
                                 if( activity != null ) { activity.moveToFragment(new CongrateFragment(), true); }
                             } else {
@@ -215,32 +225,6 @@ public class MakeProfileFragment extends Fragment {
 
                 UserManager.setUserProfileBitmap(circleBitmap);
                 break;
-        }
-    }
-
-    private void InsertUserinServer(User user, final ValidateCallback callback) throws JSONException {
-        if( HttpManager.useCollection("user") ) {
-
-            JSONObject reqObject = user.getTransformUserToJSON();
-//            reqObject.put("lastAccess", new Date().toString());
-
-            HttpManager.requestHttp(reqObject, "POST", new HttpCallback() {
-                @Override
-                public void onSuccess(JSONArray jsonArray) throws JSONException {
-                    JSONObject resultObj = (JSONObject)jsonArray.get(0);
-                    boolean result = resultObj.getBoolean("result");
-                    if( result ) {
-                        callback.onDone(FormManager.RESULT_VALIDATION_SUCCESS);
-                    } else {
-                        callback.onDone(FormManager.RESULT_VALIDATION_ERROR);
-                    }
-                }
-
-                @Override
-                public void onError(String err) {
-
-                }
-            });
         }
     }
 }
