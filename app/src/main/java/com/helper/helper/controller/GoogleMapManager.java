@@ -35,14 +35,17 @@ public class GoogleMapManager {
     private static final int FASTEST_UPDATE_INTERVAL_MS = 3000;
 
     private static GoogleApiClient m_googleApiClient;
-    private static GoogleMap m_googleMap;
-    private static float m_zoomLevel;
     private static LocationRequest m_locationReq;
     private static Location m_curLocation;
     private static Activity m_activity;
+    private static LocationCallback m_cloneLocationCallback;
     private static LocationCallback m_locatinCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
+            if( m_cloneLocationCallback != null ) {
+                m_cloneLocationCallback.onLocationResult(locationResult);
+            }
+
             List<Location> locationList = locationResult.getLocations();
             if (locationList.size() > 0) {
                 //The last location in the list is the newest
@@ -68,11 +71,11 @@ public class GoogleMapManager {
         }
     };
 
-    public static GoogleMap getGoogleMap() { return m_googleMap; }
+    public static void setLocationCallbackClone(LocationCallback callback) {
+        m_cloneLocationCallback = callback;
+    }
 
     public static Location getCurLocation() { return m_curLocation; }
-
-    public static float getZoomLevel() { return m_zoomLevel; }
 
     public static void initGoogleMap(Activity activity) {
         m_activity = activity;
@@ -144,7 +147,7 @@ public class GoogleMapManager {
     }
 
     @SuppressLint("MissingPermission")
-    public static void requsetLocation() {
+    private static void requsetLocation() {
         if (!PermissionManager.checkPermissions(m_activity, Manifest.permission.ACCESS_FINE_LOCATION) &&
                 !PermissionManager.checkPermissions(m_activity, Manifest.permission.ACCESS_COARSE_LOCATION)) {
             return;
