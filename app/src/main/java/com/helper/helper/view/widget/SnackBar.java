@@ -58,13 +58,13 @@ public class SnackBar extends FrameLayout {
     }
 
     private void getAttrs(AttributeSet attrs) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.FloatingEditTextAddonControl);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.Snackbar);
         setTypeArray(typedArray);
     }
 
 
     private void getAttrs(AttributeSet attrs, int defStyle) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.FloatingEditTextAddonControl, defStyle, 0);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.Snackbar, defStyle, 0);
         setTypeArray(typedArray);
 
     }
