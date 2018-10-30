@@ -66,11 +66,6 @@
             android:name=".view.ScrollingActivity"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity android:name=".view.contact.ContactActivity"
@@ -89,6 +84,11 @@
             android:parentActivityName=".view.ScrollingActivity"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <!--BLE service class 추가-->

@@ -1,6 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <TextView
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/lookingTitle"
+        android:layout_marginTop="126.54dp"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/looking_for"
+        android:textColor="@color/black"
+        style="@style/TitleTypo"/>
+
+    <TextView
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/lookingSuccess"
+        android:visibility="invisible"
+        android:layout_marginTop="126.54dp"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pairing_succesful"
+        android:textColor="@color/black"
+        style="@style/TitleTypo"/>
+
+    <RelativeLayout
+        app:layout_constraintTop_toBottomOf="@id/lookingTitle"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="152.76dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/pairing_circle2"
+            android:layout_centerInParent="true"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_pairing_circle"/>
+
+        <ImageView
+            android:id="@+id/pairing_circle1"
+            android:layout_centerInParent="true"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_pairing_circle"/>
+
+        <ImageView
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:id="@+id/pairing_device"
+            android:layout_width="164.16dp"
+            android:layout_height="209.76dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/device"/>
+
+        <ImageView
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:id="@+id/pairing_success_check"
+            android:layout_width="107.16dp"
+            android:layout_height="107.16dp"
+            android:visibility="invisible"
+            android:src="@drawable/ic_check_circle"/>
+
+    </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

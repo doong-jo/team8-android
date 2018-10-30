@@ -67,6 +67,7 @@
 
     <!--Looking Activity-->
     <string name="looking_for">Looking for EIGHT...</string>
+    <string name="pairing_succesful">Pairing Successful</string>
 
     <!--Status Fragment-->
     <string name="my_leds">My LEDs</string>
