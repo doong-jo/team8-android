@@ -37,6 +37,7 @@ public class AssistActivity extends FragmentActivity implements OnMapReadyCallba
     private final int PROXIMITY_RADIUS = 10000;
     private final int DEFAULT_ZOOM_LEVEL = 15;
 
+    /******************* Define widgtes in view *******************/
     private MapView m_mapView;
     private GoogleMap m_map;
     private Location m_location;
@@ -44,7 +45,7 @@ public class AssistActivity extends FragmentActivity implements OnMapReadyCallba
     protected GeoDataClient geoDataClient;
     protected PlaceDetectionClient placeDetectionClient;
 
-
+    /**************************************************************/
 
 
     @Override
@@ -55,7 +56,9 @@ public class AssistActivity extends FragmentActivity implements OnMapReadyCallba
         geoDataClient = Places.getGeoDataClient(this);
         placeDetectionClient = Places.getPlaceDetectionClient(this);
 
+        /******************* Connect widgtes with layout *******************/
         m_mapView = findViewById(R.id.assistMap);
+        /*******************************************************************/
 
         m_mapView.onCreate(savedInstanceState);
         m_mapView.onResume();

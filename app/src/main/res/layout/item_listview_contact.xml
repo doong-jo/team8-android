@@ -1,45 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.helper.helper.view.widget.CheckableRelativeLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:layout_marginRight="10dp"
-    android:paddingTop="5dp"
-    android:paddingBottom="5dp">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="16dp"
+    android:paddingTop="9dp">
 
 
-    <TextView android:id="@+id/itemName"
+    <ImageView
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:id="@+id/userProfile"
+        android:src="@drawable/ic_user"
+        android:layout_width="48dp"
+        android:layout_height="48dp" />
+
+    <LinearLayout
+        app:layout_constraintLeft_toRightOf="@id/userProfile"
+        android:layout_marginStart="19dp"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="5dp"
-        android:textSize="15dp"
-        android:textStyle="bold"
-        android:textColor="@color/textColorPrimary"
-        android:focusable="false" />
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/itemName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="1dp"
+            android:textColor="@color/black"
+            android:alpha="0.9"
+            style="@style/CategoryCardTitleTypo" />
 
-    <TextView android:id="@+id/itemPhoneNumber"
+        <TextView
+            android:id="@+id/itemPhoneNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:alpha="0.77"
+            style="@style/BodyTypo" />
+
+    </LinearLayout>
+
+    <android.support.v7.widget.AppCompatCheckBox
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="28dp"
+        android:id="@+id/deleteChk"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@id/itemName"
-        android:layout_marginLeft="10dp"
-        android:textSize="15dp"
-        android:textColor="@color/textColorPrimary"
-        android:focusable="false" />
+        android:layout_height="wrap_content" />
 
 
-    <com.helper.helper.view.widget.InertCheckBox
-        android:id="@+id/itemCheckBox"
+    <View
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/userProfile"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="5dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:focusable="false"
-        android:button="@drawable/checkbox" />
+        android:layout_marginTop="9dp"
+        android:layout_marginStart="33dp"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        android:alpha="0.13"
+        />
 
-</com.helper.helper.view.widget.CheckableRelativeLayout>
+</android.support.constraint.ConstraintLayout>
