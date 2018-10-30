@@ -23,7 +23,7 @@ public class ItemListAdapter extends ArrayAdapter<ContactItem> {
 
     private LayoutInflater li;
     private boolean m_deleteMode;
-    private boolean m_bIsSelected;
+    private View m_convertView;
 
     public ItemListAdapter(Context context, List<ContactItem> items) {
         super(context, 0, items);
@@ -32,11 +32,20 @@ public class ItemListAdapter extends ArrayAdapter<ContactItem> {
 
     public void setDeleteMode(boolean mode) {
         m_deleteMode = mode;
+
+        if( !mode ) {
+            ViewHolder holder = new ViewHolder(m_convertView);
+
+            holder.layout.setBackgroundColor(Color.WHITE);
+            holder.checkBox.setChecked(false);
+        }
     }
 
     @SuppressLint({"ResourceAsColor", "ClickableViewAccessibility"})
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        m_convertView = convertView;
+
         final ContactItem item = getItem(position);
 
         final ViewHolder holder;
