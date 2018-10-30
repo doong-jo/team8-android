@@ -19,7 +19,7 @@
         <item name="drawerArrowStyle">@style/MyDrawerArrowToggle</item>
 
         <!--statusBar Background-->
-        <item name="android:statusBarColor">@color/xgray</item>
+        <item name="android:statusBarColor">@color/gray</item>
         <!--statusBar TextColor-->
         <item name="android:windowLightStatusBar">true</item>
 

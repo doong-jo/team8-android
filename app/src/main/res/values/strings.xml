@@ -14,6 +14,7 @@
 
     <!--private key-->
     <string name="server_uri">http://175.123.140.145:80</string>
+    <string name="youtube_key">n6EydOVvJ00</string>
 
     <!--permission-->
     <string name="not_grant_location_permission">위치 서비스가 허용되지 않으면 "트래킹 서비스"와 "사고 대응 시스템"을 정상적으로 이용하실 수 없습니다. [설정-애플리케이션]에서 허용해주세요.</string>
@@ -59,7 +60,15 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <!--Info Fragment-->
+    <!--Pairing Fragment-->
+    <string name="pairing_title">EIGHT Pairing</string>
+    <string name="pairing_content_text">Make sure your Smart EIGHT is close to your mobile device and your Phone Bluetooth setting is on.</string>
+    <string name="pairing_start_txt">START PAIRING</string>
+
+    <!--Looking Activity-->
+    <string name="looking_for">Looking for EIGHT...</string>
+
+    <!--Status Fragment-->
     <string name="my_leds">My LEDs</string>
     <string name="led_setting">LED setting</string>
 

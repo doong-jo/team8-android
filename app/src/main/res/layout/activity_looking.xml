@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_marginTop="111dp"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/looking_for"
+        android:textColor="@color/black"
+        style="@style/TitleTypo"/>
+
+    <ImageView
+        android:layout_width="144dp"
+        android:layout_height="184dp"
+        android:scaleType="center"
+        android:src="@drawable/device"/>
+
+</android.support.constraint.ConstraintLayout>

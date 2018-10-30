@@ -1,5 +1,6 @@
 package com.helper.helper.view.main;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -20,6 +21,16 @@ public class InfoFragment extends Fragment {
 
     public InfoFragment() {
 
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_info, container, false);
+        m_myledsLayout = view.findViewById(R.id.myledsLayout);
+
+        m_myledsLayout.bringToFront();
+
+        return view;
     }
 
     private SeekBar.OnSeekBarChangeListener m_seekBarBrightChangeListener = new SeekBar.OnSeekBarChangeListener() {
@@ -82,15 +93,7 @@ public class InfoFragment extends Fragment {
         return meter;
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_info, container, false);
-
-
-        m_myledsLayout = view.findViewById(R.id.myledsLayout);
-
-        m_myledsLayout.bringToFront();
-
-        return view;
+    public interface OnFragmentInteractionListener {
+        void messageFromChildFragment(Uri uri);
     }
 }

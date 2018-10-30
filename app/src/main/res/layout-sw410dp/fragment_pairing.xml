@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_marginTop="42.18dp"
+            android:textAlignment="center"
+            android:layout_marginBottom="10.26dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/pairing_title"
+            android:textColor="@color/black"
+            style="@style/TitleTypo"/>
+
+        <TextView
+            android:textAlignment="center"
+            android:layout_width="272dp"
+            android:layout_height="wrap_content"
+            android:text="@string/pairing_content_text"
+            android:textColor="@color/black"
+            android:alpha="0.49"
+            style="@style/CategoryCardTitleTypo"/>
+
+        <ImageView
+            android:layout_marginTop="50.16dp"
+            android:layout_width="164.16dp"
+            android:layout_height="209.76dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/device"/>
+
+        <Button
+            android:id="@+id/startPairingBtn"
+            android:layout_marginTop="76.38dp"
+            style="@style/PrimaryButton"
+            android:text="@string/pairing_start_txt"
+            />
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

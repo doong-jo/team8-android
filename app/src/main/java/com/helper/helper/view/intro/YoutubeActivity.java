@@ -15,7 +15,7 @@ public class YoutubeActivity extends YouTubeBaseActivity implements
         YouTubePlayer.OnInitializedListener{
     private final static String TAG = YoutubeActivity.class.getSimpleName() + "/DEV";
     //https://www.youtube.com/watch?v=n6EydOVvJ00&feature=youtu.be
-    private final String VIDEO_ID = "n6EydOVvJ00";
+    private final String VIDEO_ID = getString(R.string.youtube_key);
     private MyPlayerStateChangeListener m_playerStateListener;
 
     private final class MyPlayerStateChangeListener implements YouTubePlayer.PlayerStateChangeListener {
