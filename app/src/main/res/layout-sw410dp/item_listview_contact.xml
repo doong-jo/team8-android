@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="18.24dp"
-    android:paddingTop="9.12dp"
-    android:paddingBottom="9.12dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:paddingTop="10.26dp" >
     
     <ImageView
         app:layout_constraintLeft_toLeftOf="parent"
@@ -17,7 +17,7 @@
     
     <LinearLayout
         app:layout_constraintLeft_toRightOf="@id/userProfile"
-        android:layout_marginStart="26.22dp"
+        android:layout_marginStart="21.66dp"
         android:layout_width="wrap_content"
         android:layout_height="54.72dp"
         android:gravity="center_vertical"
@@ -27,17 +27,39 @@
             android:id="@+id/itemName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2.28dp"
-            android:textColor="@color/contact_txt_clr"
-            style="@style/TopTabBarTypo"/>
+            android:layout_marginBottom="1.14dp"
+            android:textColor="@color/black"
+            android:alpha="0.9"
+            style="@style/CategoryCardTitleTypo"/>
 
         <TextView
             android:id="@+id/itemPhoneNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/contact_txt_clr"
-            style="@style/LightTypo"/>
+            android:textColor="@color/black"
+            android:alpha="0.77"
+            style="@style/BodyTypo"/>
 
     </LinearLayout>
+
+    <android.support.v7.widget.AppCompatCheckBox
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="31.92dp"
+        android:id="@+id/deleteChk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <View
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/userProfile"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="10.26dp"
+        android:layout_marginStart="37.62dp"
+        android:layout_height="1.14dp"
+        android:background="@color/black"
+        android:alpha="0.13"
+        />
 
 </android.support.constraint.ConstraintLayout>

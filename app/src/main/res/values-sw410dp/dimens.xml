@@ -35,8 +35,6 @@
 
     <dimen name="button_circle_width">56dp</dimen>
 
-    <dimen name="app_bar_height">180dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="text_margin">16dp</dimen>
+    <dimen name="fab_margin">36.48dp</dimen>
     <dimen name="google_polyline_width">12</dimen>
 </resources>
