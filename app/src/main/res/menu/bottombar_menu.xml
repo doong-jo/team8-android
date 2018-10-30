@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/item_ledshop"
+        android:icon="@drawable/ic_solid_cart"
+        android:title="LED shop"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/item_create"
+        android:icon="@drawable/ic_line_palette"
+        android:title="Create"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/item_myled"
+        android:icon="@drawable/ic_line_picture"
+        android:title="My LED"
+        app:showAsAction="ifRoom"/>
+
+</menu>
