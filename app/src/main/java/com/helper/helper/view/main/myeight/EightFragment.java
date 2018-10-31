@@ -27,7 +27,7 @@ public class EightFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         Fragment childFragment;
 
-        if( BTManager.getPaired() ) {
+        if( BTManager.getConnected() ) {
             childFragment = new InfoFragment();
         } else {
             childFragment = new PairingFragment();
@@ -46,7 +46,7 @@ public class EightFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if ( BTManager.getPaired() ) {
+        if ( BTManager.getConnected() ) {
             moveToFragment(new InfoFragment());
         } else {
             moveToFragment(new PairingFragment());
