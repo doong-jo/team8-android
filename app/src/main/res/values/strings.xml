@@ -2,7 +2,6 @@
     <!--app base-->
     <string name="app_name">TEAM EIGHT</string>
     <string name="service_name">TEAM EIGHT</string>
-    <string name="device_bluetooth_name">helper-1</string>
     <string name="google_api">AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k</string>
     <!--Bluetooth-->
     <string name="bluetooth_uuid">94f39d29-7d6d-437d-973b-fba39e49d4ee</string>

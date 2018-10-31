@@ -14,7 +14,10 @@ import android.widget.TextView;
 
 import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
+import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.view.ScrollingActivity;
+
+import org.json.JSONException;
 
 
 public class LookingActivity extends Activity {
@@ -37,6 +40,19 @@ public class LookingActivity extends Activity {
     private ImageView m_backMainImg;
     /**************************************************************/
 
+    private deviceFindingThread m_findingThread;
+
+    private static class deviceFindingThread extends Thread {
+        private Activity m_activity;
+        public deviceFindingThread(Activity activity) {
+            m_activity = activity;
+        }
+
+        public void run() {
+            BTManager.initBluetooth(m_activity);
+
+        }
+    }
     public LookingActivity() {
 
     }
@@ -70,7 +86,7 @@ public class LookingActivity extends Activity {
             public void onClick(View view) {
                 retryConnectAnimation();
                 startLookingforAnimation();
-                BTManager.initBluetooth(activity);
+                m_findingThread.start();
             }
         });
 
@@ -83,7 +99,34 @@ public class LookingActivity extends Activity {
         /*************************************************************/
 
         startLookingforAnimation();
-        BTManager.initBluetooth(activity);
+
+        m_findingThread = new deviceFindingThread(activity);
+
+        Handler findDeviceHandler = new Handler();
+        findDeviceHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                m_findingThread.start();
+            }
+        }, 2000);
+
+
+
+        BTManager.setConnectionResultCb(new ValidateCallback() {
+            @Override
+            public void onDone(final int resultCode) throws JSONException {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if( resultCode == BTManager.SUCCESS_BLUETOOTH_CONNECT ) {
+                            transformResult(true);
+                        } else if( resultCode == BTManager.FAIL_BLUETOOTH_CONNECT ) {
+                            transformResult(false);
+                        }
+                    }
+                });
+            }
+        });
 
 //        transformPairingSuccessful();
 //        Handler hideHandler = new Handler();
@@ -125,6 +168,7 @@ public class LookingActivity extends Activity {
                         R.anim.pairing_anim));
 
 
+        final Activity activity = this;
         Handler circleHandler = new Handler();
         circleHandler.postDelayed(new Runnable() {
             @Override
@@ -193,7 +237,6 @@ public class LookingActivity extends Activity {
                             hideHandler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    BTManager.setPaired(true);
                                     finish();
                                 }
                             }, MOVE_MAINACTIVITY_TIME);
@@ -232,6 +275,7 @@ public class LookingActivity extends Activity {
             m_resultCircle.setImageResource(R.drawable.pairing_success_circle);
         } else {
             m_retryBtn.setVisibility(View.VISIBLE);
+            m_retryBtn.startAnimation(retryBtnAnim);
             m_resultTitle.setText(getString(R.string.pairing_fail));
             m_resultSymbol.setImageResource(R.drawable.ic_warning_circle);
             m_resultCircle.setImageResource(R.drawable.pairing_fail_circle);
@@ -240,7 +284,6 @@ public class LookingActivity extends Activity {
 
         m_resultTitle.startAnimation(successTitleAnim);
         m_resultSymbol.startAnimation(checkAnim);
-        m_retryBtn.startAnimation(retryBtnAnim);
     }
 
     private void hideResult() {
