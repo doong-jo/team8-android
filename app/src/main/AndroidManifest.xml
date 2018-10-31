@@ -85,6 +85,12 @@
             android:screenOrientation="portrait">
         </activity>
 
+        <activity android:name=".view.looking.LookingActivity"
+            android:parentActivityName=".view.ScrollingActivity"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait">
+        </activity>
+
         <!--BLE service class 추가-->
         <!--<service android:name=".controller.ble.BluetoothLeService" android:enabled="true"/>-->
 

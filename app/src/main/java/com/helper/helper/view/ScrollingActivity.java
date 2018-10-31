@@ -10,20 +10,18 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -39,10 +37,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.R;
 import com.helper.helper.controller.AddressManager;
 import com.helper.helper.controller.BTManager;
@@ -53,7 +49,8 @@ import com.helper.helper.controller.SMSManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.view.assist.AssistActivity;
-import com.helper.helper.view.main.InfoFragment;
+import com.helper.helper.view.main.myeight.EightFragment;
+import com.helper.helper.view.main.myeight.InfoFragment;
 import com.helper.helper.view.contact.ContactActivity;
 import com.helper.helper.controller.GyroManager;
 import com.helper.helper.controller.HttpManager;
@@ -75,11 +72,15 @@ public class ScrollingActivity extends AppCompatActivity
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,
-        NavigationView.OnNavigationItemSelectedListener{
+        NavigationView.OnNavigationItemSelectedListener,
+        EightFragment.OnFragmentInteractionListener,
+        InfoFragment.OnFragmentInteractionListener {
     private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
-    private static final int TAB_STATUS = 0;
-    private static final int TAB_LED = 1;
-    private static final int TAB_TRACKING = 2;
+
+//    private static final int TAB_STATUS = 0;
+//    private static final int TAB_LED = 1;
+//    private static final int TAB_TRACKING = 2;
+
     private static final int PERMISSION_REQUEST = 267;
 
     private TabLayout m_tabLayout;
@@ -100,8 +101,6 @@ public class ScrollingActivity extends AppCompatActivity
 
         /******************* Connect widgtes with layout *******************/
         setContentView(R.layout.activity_scrolling);
-//        getSupportActionBar().setDisplayShowTitleEnabled(false);
-//        getSupportActionBar().setTitle("asdf");
 
         /** Set Emergency Contacts **/
         if ( EmergencyManager.getEmergencyContacts() == null ) {
@@ -120,8 +119,8 @@ public class ScrollingActivity extends AppCompatActivity
         }
 
         /** ToolBar **/
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        TextView mTitle = toolbar.findViewById(R.id.toolbar_title);
 
         setSupportActionBar(toolbar);
         mTitle.setText(toolbar.getTitle());
@@ -129,13 +128,13 @@ public class ScrollingActivity extends AppCompatActivity
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         /** Navigation **/
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        m_navigationView = (NavigationView) findViewById(R.id.nav_view);
+        m_navigationView = findViewById(R.id.nav_view);
         m_navigationView.setNavigationItemSelectedListener(this);
 
         /** Tab **/
@@ -155,17 +154,13 @@ public class ScrollingActivity extends AppCompatActivity
                 Log.d("DEV", "onTabSelected called! posistion : " + tab.getPosition());
                 m_viewPager.setCurrentItem(tab.getPosition());
 
+                /*
                 if (tab.getPosition() == TAB_STATUS) {
 
-//                    if (m_IsRecorded) {
-//                        ((FloatingActionButton) m_infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_solid, getApplicationContext().getTheme()));
-//                    } else {
-//                        ((FloatingActionButton) m_infoFrag.getView().findViewById(R.id.recordToggleBtn)).setImageDrawable(getResources().getDrawable(R.drawable.ic_circle_solid, getApplicationContext().getTheme()));
-//                    }
                 } else if (tab.getPosition() == TAB_TRACKING) {
 
-
                 }
+                */
             }
 
             @Override
@@ -201,20 +196,6 @@ public class ScrollingActivity extends AppCompatActivity
             /* Result about user selection -> onActivityResult in ScrollActivity */
             PermissionManager.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.SEND_SMS}, PERMISSION_REQUEST);
         }
-//        else {
-//            if ( m_googleApiClient == null) {
-//                buildGoogleApiClient();
-//            }
-//            requsetLocation();
-//        }
-//
-//        if ( !PermissionManager.checkPermissions(getActivity(), Manifest.permission.SEND_SMS) ) {
-//
-//            /* Result about user selection -> onActivityResult in ScrollActivity */
-//            PermissionManager.requestPermissions(getActivity(), new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_REQUEST_CODE);
-//        } else {
-//
-//        }
 
         /** Internal FileStorage **/
         Storage storage = new Storage(getApplicationContext());
@@ -293,7 +274,9 @@ public class ScrollingActivity extends AppCompatActivity
 
     /** Result handler **/
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case BTManager.SUCCESS_BLUETOOTH_CONNECT:
                 Toast.makeText(this, "디바이스 블루투스 연결 성공", Toast.LENGTH_SHORT).show();
@@ -333,32 +316,6 @@ public class ScrollingActivity extends AppCompatActivity
                 Toast.makeText(this, "권한요청 프로세스 완료", Toast.LENGTH_SHORT).show();
                 break;
         }
-//        if (requestCode == PermissionManager.REQUEST_LOCATION) {
-//            if (PermissionManager.verifyPermission(grantResults)) {
-//                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-//                        ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                    return;
-//                }
-//
-//                if (m_viewPager.getCurrentItem() == TAB_STATUS) {
-//                    if (m_infoFrag == null) {
-//                        m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
-//                                "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter) m_viewPager.getAdapter())
-//                                        .getItemId(TAB_STATUS));
-//                    }
-//
-//                    m_infoFrag.requsetLocation();
-//                }
-//
-//
-//            } else {
-//                for (String permissino : permissinos) {
-//                    Log.d(TAG, "verifyPermission fail : " + permissino.toString());
-//                }
-//            }
-//        } else {
-//            super.onRequestPermissionsResult(requestCode, permissinos, grantResults);
-//        }
     }
 
     /** GoogleMap callback **/
@@ -376,7 +333,7 @@ public class ScrollingActivity extends AppCompatActivity
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Toast.makeText(this, "GoogleMap connected!", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -390,9 +347,11 @@ public class ScrollingActivity extends AppCompatActivity
     }
 
     /** Life cycle **/
+
     @Override
     protected void onResume() {
         super.onResume();
+
         GyroManager.m_sensorManager.registerListener(this, GyroManager.m_sensorAccel, SensorManager.SENSOR_DELAY_UI);
         GyroManager.m_sensorManager.registerListener(this, GyroManager.m_sensorMag, SensorManager.SENSOR_DELAY_UI);
     }
@@ -406,7 +365,7 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        GyroManager.m_sensorManager.unregisterListener(this);
+//        GyroManager.m_sensorManager.unregisterListener(this);
     }
 
     @Override
@@ -464,8 +423,6 @@ public class ScrollingActivity extends AppCompatActivity
                                                 }
                                             }
                                         });
-                                        // insert data to server
-//                                        EmergencyManager.insertAccidentinServer(UserManager.getUser(), accLocation);
                                     }
                                 }
                             });
@@ -476,39 +433,6 @@ public class ScrollingActivity extends AppCompatActivity
                 e.printStackTrace();
             }
         }
-//        if (!m_bInitialize) { return; }
-//
-//        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-//            m_fAccel[0] = sensorEvent.values[0];
-//            m_fAccel[1] = sensorEvent.values[1];
-//            m_fAccel[2] = sensorEvent.values[2];
-//
-//            shockStateDetector(m_fAccel[0], m_fAccel[1], m_fAccel[2]);
-//        }
-//        else if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-//            m_fMag[0] = sensorEvent.values[0];
-//            m_fMag[1] = sensorEvent.values[1];
-//            m_fMag[2] = sensorEvent.values[2];
-//        }
-//
-//        float[] resultValues = GyroManager.getOrientation(m_fAccel, m_fMag);
-//
-//        changeLeftOrRightLEDOfRoll(resultValues[2]);
-//
-//        GyroManager.setPivotRoll(resultValues[2]);
-//
-//        if( m_infoFrag == null) {
-//            m_infoFrag = (InfoFragment) getSupportFragmentManager().findFragmentByTag(
-//                    "android:switcher:" + m_viewPager.getId() + ":" + ((TabPagerAdapter)m_viewPager.getAdapter())
-//                            .getItemId(TAB_STATUS));
-//
-////            m_infoFrag = (InfoFragment)m_viewPager
-////                    .getAdapter()
-////                    .instantiateItem(m_viewPager, TAB_STATUS);
-//
-//        } else {
-////            m_infoFrag.setTextTiltXYZ(resultValues);
-//        }
     }
 
     @Override
@@ -586,78 +510,17 @@ public class ScrollingActivity extends AppCompatActivity
 
     }
 
-    /*
-    public void shockStateDetector(float accelX, float accelY, float accelZ) {
-        long currentTime = System.currentTimeMillis();
-        long gabOfTime = (currentTime - m_shockStateLastTime);
-        float speed = 0;
-        if (gabOfTime > 100) {
-            m_shockStateLastTime = currentTime;
-
-            speed = Math.abs(accelX + accelY + accelZ - m_beforeAccelX - m_beforeAccelY - m_beforeAccelZ) / gabOfTime * 10000;
-
-//            if(count++ < 3 ) {
-//                sum_speed += speed;
-//                return;
-//            } else {
-//                count = 0;
-//                speed = sum_speed/3;
-//                sum_speed = 0;
-//            }
-//            if (speed > 700 && speed < SHAKE_THRESHOLD) {
-//                Log.e("speed", "speed : " + speed);
-//                if(bProcessing) {// 사용자 실수시 가볍게 흔들어서 취소
-//                    hanSensor.removeMessages(1);
-//                    hanSensor.sendEmptyMessageDelayed(2, 1000);
-//                    showMsgl("취소 " + speed);
-//                    return;
-//                }
-            if (speed > SHAKE_THRESHOLD) {
-                Log.d(TAG, "shockStateDetector: ");
-                try {
-                    String strSMS1 = getString(R.string.sms_content) + "\n\n" + m_strAddressOutput;
-                    String strSMS2 = "https://google.com/maps?q=" + m_strLatitude + "," + m_strLogitude;
-
-                    List<ContactItem> contactItems;
-                    try {
-                        contactItems = FileManager.readXmlEmergencyContacts(this);
-
-                        for (ContactItem item :
-                                contactItems) {
-                            sendSMS(item.getPhoneNumber(), strSMS1);
-                            sendSMS(item.getPhoneNumber(), strSMS2);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-//                    sendSMS("+8201034823161", strSMS1);
-//                    sendSMS("+8201034823161", strSMS2);
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
-                }
-//                if(!bProcessing) {
-//                    bProcessing = true;
-//                    hanSensor.sendEmptyMessage(0);
-//                    showMsgl("충격 발생 " + speed);
-
-            }
-//                else { // 2차 충격
-//                    bProcessing = true;
-//                    hanSensor.removeMessages(1); // 다이얼로그 연장
-//                    hanSensor.sendEmptyMessageDelayed(1, send_time * 1000);
-//                    showMsgl("2,3차 충격 " + speed);
-//                }
-//            }
-
-
-            m_beforeAccelX = accelX;
-            m_beforeAccelY = accelY;
-            m_beforeAccelZ = accelZ;
-
-        }
+    @Override
+    public void messageFromParentFragment(Uri uri) {
+        Log.i("TAG", "received communication from parent fragment");
     }
 
+    @Override
+    public void messageFromChildFragment(Uri uri) {
+        Log.i("TAG", "received communication from child fragment");
+    }
+
+    /*
     public void changeLeftOrRightLEDOfRoll(float roll) {
         String writeStr = "";
 

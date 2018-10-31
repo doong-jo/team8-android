@@ -65,6 +65,8 @@ public class BTManager {
 
     private static boolean m_IsProcessing = false;
     private static boolean m_IsReadProcessing = false;
+    private static boolean m_bIsPairing = false;
+
     private static Activity m_activity;
     private static BluetoothAdapter m_bluetoothAdapter;
     private static BluetoothDevice m_pairedDevice;
@@ -74,6 +76,11 @@ public class BTManager {
     private static BroadcastReceiver m_discoveryReceiver = makeBroadcastReceiver();
     private static BluetoothReadThread m_bluetoothReadthread;
     private static ProgressDialog m_loadingDlg;
+
+    public static boolean getPaired() { return m_bIsPairing; }
+
+    public static void setPaired(boolean paired) { m_bIsPairing = paired; }
+
     public static void initBluetooth(final Activity activity) {
         if( activity != null) {
             m_activity = activity;
@@ -127,7 +134,7 @@ public class BTManager {
             return;
         }
 
-        m_loadingDlg = ProgressDialog.show(m_activity, m_activity.getString(R.string.bluetooth_loading_title), m_activity.getString(R.string.bluetooth_loading_message), true);
+//        m_loadingDlg = ProgressDialog.show(m_activity, m_activity.getString(R.string.bluetooth_loading_title), m_activity.getString(R.string.bluetooth_loading_message), true);
 
         /** 만약 페어링 기기들 리스트에 있다면 바로 연결 **/
         List<BluetoothDevice> devices = new ArrayList<>(m_bluetoothAdapter.getBondedDevices());
@@ -169,7 +176,7 @@ public class BTManager {
             Toast.makeText(m_activity, "디바이스 연결에 실패했습니다.", Toast.LENGTH_SHORT).show();
             ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
         }
-        m_loadingDlg.dismiss();
+//        m_loadingDlg.dismiss();
     }
 
     /** Find Bluetooth **/
@@ -198,8 +205,8 @@ public class BTManager {
 
                 } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()) ) {
                     Toast.makeText(m_activity, "디비이스를 찾지 못했습니다.", Toast.LENGTH_SHORT).show();
-                    ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
-                    m_loadingDlg.dismiss();
+//                    ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
+//                    m_loadingDlg.dismiss();
                 }
             }
         };

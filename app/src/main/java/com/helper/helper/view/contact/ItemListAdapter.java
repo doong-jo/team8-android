@@ -90,7 +90,6 @@ public class ItemListAdapter extends ArrayAdapter<ContactItem> {
                         holder.checkBox.setChecked(false);
                         view.setBackgroundColor(Color.WHITE);
                     }
-
                 }
                 return false;
             }
