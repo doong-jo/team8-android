@@ -108,11 +108,21 @@ public class BTManager {
         m_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (m_bluetoothAdapter == null) {
             Toast.makeText(activity, "블루투스를 지원하지 않는 기기입니다.", Toast.LENGTH_SHORT).show();
+            try {
+                m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             return;
         }
 
         if (!m_bluetoothAdapter.isEnabled()) {
             Toast.makeText(m_activity, "블루투스가 비활성화 되어있습니다.", Toast.LENGTH_SHORT).show();
+            try {
+                m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             requestEnableBluetooth();
         } else {
             prepareDevice();
@@ -137,11 +147,16 @@ public class BTManager {
 
     /** Find Bluetooth Device **/
     private static void prepareDevice()  {
-        if (m_pairedDevice != null) {
-            m_bIsPairing = true;
-//            Toast.makeText(m_activity, "이미 디바이스와 연결되어 있습니다.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+//        if (m_pairedDevice != null) {
+//            m_bIsPairing = true;
+//            try {
+//                m_connectionResultCb.onDone(SUCCESS_BLUETOOTH_CONNECT);
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+////            Toast.makeText(m_activity, "이미 디바이스와 연결되어 있습니다.", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
 //        m_loadingDlg = ProgressDialog.show(m_activity, m_activity.getString(R.string.bluetooth_loading_title), m_activity.getString(R.string.bluetooth_loading_message), true);
 

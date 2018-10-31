@@ -40,19 +40,6 @@ public class LookingActivity extends Activity {
     private ImageView m_backMainImg;
     /**************************************************************/
 
-    private deviceFindingThread m_findingThread;
-
-    private static class deviceFindingThread extends Thread {
-        private Activity m_activity;
-        public deviceFindingThread(Activity activity) {
-            m_activity = activity;
-        }
-
-        public void run() {
-            BTManager.initBluetooth(m_activity);
-
-        }
-    }
     public LookingActivity() {
 
     }
@@ -86,7 +73,13 @@ public class LookingActivity extends Activity {
             public void onClick(View view) {
                 retryConnectAnimation();
                 startLookingforAnimation();
-                m_findingThread.start();
+                Thread findingThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        BTManager.initBluetooth(activity);
+                    }
+                });
+                findingThread.start();
             }
         });
 
@@ -100,13 +93,17 @@ public class LookingActivity extends Activity {
 
         startLookingforAnimation();
 
-        m_findingThread = new deviceFindingThread(activity);
-
         Handler findDeviceHandler = new Handler();
         findDeviceHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                m_findingThread.start();
+                Thread findingThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        BTManager.initBluetooth(activity);
+                    }
+                });
+                findingThread.start();
             }
         }, 2000);
 
