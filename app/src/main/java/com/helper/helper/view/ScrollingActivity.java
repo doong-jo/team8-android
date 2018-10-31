@@ -83,9 +83,11 @@ public class ScrollingActivity extends AppCompatActivity
 
     private static final int PERMISSION_REQUEST = 267;
 
+    /***************** Define widgtes in view *******************/
     private TabLayout m_tabLayout;
     private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
+    /**************************************************************/
 
     private NavigationView m_navigationView;
 
@@ -359,7 +361,7 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        BTManager.closeBluetoothSocket();
+//        BTManager.closeBluetoothSocket();
     }
 
     @Override

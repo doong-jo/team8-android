@@ -169,6 +169,7 @@
                         android:layout_height="26.22dp" />
 
                     <SeekBar
+                        android:id="@+id/brightnessSeek"
                         android:layout_marginEnd="-10.26dp"
                         android:layout_gravity="center_vertical"
                         android:progress="50"
@@ -188,6 +189,7 @@
                         android:layout_height="26.22dp" />
 
                     <SeekBar
+                        android:id="@+id/speedSeek"
                         android:layout_marginEnd="10.26dp"
                         android:layout_gravity="center_vertical"
                         android:progress="50"

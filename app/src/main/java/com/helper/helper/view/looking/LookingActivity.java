@@ -93,21 +93,28 @@ public class LookingActivity extends Activity {
 
         startLookingforAnimation();
 
-        Handler findDeviceHandler = new Handler();
-        findDeviceHandler.postDelayed(new Runnable() {
+//        Handler findDeviceHandler = new Handler();
+//        findDeviceHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                Thread findingThread = new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        BTManager.initBluetooth(activity);
+//                    }
+//                });
+//                findingThread.start();
+//            }
+//        }, 2000);
+
+
+        Thread findingThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Thread findingThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        BTManager.initBluetooth(activity);
-                    }
-                });
-                findingThread.start();
+                BTManager.initBluetooth(activity);
             }
-        }, 2000);
-
-
+        });
+        findingThread.start();
 
         BTManager.setConnectionResultCb(new ValidateCallback() {
             @Override
