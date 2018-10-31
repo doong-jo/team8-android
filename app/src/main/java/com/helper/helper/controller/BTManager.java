@@ -36,9 +36,20 @@ public class BTManager {
     private final static String TAG = BTManager.class.getSimpleName() + "/DEV";
 
     /******************* Definition constants *******************/
-    public static final String BLUETOOTH_UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee";
-    public static final String DEVICE_ALIAS = "EIGHT_";
+    /*
+    // UUID that specifies a protocol for generic bluetooth serial communication
+    private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+     */
 
+    /** Bluetooth Signal Rules **/
+    public static final String BLUETOOTH_SIGNAL_SEPERATE = "-";
+
+    public static final String BLUETOOTH_SIGNAL_LED = "0";
+    public static final String BLUETOOTH_SIGNAL_SPEED = "1";
+    public static final String BLUETOOTH_SIGNAL_BRIGHTNESS = "2";
+
+    private static final String BLUETOOTH_UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee";
+    private static final String DEVICE_ALIAS = "EIGHT_";
 
     public static final int SUCCESS_BLUETOOTH_CONNECT = 1001;
     public static final int FAIL_BLUETOOTH_CONNECT = 1002;
@@ -78,6 +89,8 @@ public class BTManager {
     private static BroadcastReceiver m_discoveryReceiver = makeBroadcastReceiver();
     private static BluetoothReadThread m_bluetoothReadthread;
     private static ValidateCallback m_connectionResultCb;
+    private static BluetoothReadCallback m_readResultCb;
+    private static String m_lastSignalStr = "";
     private static ProgressDialog m_loadingDlg;
 
     public static boolean getConnected() {
@@ -87,6 +100,10 @@ public class BTManager {
     public static void setConnectionResultCb(ValidateCallback callback) {
         m_connectionResultCb = callback;
     }
+
+    public static String getLastSignalStr() { return m_lastSignalStr; }
+
+    public static void setReadResultCb(BluetoothReadCallback callback) { m_readResultCb = callback; }
 
     public static void initBluetooth(final Activity activity) {
         if( activity != null) {
@@ -130,19 +147,25 @@ public class BTManager {
     }
 
     private static void bluetoothSignalHandler(String signalMsg) {
+        m_lastSignalStr = signalMsg;
         if ( signalMsg.equals("EMERGENCY") ) {
             try {
                 EmergencyManager.startEmergencyProcess(m_activity);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        } else if( signalMsg.split("info").length != 0 ) {
-            String[] splitStr = signalMsg.split("/");
-
-            int ledInd = Integer.parseInt(splitStr[1]);
-            float spdVal = Float.parseFloat(splitStr[2]);
-            float brtVal = Float.parseFloat(splitStr[3]);
+        } else {
+            if( m_readResultCb != null ) {
+                m_readResultCb.onResult(signalMsg);
+            }
         }
+//        else if( signalMsg.split("info").length != 0 ) {
+//            String[] splitStr = signalMsg.split("/");
+//
+//            int ledInd = Integer.parseInt(splitStr[1]);
+//            float spdVal = Float.parseFloat(splitStr[2]);
+//            float brtVal = Float.parseFloat(splitStr[3]);
+//        }
     }
 
     /** Find Bluetooth Device **/
@@ -186,11 +209,26 @@ public class BTManager {
 
         try {
             m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BTManager.BLUETOOTH_UUID));
+
+            m_bluetoothSocket.connect();
+
             m_bluetoothInput = m_bluetoothSocket.getInputStream();
             m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
 
-            m_bluetoothSocket.connect();
             m_bluetoothReadthread.start();
+//            Thread bluetoothReadThread = new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    while (true) {
+//                        BTManager.readFromBluetoothDevice(new BluetoothReadCallback() {
+//                            @Override
+//                            public void onResult(String result) {
+//                                bluetoothSignalHandler(result);
+//                            }
+//                        });
+//                    }
+//                }
+//            });
 
             try {
                 m_connectionResultCb.onDone(SUCCESS_BLUETOOTH_CONNECT);
@@ -270,8 +308,16 @@ public class BTManager {
     }
 
     public static void readFromBluetoothDevice(BluetoothReadCallback callback) {
-        if (m_bluetoothInput == null || !m_bluetoothSocket.isConnected()) {
+        if (m_bluetoothReadthread != null && !m_bluetoothSocket.isConnected()) {
             m_bluetoothReadthread.interrupt();
+            m_bluetoothReadthread = null;
+            try {
+                m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            m_bIsPairing = false;
             return;
         }
 
