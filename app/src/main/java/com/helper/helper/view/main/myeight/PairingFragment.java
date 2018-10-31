@@ -1,4 +1,4 @@
-package com.helper.helper.view.main;
+package com.helper.helper.view.main.myeight;
 
 import android.content.Intent;
 import android.os.Bundle;

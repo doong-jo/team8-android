@@ -11,8 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;         // 이전 Fragment로 돌아갈 수 있음 (삭제X)
 import android.util.Log;
 
-import com.helper.helper.view.main.EightFragment;
-import com.helper.helper.view.main.InfoFragment;
+import com.helper.helper.view.main.myeight.EightFragment;
 import com.helper.helper.view.main.LEDFragment;
 import com.helper.helper.view.main.TrackingFragment;
 

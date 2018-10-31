@@ -10,8 +10,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -24,7 +22,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -40,10 +37,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.R;
 import com.helper.helper.controller.AddressManager;
 import com.helper.helper.controller.BTManager;
@@ -54,8 +49,8 @@ import com.helper.helper.controller.SMSManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.view.assist.AssistActivity;
-import com.helper.helper.view.main.EightFragment;
-import com.helper.helper.view.main.InfoFragment;
+import com.helper.helper.view.main.myeight.EightFragment;
+import com.helper.helper.view.main.myeight.InfoFragment;
 import com.helper.helper.view.contact.ContactActivity;
 import com.helper.helper.controller.GyroManager;
 import com.helper.helper.controller.HttpManager;
@@ -69,7 +64,6 @@ import java.io.IOException;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-import static android.opengl.GLES20.GL_MAX_TEXTURE_SIZE;
 import static android.support.design.widget.TabLayout.*;
 
 public class ScrollingActivity extends AppCompatActivity
@@ -82,11 +76,11 @@ public class ScrollingActivity extends AppCompatActivity
         EightFragment.OnFragmentInteractionListener,
         InfoFragment.OnFragmentInteractionListener {
     private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
-    /*
-    private static final int TAB_STATUS = 0;
-    private static final int TAB_LED = 1;
-    private static final int TAB_TRACKING = 2;
-    */
+
+//    private static final int TAB_STATUS = 0;
+//    private static final int TAB_LED = 1;
+//    private static final int TAB_TRACKING = 2;
+
     private static final int PERMISSION_REQUEST = 267;
 
     private TabLayout m_tabLayout;
@@ -280,7 +274,9 @@ public class ScrollingActivity extends AppCompatActivity
 
     /** Result handler **/
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case BTManager.SUCCESS_BLUETOOTH_CONNECT:
                 Toast.makeText(this, "디바이스 블루투스 연결 성공", Toast.LENGTH_SHORT).show();
@@ -337,7 +333,7 @@ public class ScrollingActivity extends AppCompatActivity
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Toast.makeText(this, "GoogleMap connected!", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -351,9 +347,11 @@ public class ScrollingActivity extends AppCompatActivity
     }
 
     /** Life cycle **/
+
     @Override
     protected void onResume() {
         super.onResume();
+
         GyroManager.m_sensorManager.registerListener(this, GyroManager.m_sensorAccel, SensorManager.SENSOR_DELAY_UI);
         GyroManager.m_sensorManager.registerListener(this, GyroManager.m_sensorMag, SensorManager.SENSOR_DELAY_UI);
     }
@@ -367,7 +365,7 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        GyroManager.m_sensorManager.unregisterListener(this);
+//        GyroManager.m_sensorManager.unregisterListener(this);
     }
 
     @Override

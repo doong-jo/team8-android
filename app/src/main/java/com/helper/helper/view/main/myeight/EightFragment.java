@@ -1,16 +1,16 @@
-package com.helper.helper.view.main;
+package com.helper.helper.view.main.myeight;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.helper.helper.R;
+import com.helper.helper.controller.BTManager;
 
 public class EightFragment extends Fragment {
 
@@ -25,7 +25,14 @@ public class EightFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        Fragment childFragment = new PairingFragment();
+        Fragment childFragment;
+
+        if( BTManager.getPaired() ) {
+            childFragment = new InfoFragment();
+        } else {
+            childFragment = new PairingFragment();
+        }
+
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.replace(R.id.eight_fragment_container, childFragment).commit();
     }
@@ -34,6 +41,16 @@ public class EightFragment extends Fragment {
         Fragment childFragment = targetFragment;
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.replace(R.id.eight_fragment_container, childFragment).commit();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if ( BTManager.getPaired() ) {
+            moveToFragment(new InfoFragment());
+        } else {
+            moveToFragment(new PairingFragment());
+        }
     }
 
     @Override

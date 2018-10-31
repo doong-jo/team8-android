@@ -2,19 +2,26 @@ package com.helper.helper.view.looking;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.helper.helper.R;
+import com.helper.helper.controller.BTManager;
+import com.helper.helper.view.ScrollingActivity;
 
 
 public class LookingActivity extends Activity {
     private final static String TAG = LookingActivity.class.getSimpleName() + "/DEV";
+
+    private static final int MOVE_MAINACTIVITY_TIME = 2000;
+    private static final int INTERVAL_CIRCLE_OCCURE = 500;
 
     /******************* Define widgtes in view *******************/
     private ImageView m_pairingCircle1;
@@ -22,8 +29,12 @@ public class LookingActivity extends Activity {
     private ImageView m_device;
     private TextView m_title;
 
-    private TextView m_success;
-    private ImageView m_successCheck;
+    private TextView m_resultTitle;
+    private ImageView m_resultSymbol;
+    private ImageView m_resultCircle;
+
+    private Button m_retryBtn;
+    private ImageView m_backMainImg;
     /**************************************************************/
 
     public LookingActivity() {
@@ -35,28 +46,80 @@ public class LookingActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_looking);
 
+        final Activity activity = this;
+
         /******************* Connect widgtes with layout *******************/
         m_pairingCircle1 = findViewById(R.id.pairing_circle1);
         m_pairingCircle2 = findViewById(R.id.pairing_circle2);
         m_device = findViewById(R.id.pairing_device);
         m_title = findViewById(R.id.lookingTitle);
-        m_success = findViewById(R.id.lookingSuccess);
-        m_successCheck = findViewById(R.id.pairing_success_check);
+
+        m_resultTitle = findViewById(R.id.resultTitle);
+        m_resultSymbol = findViewById(R.id.pairing_result_symbol);
+        m_resultCircle = findViewById(R.id.pairing_result_circle);
+
+        m_retryBtn = findViewById(R.id.retryBtn);
+
+        m_backMainImg = findViewById(R.id.backMainActivity);
         /*******************************************************************/
 
-        startLookingforAnimation();
+        /******************* Make Listener in View *******************/
 
-        Handler hideHandler = new Handler();
-        hideHandler.postDelayed(new Runnable() {
+        m_retryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                transformPairingSuccessful();
+            public void onClick(View view) {
+                retryConnectAnimation();
+                startLookingforAnimation();
+                BTManager.initBluetooth(activity);
             }
-        }, 5000);
+        });
+
+        m_backMainImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        /*************************************************************/
+
+        startLookingforAnimation();
+        BTManager.initBluetooth(activity);
+
+//        transformPairingSuccessful();
+//        Handler hideHandler = new Handler();
+//        hideHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                transformResult(false);
+//            }
+//        }, 5000);
 
     }
 
+    private void retryConnectAnimation() {
+        m_title.setAnimation(null);
+        m_device.setAnimation(null);
+        m_pairingCircle1.setAnimation(null);
+        m_pairingCircle2.setAnimation(null);
+
+        m_resultCircle.setAnimation(null);
+        m_resultSymbol.setAnimation(null);
+        m_resultTitle.setAnimation(null);
+        m_retryBtn.setAnimation(null);
+
+        m_backMainImg.setVisibility(View.INVISIBLE);
+        m_title.setVisibility(View.VISIBLE);
+        m_device.setVisibility(View.VISIBLE);
+        m_resultCircle.setVisibility(View.INVISIBLE);
+        m_resultSymbol.setVisibility(View.INVISIBLE);
+        m_resultTitle.setVisibility(View.INVISIBLE);
+        m_retryBtn.setVisibility(View.INVISIBLE);
+    }
+
     private void startLookingforAnimation() {
+        m_pairingCircle1.setVisibility(View.VISIBLE);
+        m_pairingCircle2.setVisibility(View.VISIBLE);
+
         m_pairingCircle1.startAnimation(AnimationUtils
                 .loadAnimation(getApplicationContext(),
                         R.anim.pairing_anim));
@@ -75,10 +138,18 @@ public class LookingActivity extends Activity {
                     }
                 });
             }
-        }, 500);
+        }, INTERVAL_CIRCLE_OCCURE);
     }
 
-    private void transformPairingSuccessful() {
+    private void transformResult(final boolean bIsSuccess) {
+        m_pairingCircle1.setAnimation(null);
+        m_pairingCircle2.setAnimation(null);
+        m_pairingCircle1.setVisibility(View.INVISIBLE);
+        m_pairingCircle2.setVisibility(View.INVISIBLE);
+
+        m_resultTitle.setVisibility(View.VISIBLE);
+        m_resultSymbol.setVisibility(View.VISIBLE);
+        m_resultCircle.setVisibility(View.INVISIBLE);
 
         Animation deviceAnim = AnimationUtils
                 .loadAnimation(getApplicationContext(),
@@ -88,11 +159,6 @@ public class LookingActivity extends Activity {
                 .loadAnimation(getApplicationContext(),
                         R.anim.pairing_bottom_hide);
 
-        m_pairingCircle1.setAnimation(null);
-        m_pairingCircle2.setAnimation(null);
-        m_pairingCircle1.setVisibility(View.INVISIBLE);
-        m_pairingCircle2.setVisibility(View.INVISIBLE);
-
         m_device.startAnimation(deviceAnim);
         m_title.startAnimation(titleAnim);
 
@@ -100,14 +166,84 @@ public class LookingActivity extends Activity {
                 .loadAnimation(getApplicationContext(),
                         R.anim.pairing_scale_up);
 
+        final Activity activity = this;
+        checkAnim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                Animation circleAnim = AnimationUtils
+                        .loadAnimation(getApplicationContext(),
+                                R.anim.pairing_scale_up_slow);
+
+                circleAnim.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        /** move MainActivity **/
+                        if( bIsSuccess ) {
+                            Handler hideHandler = new Handler();
+                            hideHandler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    BTManager.setPaired(true);
+                                    finish();
+                                }
+                            }, MOVE_MAINACTIVITY_TIME);
+                        }
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+
+                m_resultCircle.setVisibility(View.VISIBLE);
+                m_resultCircle.startAnimation(circleAnim);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
         Animation successTitleAnim = AnimationUtils
                 .loadAnimation(getApplicationContext(),
                         R.anim.pairing_top_show);
 
-        m_success.setVisibility(View.VISIBLE);
-        m_successCheck.setVisibility(View.VISIBLE);
+        Animation retryBtnAnim = AnimationUtils
+                .loadAnimation(getApplicationContext(),
+                        R.anim.pairing_bottom_show);
 
-        m_success.startAnimation(successTitleAnim);
-        m_successCheck.startAnimation(checkAnim);
+        if ( bIsSuccess ) {
+            m_retryBtn.setVisibility(View.INVISIBLE);
+            m_resultTitle.setText(getString(R.string.pairing_succesful));
+            m_resultSymbol.setImageResource(R.drawable.ic_check_circle);
+            m_resultCircle.setImageResource(R.drawable.pairing_success_circle);
+        } else {
+            m_retryBtn.setVisibility(View.VISIBLE);
+            m_resultTitle.setText(getString(R.string.pairing_fail));
+            m_resultSymbol.setImageResource(R.drawable.ic_warning_circle);
+            m_resultCircle.setImageResource(R.drawable.pairing_fail_circle);
+            m_backMainImg.setVisibility(View.VISIBLE);
+        }
+
+        m_resultTitle.startAnimation(successTitleAnim);
+        m_resultSymbol.startAnimation(checkAnim);
+        m_retryBtn.startAnimation(retryBtnAnim);
+    }
+
+    private void hideResult() {
+
     }
 }

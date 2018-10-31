@@ -1,8 +1,7 @@
-package com.helper.helper.view.main;
+package com.helper.helper.view.main.myeight;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
 import android.view.View;

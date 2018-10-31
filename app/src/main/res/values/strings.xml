@@ -68,6 +68,9 @@
     <!--Looking Activity-->
     <string name="looking_for">Looking for EIGHT...</string>
     <string name="pairing_succesful">Pairing Successful</string>
+    <string name="pairing_fail">Sorry! We cannot find your device.</string>
+    <string name="pairing_fail_msg">why not try again?</string>
+    <string name="pairing_retry">RETRY</string>
 
     <!--Status Fragment-->
     <string name="my_leds">My LEDs</string>

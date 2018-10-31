@@ -3,7 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white">
+
+    <ImageView
+        android:id="@+id/backMainActivity"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="invisible"
+        android:src="@drawable/ic_back"
+        android:layout_marginStart="13.68dp"
+        android:layout_marginTop="11.4dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <TextView
         app:layout_constraintTop_toTopOf="parent"
@@ -18,7 +32,7 @@
 
     <TextView
         app:layout_constraintTop_toTopOf="parent"
-        android:id="@+id/lookingSuccess"
+        android:id="@+id/resultTitle"
         android:visibility="invisible"
         android:layout_marginTop="126.54dp"
         android:textAlignment="center"
@@ -32,7 +46,7 @@
         app:layout_constraintTop_toBottomOf="@id/lookingTitle"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="152.76dp"
+        android:layout_marginTop="22.8dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -62,11 +76,29 @@
         <ImageView
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
-            android:id="@+id/pairing_success_check"
+            android:id="@+id/pairing_result_circle"
+            android:layout_width="107.16dp"
+            android:layout_height="107.16dp"
+            android:visibility="invisible"
+            android:src="@drawable/pairing_success_circle"/>
+
+        <ImageView
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:id="@+id/pairing_result_symbol"
             android:layout_width="107.16dp"
             android:layout_height="107.16dp"
             android:visibility="invisible"
             android:src="@drawable/ic_check_circle"/>
+
+        <Button
+            android:id="@+id/retryBtn"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="33dp"
+            android:visibility="invisible"
+            android:text="@string/pairing_retry"
+            style="@style/PrimaryButton" />
 
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
