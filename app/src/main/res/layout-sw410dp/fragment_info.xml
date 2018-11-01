@@ -14,20 +14,31 @@
         <android.support.v7.widget.CardView
             android:layout_marginStart="20.52dp"
             android:layout_marginTop="15.96dp"
-            app:contentPaddingTop="17.1dp"
+            app:contentPaddingTop="11.4dp"
             app:contentPaddingLeft="31.92dp"
-            app:contentPaddingBottom="17.46dp"
+            app:contentPaddingBottom="11.76dp"
             style="@style/wideCard">
-            <android.support.constraint.ConstraintLayout
 
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <ImageView
+                    android:id="@+id/curledImageThumb"
+                    android:src="@drawable/bird"
+                    android:layout_marginStart="5.7dp"
+                    android:layout_marginTop="11.4dp"
+                    android:layout_width="63.84dp"
+                    android:layout_height="63.84dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    />
+
+                <ImageView
                     android:id="@+id/userDevice"
-                    android:src="@drawable/ic_user"
-                    android:layout_width="74.1dp"
-                    android:layout_height="74.1dp"
+                    android:src="@drawable/my_eight_device"
+                    android:layout_width="75.24dp"
+                    android:layout_height="84.36dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     />
 
@@ -39,9 +50,9 @@
                     android:gravity="center_vertical"
                     android:orientation="vertical">
                     <TextView
+                        android:id="@+id/myeightUsername"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Welcome, Jisso Lah!"
                         android:textColor="@color/black"
                         android:alpha="0.77"
                         style="@style/CategoryCardTitleTypo"
@@ -49,7 +60,7 @@
 
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="horizontal">
                         <TextView
                             android:layout_gravity="bottom"
@@ -65,7 +76,6 @@
                         <TextView
                             android:layout_gravity="bottom"
                             android:layout_marginStart="18.24dp"
-                            android:layout_marginTop="13.68dp"
                             android:id="@+id/remainTime"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

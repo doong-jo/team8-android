@@ -8,11 +8,15 @@ import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
+import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.BluetoothReadCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 
@@ -28,6 +32,8 @@ public class InfoFragment extends Fragment {
     private SeekBar m_brightnessSeek;
     private SeekBar m_speedSeek;
 
+    private TextView m_userName;
+    private ImageView m_thumbImg;
     /**************************************************************/
 
     public InfoFragment() {
@@ -42,9 +48,18 @@ public class InfoFragment extends Fragment {
         m_myledsLayout = view.findViewById(R.id.myledsLayout);
         m_brightnessSeek = view.findViewById(R.id.brightnessSeek);
         m_speedSeek = view.findViewById(R.id.speedSeek);
-
-        m_myledsLayout.bringToFront();
+        m_userName = view.findViewById(R.id.myeightUsername);
+        m_thumbImg = view.findViewById(R.id.curledImageThumb);
         /*******************************************************************/
+
+        String tempName = "조성동";
+        m_myledsLayout.bringToFront();
+
+        // TODO: 01/11/2018 get UserManager getUser Name
+        m_userName.setText(tempName + "'s EIGHT");
+
+        // TODO: 01/11/2018 get ThumbImage From Server
+//        m_thumbImg.setImageResource();
 
         /******************* Make Listener in View *******************/
         m_brightnessSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -111,7 +126,7 @@ public class InfoFragment extends Fragment {
 
         BTManager.setReadResultCb(m_bluetoothReadCallback);
 
-        /** Initialize Device info from bluetooth signal **/
+        /** Initialize Device info from bluetooth signal After pairing complete**/
         String lastSignalStr = BTManager.getLastSignalStr();
 
         if( lastSignalStr.split("/").length != 0 ) {
