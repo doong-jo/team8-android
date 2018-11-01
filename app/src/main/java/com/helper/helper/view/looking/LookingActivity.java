@@ -180,9 +180,11 @@ public class LookingActivity extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        m_pairingCircle2.startAnimation(AnimationUtils
-                                .loadAnimation(getApplicationContext(),
-                                        R.anim.pairing_anim));
+                        if( m_pairingCircle2.getVisibility() == View.VISIBLE ) {
+                            m_pairingCircle2.startAnimation(AnimationUtils
+                                    .loadAnimation(getApplicationContext(),
+                                            R.anim.pairing_anim));
+                        }
                     }
                 });
             }
