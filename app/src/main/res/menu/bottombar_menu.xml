@@ -12,6 +12,7 @@
         android:id="@+id/item_create"
         android:icon="@drawable/ic_line_palette"
         android:title="Create"
+        android:iconTint="@color/xgray"
         app:showAsAction="ifRoom"/>
 
     <item

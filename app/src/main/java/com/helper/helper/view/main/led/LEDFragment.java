@@ -1,4 +1,4 @@
-package com.helper.helper.view.main;
+package com.helper.helper.view.main.led;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,17 +9,16 @@ import android.support.v4.app.Fragment;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 //import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.helper.helper.R;
-import com.helper.helper.view.led.LEDShopFragment;
 
 public class LEDFragment extends Fragment {
     private BottomNavigationView bottomNavigationView;
 
-    public static LEDFragment newInstance() {
-        return new LEDFragment();
+
+    public LEDFragment() {
+
     }
 
     @Override
@@ -39,24 +38,17 @@ public class LEDFragment extends Fragment {
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        Fragment fg;
                         switch (item.getItemId()) {
                             case R.id.item_ledshop:
                                 // TODO
-                                InfoFragment infoFragment = new InfoFragment();
-                                fg = infoFragment;
-                                setChildFragment(fg);
+                                setChildFragment(new LEDShopFragment());
                                 return true;
                             case R.id.item_create:
                                 // TODO
-                                LEDFragment ledFragment = new LEDFragment();
-                                fg = ledFragment;
-                                setChildFragment(fg);
+                                setChildFragment(new LEDCreateFragment());
                                 return true;
                             case R.id.item_myled:
-                                TrackingFragment trackingFragment = new TrackingFragment();
-                                fg = trackingFragment;
-                                setChildFragment(fg);
+                                setChildFragment(new MyLEDFragment());
                                 return true;
                         }
                         return false;

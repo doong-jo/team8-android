@@ -1,4 +1,7 @@
 <resources>
+    <!--Botton Navigation-->
+    <dimen name="bottom_bar_height">57dp</dimen>
+
     <!--Alpha-->
     <item name="black_alpha_lv0" type="dimen" format="float">0.0</item>
     <item name="black_alpha_lv1" type="dimen" format="float">0.5</item>
@@ -25,6 +28,7 @@
 
     <!--Snackbar-->
     <dimen name="snackbar_height">34dp</dimen>
+
 
     <!--Button-->
     <dimen name="button_small_width">192dp</dimen>
