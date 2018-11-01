@@ -23,7 +23,7 @@ import org.json.JSONException;
 public class LookingActivity extends Activity {
     private final static String TAG = LookingActivity.class.getSimpleName() + "/DEV";
 
-    private static final int MOVE_MAINACTIVITY_TIME = 2000;
+    private static final int MOVE_MAINACTIVITY_TIME = 1000;
     private static final int INTERVAL_CIRCLE_OCCURE = 500;
 
     /******************* Define widgtes in view *******************/
