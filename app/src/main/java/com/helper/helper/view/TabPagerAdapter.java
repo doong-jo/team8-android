@@ -12,7 +12,7 @@ import android.support.v4.app.FragmentPagerAdapter;         // 이전 Fragment�
 import android.util.Log;
 
 import com.helper.helper.view.main.myeight.EightFragment;
-import com.helper.helper.view.main.LEDFragment;
+import com.helper.helper.view.main.led.LEDFragment;
 import com.helper.helper.view.main.TrackingFragment;
 
 public class TabPagerAdapter extends FragmentPagerAdapter {

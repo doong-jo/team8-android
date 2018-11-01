@@ -3,11 +3,6 @@ package com.helper.helper.view;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.util.Log;
-
-import com.helper.helper.view.main.InfoFragment;
-import com.helper.helper.view.main.LEDFragment;
-import com.helper.helper.view.main.TrackingFragment;
 
 public class LedMenuAdapter extends FragmentPagerAdapter {
     private int l_menuCont;

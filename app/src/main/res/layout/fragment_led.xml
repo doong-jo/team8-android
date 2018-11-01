@@ -19,11 +19,13 @@
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottomNavigationView_led_menu"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:padding="0dp"
+        android:background="@color/white"
+        android:elevation="20dp"
+        app:elevation="20dp"
         app:itemBackground="@color/white"
-        app:itemIconTint="@color/accent_orange"
-        app:itemTextColor="@color/accent_orange"
-        app:menu="@menu/bottombar_menu" />
+        app:itemIconTint="@color/bottom_bar_item_selector"
+        app:itemTextColor="@color/bottom_bar_item_selector"
+        app:menu="@menu/bottombar_menu"/>
 </RelativeLayout>
