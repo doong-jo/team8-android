@@ -22,23 +22,33 @@
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.AppBarOverlay">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:navigationIcon="@drawable/ic_menu"
-                app:navigationContentDescription="user navigation"
-                app:popupTheme="@style/AppTheme.PopupOverlay">
-                <TextView
-                    android:id="@+id/toolbar_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/app_name"
-                    android:textColor="@color/black"
-                    android:alpha="0.9"
-                    style="@style/ToolbarTitleTypo"
-                    android:layout_gravity="center" />
-            </android.support.v7.widget.Toolbar>
+                android:layout_height="match_parent"
+                app:contentScrim="?attr/colorPrimary"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed">
+                <android.support.v7.widget.Toolbar
+                    app:layout_collapseMode="pin"
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:navigationIcon="@drawable/ic_menu"
+                    app:navigationContentDescription="user navigation"
+                    app:popupTheme="@style/AppTheme.PopupOverlay">
+                    <TextView
+                        android:id="@+id/toolbar_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/app_name"
+                        android:textColor="@color/black"
+                        android:alpha="0.9"
+                        app:layout_collapseMode="pin"
+                        style="@style/ToolbarTitleTypo"
+                        android:layout_gravity="center" />
+                </android.support.v7.widget.Toolbar>
+            </android.support.design.widget.CollapsingToolbarLayout>
+
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabLayout"

@@ -22,24 +22,40 @@
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.AppBarOverlay">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:fitsSystemWindows="true"
+                app:titleEnabled="false"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlwaysCollapsed"
+                app:layout_collapseMode="none"
+                android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:navigationIcon="@drawable/ic_menu"
-                app:navigationContentDescription="user navigation"
-                app:popupTheme="@style/AppTheme.PopupOverlay">
-                <TextView
-                    android:id="@+id/toolbar_title"
-                    android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:contentScrim="?attr/colorPrimary"
+                >
+                <android.support.v7.widget.Toolbar
+                    app:contentInsetLeft="0dp"
+                    app:contentInsetStart="0dp"
+                    android:gravity="top"
+                    android:layout_gravity="top"
+                    app:layout_collapseMode="pin"
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/app_name"
-                    android:textColor="@color/black"
-                    android:alpha="0.9"
-                    style="@style/ToolbarTitleTypo"
-                    android:layout_gravity="center" />
-            </android.support.v7.widget.Toolbar>
-
+                    app:navigationIcon="@drawable/ic_menu"
+                    app:navigationContentDescription="user navigation"
+                    app:popupTheme="@style/AppTheme.PopupOverlay">
+                    <TextView
+                        android:gravity="center_horizontal"
+                        android:id="@+id/toolbar_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/app_name"
+                        android:textColor="@color/black"
+                        android:alpha="0.9"
+                        style="@style/ToolbarTitleTypo"
+                        android:layout_gravity="left" />
+                </android.support.v7.widget.Toolbar>
+            </android.support.design.widget.CollapsingToolbarLayout>
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
