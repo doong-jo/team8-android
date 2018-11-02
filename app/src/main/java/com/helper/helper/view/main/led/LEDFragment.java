@@ -31,8 +31,9 @@ public class LEDFragment extends Fragment {
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
         View view = inflater.inflate( R.layout.fragment_led, container, false );
 
-        bottomNavigationView = (BottomNavigationView) view.findViewById(R.id.bottomNavigationView_led_menu);
+        setChildFragment(new LEDShopFragment());
 
+        bottomNavigationView = (BottomNavigationView) view.findViewById(R.id.bottomNavigationView_led_menu);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {

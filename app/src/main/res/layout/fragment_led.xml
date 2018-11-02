@@ -5,16 +5,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.v4.widget.NestedScrollView
+    <LinearLayout
         android:layout_alignParentTop="true"
         android:id="@+id/ledFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
             <!--LED Detail-->
 
             <!--LED List-->
-    </android.support.v4.widget.NestedScrollView>
+    </LinearLayout>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottomNavigationView_led_menu"
@@ -23,6 +24,7 @@
         android:layout_alignParentBottom="true"
         android:background="@color/white"
         android:elevation="20dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:elevation="20dp"
         app:itemBackground="@color/white"
         app:itemIconTint="@color/bottom_bar_item_selector"

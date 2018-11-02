@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    tools:openDrawer="end"
+    android:background="@color/white">
 
     <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -26,6 +27,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
                 app:navigationIcon="@drawable/ic_menu"
                 app:navigationContentDescription="user navigation"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
@@ -44,12 +46,13 @@
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
                 app:tabBackground="@color/white"
                 app:tabIndicatorColor="@color/tab_indicator_color"
                 app:tabRippleColor="@color/tab_indicator_color"
                 app:tabSelectedTextColor="@color/tab_indicator_color"
                 app:tabTextAppearance="@style/TopTabBarTypo"
-                app:tabIndicatorHeight="4dp"
+                app:tabIndicatorHeight="4.56dp"
                 app:tabTextColor="@color/xxxgray" />
 
         </android.support.design.widget.AppBarLayout>
