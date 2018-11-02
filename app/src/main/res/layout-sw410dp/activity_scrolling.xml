@@ -57,10 +57,7 @@
 
         </android.support.design.widget.AppBarLayout>
 
-
         <include layout="@layout/content_scrolling" />
-
-
 
     </android.support.design.widget.CoordinatorLayout>
 
