@@ -31,6 +31,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,6 +56,7 @@ import com.helper.helper.view.contact.ContactActivity;
 import com.helper.helper.controller.GyroManager;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.PermissionManager;
+import com.helper.helper.view.widget.WrapContentViewPager;
 import com.snatik.storage.Storage;
 
 import org.json.JSONException;
@@ -155,7 +157,7 @@ public class ScrollingActivity extends AppCompatActivity
             public void onTabSelected(Tab tab) {
                 Log.d("DEV", "onTabSelected called! posistion : " + tab.getPosition());
                 m_viewPager.setCurrentItem(tab.getPosition());
-
+//                m_viewPager.reMeasureCurrentPage(tab.getPosition());
                 /*
                 if (tab.getPosition() == TAB_STATUS) {
 
