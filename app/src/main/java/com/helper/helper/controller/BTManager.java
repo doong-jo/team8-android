@@ -183,21 +183,21 @@ public class BTManager {
 
         try {
             m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BTManager.BLUETOOTH_UUID));
-
             m_bluetoothSocket.connect();
 
             m_bluetoothInput = m_bluetoothSocket.getInputStream();
             m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
-
-            /** create bluetooth read thread **/
-            m_bluetoothReadthread = new BluetoothReadThread();
-            m_bluetoothReadthread.start();
 
             try {
                 m_connectionResultCb.onDone(SUCCESS_BLUETOOTH_CONNECT);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            /** create bluetooth read thread **/
+            m_bluetoothReadthread = new BluetoothReadThread();
+            m_bluetoothReadthread.start();
+
         } catch (IOException e) {
             e.printStackTrace();
             try {
@@ -244,13 +244,7 @@ public class BTManager {
     }
 
     public static void writeToBluetoothDevice(byte[] bytes) {
-        if( !getConnected() ) {
-            stopReadThread();
-            try {
-                m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        if( m_bluetoothOutput == null ) {
             return;
         }
 
@@ -264,13 +258,8 @@ public class BTManager {
     }
 
     public static void readFromBluetoothDevice(BluetoothReadCallback callback) {
-        if (!getConnected()) {
+        if (m_bluetoothInput == null) {
             stopReadThread();
-            try {
-                m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
             return;
         }
 
@@ -302,6 +291,9 @@ public class BTManager {
         if( m_bluetoothReadthread != null ) {
             m_bluetoothReadthread.interrupt();
             m_bluetoothReadthread = null;
+            m_bluetoothInput = null;
+            m_bluetoothOutput = null;
+
         }
     }
 }

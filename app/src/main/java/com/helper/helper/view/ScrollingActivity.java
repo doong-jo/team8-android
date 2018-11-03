@@ -384,8 +384,8 @@ public class ScrollingActivity extends AppCompatActivity
             tab.select();
         }
 
-        GyroManager.m_sensorManager.registerListener(this, GyroManager.m_sensorAccel, SensorManager.SENSOR_DELAY_UI);
-        GyroManager.m_sensorManager.registerListener(this, GyroManager.m_sensorMag, SensorManager.SENSOR_DELAY_UI);
+//        GyroManager.m_sensorManager.registerListener(this, GyroManager.m_sensorAccel, SensorManager.SENSOR_DELAY_UI);
+//        GyroManager.m_sensorManager.registerListener(this, GyroManager.m_sensorMag, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
@@ -393,7 +393,6 @@ public class ScrollingActivity extends AppCompatActivity
         super.onStop();
 //        ViewStateManager.stop ++;
         Log.d(TAG, "onStop: ");
-//        BTManager.closeBluetoothSocket();
     }
 
     @Override
@@ -409,10 +408,6 @@ public class ScrollingActivity extends AppCompatActivity
 
         ViewStateManager.saveTabPosition(m_tabLayout.getSelectedTabPosition());
         Log.d(TAG, "onDestroy: Tab pos is " + ViewStateManager.getSavedTabPosition());
-
-
-        // Save view state
-
 
         BTManager.closeBluetoothSocket();
     }
