@@ -37,9 +37,9 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
             case 1:
                 LEDFragment LEDfragment = new LEDFragment();
                 return LEDfragment;
-            case 2:
-                TrackingFragment trackingFragment = new TrackingFragment();
-                return trackingFragment;
+//            case 2:
+//                TrackingFragment trackingFragment = new TrackingFragment();
+//                return trackingFragment;
             default:
                 return null;
         }

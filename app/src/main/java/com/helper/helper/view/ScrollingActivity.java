@@ -149,7 +149,7 @@ public class ScrollingActivity extends AppCompatActivity
         m_tabLayout = findViewById(R.id.tabLayout);
         m_tabLayout.addTab(m_tabLayout.newTab().setText("MY EIGHT"));
         m_tabLayout.addTab(m_tabLayout.newTab().setText("LED"));
-        m_tabLayout.addTab(m_tabLayout.newTab().setText("TRACKING"));
+//        m_tabLayout.addTab(m_tabLayout.newTab().setText("TRACKING"));
 
         m_pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), m_tabLayout.getTabCount());
 
