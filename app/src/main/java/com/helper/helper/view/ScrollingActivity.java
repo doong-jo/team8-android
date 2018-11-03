@@ -33,6 +33,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -144,6 +145,16 @@ public class ScrollingActivity extends AppCompatActivity
 
         m_navigationView = findViewById(R.id.nav_view);
         m_navigationView.setNavigationItemSelectedListener(this);
+
+        View headerView = m_navigationView.getHeaderView(0);
+
+        TextView navUserName = headerView.findViewById(R.id.navUserName);
+        navUserName.setText(UserManager.getUserName());
+        ImageView navUserProfile = headerView.findViewById(R.id.navUserProfile);
+
+        // TODO: 03/11/2018 set User Profile Bitmap.
+//        navUserProfile.setImageBitmap(UserManager.getUserProfileBitmap());
+        
 
         /** Tab **/
         m_tabLayout = findViewById(R.id.tabLayout);
