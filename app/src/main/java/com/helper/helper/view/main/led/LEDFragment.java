@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 //import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.helper.helper.R;
+import com.helper.helper.controller.ViewStateManager;
 
 public class LEDFragment extends Fragment {
     private BottomNavigationView bottomNavigationView;
@@ -59,6 +60,18 @@ public class LEDFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        bottomNavigationView.setSelectedItemId(ViewStateManager.getSavedBottomNavPosition());
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ViewStateManager.saveBottomNavigationPosition(bottomNavigationView.getSelectedItemId());
+    }
+
     private void setChildFragment(Fragment child) {
         FragmentTransaction childFt = getChildFragmentManager().beginTransaction();
 
@@ -68,6 +81,4 @@ public class LEDFragment extends Fragment {
             childFt.commit();
         }
     }
-    /*----------- listener---------------- */
-
 }

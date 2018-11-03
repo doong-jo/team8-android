@@ -25,6 +25,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -48,6 +49,7 @@ import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.GoogleMapManager;
 import com.helper.helper.controller.SMSManager;
 import com.helper.helper.controller.UserManager;
+import com.helper.helper.controller.ViewStateManager;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.view.assist.AssistActivity;
 import com.helper.helper.view.main.myeight.EightFragment;
@@ -86,14 +88,15 @@ public class ScrollingActivity extends AppCompatActivity
     private static final int PERMISSION_REQUEST = 267;
 
     /***************** Define widgtes in view *******************/
+    private NavigationView m_navigationView;
+
     private TabLayout m_tabLayout;
     private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
     /**************************************************************/
 
-    private NavigationView m_navigationView;
-
     private SweetAlertDialog m_accDialog;
+
 
     public ViewPager getViewPager() {
         return m_viewPager;
@@ -102,6 +105,7 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: ");
 
         /******************* Connect widgtes with layout *******************/
         setContentView(R.layout.activity_scrolling);
@@ -352,9 +356,22 @@ public class ScrollingActivity extends AppCompatActivity
 
     /** Life cycle **/
 
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d(TAG, "onRestart: ");
+    }
+    
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume: ");
+
+        TabLayout.Tab tab = m_tabLayout.getTabAt(ViewStateManager.getSavedTabPosition());
+        if (tab != null) {
+            tab.select();
+        }
 
         GyroManager.m_sensorManager.registerListener(this, GyroManager.m_sensorAccel, SensorManager.SENSOR_DELAY_UI);
         GyroManager.m_sensorManager.registerListener(this, GyroManager.m_sensorMag, SensorManager.SENSOR_DELAY_UI);
@@ -363,18 +380,29 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
+//        ViewStateManager.stop ++;
+        Log.d(TAG, "onStop: ");
 //        BTManager.closeBluetoothSocket();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d(TAG, "onPause: ");
 //        GyroManager.m_sensorManager.unregisterListener(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        ViewStateManager.saveTabPosition(m_tabLayout.getSelectedTabPosition());
+        Log.d(TAG, "onDestroy: Tab pos is " + ViewStateManager.getSavedTabPosition());
+
+
+        // Save view state
+
+
         BTManager.closeBluetoothSocket();
     }
 

@@ -16,12 +16,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.helper.helper.R;
 import com.helper.helper.interfaces.BluetoothReadCallback;
 import com.helper.helper.interfaces.ValidateCallback;
-import com.helper.helper.view.ScrollingActivity;
 
 import org.json.JSONException;
 
@@ -76,10 +73,6 @@ public class BTManager {
         }
     }
 
-    private static boolean m_IsProcessing = false;
-    private static boolean m_IsReadProcessing = false;
-    private static boolean m_bIsPairing = false;
-
     private static Activity m_activity;
     private static BluetoothAdapter m_bluetoothAdapter;
     private static BluetoothDevice m_pairedDevice;
@@ -109,11 +102,14 @@ public class BTManager {
     public static void setReadResultCb(BluetoothReadCallback callback) { m_readResultCb = callback; }
 
     public static void initBluetooth(final Activity activity) {
+        if( getConnected() ) {
+            Log.d(TAG, "initBluetooth: Already connect");
+            return;
+        }
+
         if( activity != null) {
             m_activity = activity;
         }
-
-        m_IsProcessing = true;
 
         /** create bluetooth (GATT) service **/
 //        Intent bluetoothServiceIntent = new Intent(m_activity, BluetoothLeService.class);
@@ -157,29 +153,10 @@ public class BTManager {
                 m_readResultCb.onResult(signalMsg);
             }
         }
-//        else if( signalMsg.split("info").length != 0 ) {
-//            String[] splitStr = signalMsg.split("/");
-//
-//            int ledInd = Integer.parseInt(splitStr[1]);
-//            float spdVal = Float.parseFloat(splitStr[2]);
-//            float brtVal = Float.parseFloat(splitStr[3]);
-//        }
     }
 
     /** Find Bluetooth Device **/
     private static void prepareDevice()  {
-//        if (m_pairedDevice != null) {
-//            m_bIsPairing = true;
-//            try {
-//                m_connectionResultCb.onDone(SUCCESS_BLUETOOTH_CONNECT);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-////            Toast.makeText(m_activity, "이미 디바이스와 연결되어 있습니다.", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-
-//        m_loadingDlg = ProgressDialog.show(m_activity, m_activity.getString(R.string.bluetooth_loading_title), m_activity.getString(R.string.bluetooth_loading_message), true);
 
         /** 만약 페어링 기기들 리스트에 있다면 바로 연결 **/
         List<BluetoothDevice> devices = new ArrayList<>(m_bluetoothAdapter.getBondedDevices());
@@ -188,7 +165,6 @@ public class BTManager {
         for (int i = 0; i < deviceLabels.length; ++i) {
             if (devices.get(i).getName().contains(DEVICE_ALIAS)) {
                 connectDevice(devices.get(i));
-                // updateConnectionLayout(true);
                 return;
             }
         }
@@ -209,7 +185,6 @@ public class BTManager {
             m_bluetoothSocket = m_pairedDevice.createRfcommSocketToServiceRecord(UUID.fromString(BTManager.BLUETOOTH_UUID));
 
             m_bluetoothSocket.connect();
-            boolean isConnected = m_bluetoothSocket.isConnected();
 
             m_bluetoothInput = m_bluetoothSocket.getInputStream();
             m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
@@ -217,29 +192,12 @@ public class BTManager {
             /** create bluetooth read thread **/
             m_bluetoothReadthread = new BluetoothReadThread();
             m_bluetoothReadthread.start();
-//            Thread bluetoothReadThread = new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    while (true) {
-//                        BTManager.readFromBluetoothDevice(new BluetoothReadCallback() {
-//                            @Override
-//                            public void onResult(String result) {
-//                                bluetoothSignalHandler(result);
-//                            }
-//                        });
-//                    }
-//                }
-//            });
 
             try {
                 m_connectionResultCb.onDone(SUCCESS_BLUETOOTH_CONNECT);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            m_bIsPairing = true;
-//            Toast.makeText(m_activity, "디바이스 연결에 성공했습니다.", Toast.LENGTH_SHORT).show();
-
-
         } catch (IOException e) {
             e.printStackTrace();
             try {
@@ -247,10 +205,7 @@ public class BTManager {
             } catch (JSONException e1) {
                 e1.printStackTrace();
             }
-            m_bIsPairing = false;
-//            Toast.makeText(m_activity, "디바이스 연결에 실패했습니다.", Toast.LENGTH_SHORT).show();
         }
-//        m_loadingDlg.dismiss();
     }
 
     /** Find Bluetooth **/
@@ -262,13 +217,6 @@ public class BTManager {
                 if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
 
                     BluetoothDevice searchedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-//                    if (searchedDevice.getName() == null) {
-//                        Toast.makeText(m_activity, "디비이스를 찾지 못했습니다.", Toast.LENGTH_SHORT).show();
-//                        ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
-//                        scrollingActivity.updateConnectionLayout(false);
-//                        m_loadingDlg.dismiss();
-//                        return;
-//                    }
 
                     String searchDeviceName = searchedDevice.getName();
                     if ( searchDeviceName == null ) { return; }
@@ -278,10 +226,11 @@ public class BTManager {
                     }
 
                 } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()) ) {
-//                    Toast.makeText(m_activity, "디비이스를 찾지 못했습니다.", Toast.LENGTH_SHORT).show();
-                    m_bIsPairing = false;
-//                    ScrollingActivity scrollingActivity = (ScrollingActivity) m_activity;
-//                    m_loadingDlg.dismiss();
+                    try {
+                        m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         };
@@ -295,30 +244,33 @@ public class BTManager {
     }
 
     public static void writeToBluetoothDevice(byte[] bytes) {
-//        if (m_bluetoothInput == null || !m_bluetoothSocket.isConnected()) {
-//            return;
-//        }
-
-        try {
-            m_bluetoothOutput.write(bytes);
-        } catch (IOException e) {
-            m_bIsPairing = false;
-            e.printStackTrace();
-//            Toast.makeText(m_activity, "블루투스 신호 전송에 실패했습니다.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public static void readFromBluetoothDevice(BluetoothReadCallback callback) {
-        if (m_bluetoothReadthread != null && !m_bluetoothSocket.isConnected()) {
-            m_bluetoothReadthread.interrupt();
-            m_bluetoothReadthread = null;
+        if( !getConnected() ) {
+            stopReadThread();
             try {
                 m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            return;
+        }
 
-            m_bIsPairing = false;
+        try {
+            m_bluetoothOutput.write(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+            stopReadThread();
+//            Toast.makeText(m_activity, "블루투스 신호 전송에 실패했습니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public static void readFromBluetoothDevice(BluetoothReadCallback callback) {
+        if (!getConnected()) {
+            stopReadThread();
+            try {
+                m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             return;
         }
 
@@ -330,6 +282,7 @@ public class BTManager {
             String readMessage = new String(buffer, 0, bytes);
             callback.onResult(readMessage);
         } catch (IOException e) {
+            stopReadThread();
             e.printStackTrace();
         }
     }
@@ -338,10 +291,17 @@ public class BTManager {
         try {
             if( m_bluetoothSocket != null && m_bluetoothSocket.isConnected() ) {
                 m_bluetoothSocket.close();
-                m_bluetoothReadthread.interrupt();
+                stopReadThread();
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void stopReadThread() {
+        if( m_bluetoothReadthread != null ) {
+            m_bluetoothReadthread.interrupt();
+            m_bluetoothReadthread = null;
         }
     }
 }
