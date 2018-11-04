@@ -14,4 +14,8 @@
     <declare-styleable name="LoadingButton">
 
     </declare-styleable>
+
+    <declare-styleable name="DialogLED">
+
+    </declare-styleable>
 </resources>
