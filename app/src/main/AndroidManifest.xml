@@ -58,8 +58,7 @@
         <activity android:name=".view.login.LoginActivity"
             android:screenOrientation="portrait"
             android:noHistory="false"
-            android:theme="@style/AppTheme"
-            >
+            android:theme="@style/AppTheme">
         </activity>
 
         <activity

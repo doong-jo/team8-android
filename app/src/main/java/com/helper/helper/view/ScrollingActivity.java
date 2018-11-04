@@ -33,7 +33,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -94,6 +96,7 @@ public class ScrollingActivity extends AppCompatActivity
     private TabLayout m_tabLayout;
     private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
+
     /**************************************************************/
 
     private SweetAlertDialog m_accDialog;
@@ -240,6 +243,7 @@ public class ScrollingActivity extends AppCompatActivity
         /* Sensor end */
     }
 
+    /** Dialog **/
     private SweetAlertDialog resetAccDialog() {
         return
             new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
@@ -391,14 +395,15 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
+        ViewStateManager.saveTabPosition(m_tabLayout.getSelectedTabPosition());
 //        ViewStateManager.stop ++;
-        Log.d(TAG, "onStop: ");
+//        Log.d(TAG, "onStop: ");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause: ");
+//        Log.d(TAG, "onPause: ");
 //        GyroManager.m_sensorManager.unregisterListener(this);
     }
 
@@ -406,8 +411,7 @@ public class ScrollingActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
 
-        ViewStateManager.saveTabPosition(m_tabLayout.getSelectedTabPosition());
-        Log.d(TAG, "onDestroy: Tab pos is " + ViewStateManager.getSavedTabPosition());
+//        Log.d(TAG, "onDestroy: ");
 
         BTManager.closeBluetoothSocket();
     }
