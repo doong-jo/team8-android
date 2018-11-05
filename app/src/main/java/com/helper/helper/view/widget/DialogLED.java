@@ -6,18 +6,26 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.helper.helper.R;
+import com.helper.helper.model.LED;
 
 public class DialogLED extends FrameLayout {
 
     private int m_dlgMode;
+    private LED m_ledData;
 
-    public DialogLED(Context context, int mode) {
+    private ImageView m_bookmarkToggle;
+    private boolean m_bIsBookmarked;
+
+    private ImageView m_ImageLED;
+
+    public DialogLED(Context context, int mode, LED ledData) {
         super(context);
         m_dlgMode = mode;
+        m_ledData = ledData;
         initView();
-
     }
 
     public DialogLED(Context context, AttributeSet attrs) {
@@ -47,6 +55,30 @@ public class DialogLED extends FrameLayout {
             v = li.inflate(R.layout.widget_detail_ledshop_dialog, this, false);
         }
         addView(v);
+
+        m_bookmarkToggle = v.findViewById(R.id.bookmarkToggle);
+        m_ImageLED = v.findViewById(R.id.dlgImageLED);
+        m_ImageLED.setImage();
+
+        m_bIsBookmarked = m_ledData.getBookmarked();
+        if( m_bIsBookmarked ) {
+            m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
+        } else {
+            m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
+        }
+
+        m_bookmarkToggle.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if( m_bIsBookmarked ) {
+                    m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
+                } else {
+                    m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
+                }
+
+                m_bIsBookmarked = !m_bIsBookmarked;
+            }
+        });
 
         /** Do something about child widget **/
     }

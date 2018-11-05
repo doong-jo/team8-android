@@ -7,10 +7,12 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.helper.helper.R;
+import com.helper.helper.model.LED;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -22,6 +24,7 @@ public class ImageCardViewAddonText extends FrameLayout {
 
     private LinearLayout m_cardLayout;
     private TextView m_cardNameTxt;
+    private ImageView m_cardImage;
     private SweetAlertDialog m_detailDlg;
 
     public ImageCardViewAddonText(Context context) {
@@ -54,6 +57,7 @@ public class ImageCardViewAddonText extends FrameLayout {
         addView(v);
 
         m_cardLayout = v.findViewById(R.id.cardLayout);
+        m_cardImage = v.findViewById(R.id.cardViewImage);
         m_cardNameTxt = v.findViewById(R.id.cardNameText);
 
         /** Do something about child widget **/
@@ -81,10 +85,10 @@ public class ImageCardViewAddonText extends FrameLayout {
         typedArray.recycle();
     }
 
-    private SweetAlertDialog makeDownloadDlg(Context context, String ledName) {
+    private SweetAlertDialog makeDownloadDlg(Context context, LED ledData) {
         return
                 new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
-                        .setTitleText(ledName)
+                        .setTitleText(ledData.getName())
                         .setCancelText(context.getString(R.string.led_dialog_cancel))
                         .setConfirmButton(context.getString(R.string.led_dialog_download), new SweetAlertDialog.OnSweetClickListener() {
                             @Override
@@ -94,11 +98,11 @@ public class ImageCardViewAddonText extends FrameLayout {
                         });
     }
 
-    private SweetAlertDialog makeDetailDlg(Context context, String ledName) {
+    private SweetAlertDialog makeDetailDlg(Context context, LED ledData) {
 
         return
                 new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
-                        .setTitleText(ledName)
+                        .setTitleText(ledData.getName())
                         .setCancelText(context.getString(R.string.led_dialog_cancel))
                         .setConfirmButton(context.getString(R.string.led_dialog_showon), new SweetAlertDialog.OnSweetClickListener() {
                             @Override
@@ -108,7 +112,15 @@ public class ImageCardViewAddonText extends FrameLayout {
                         });
     }
 
-    public void setOnClickCustomDialogEnable(final int mode, final Context context) {
+    public void setImage(int resId) {
+        m_cardImage.setImageResource(resId);
+    }
+
+    public void setName(String name) {
+        m_cardNameTxt.setText(name);
+    }
+
+    public void setOnClickCustomDialogEnable(final int mode, final LED ledModel, final Context context) {
         if( mode == NORMAL_DIALOG_TYPE ) { return; }
 
 //        m_dlgTargetContxt = context;
@@ -118,12 +130,12 @@ public class ImageCardViewAddonText extends FrameLayout {
             @Override
             public void onClick(View view) {
                 if( mode == DETAIL_DIALOG_TYPE ) {
-                    m_detailDlg = makeDetailDlg(context, "Bird");
+                    m_detailDlg = makeDetailDlg(context, ledModel);
                 } else if( mode == DOWNLOAD_DIALOG_TYPE ) {
-                    m_detailDlg = makeDownloadDlg(context, "Bird");
+                    m_detailDlg = makeDownloadDlg(context, ledModel);
                 }
 
-                m_detailDlg.setCustomView(new DialogLED(context, mode));
+                m_detailDlg.setCustomView(new DialogLED(context, mode, ledModel));
                 m_detailDlg.show();
                 TextView titleText = m_detailDlg.findViewById(R.id.title_text);
                 titleText.setTextAppearance(R.style.HeadlineTypo);

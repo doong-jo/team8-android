@@ -14,6 +14,7 @@ import android.widget.ImageView;
 
 //import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.helper.helper.R;
+import com.helper.helper.model.LED;
 import com.helper.helper.view.ScrollingActivity;
 import com.helper.helper.view.widget.ImageCardViewAddonText;
 
@@ -23,8 +24,6 @@ public class MyLEDFragment extends Fragment {
     private ImageView m_ledGridToggle;
     private ImageView m_bookmarkToggle;
     private GridLayout m_ledGridLayout;
-
-    private ImageCardViewAddonText m_ledCardTest;
 
     private boolean m_bIsBookmarkView;
     /**************************************************************/
@@ -41,7 +40,6 @@ public class MyLEDFragment extends Fragment {
         m_ledGridToggle = view.findViewById(R.id.ledGridView);
         m_bookmarkToggle = view.findViewById(R.id.bookmarkView);
         m_ledGridLayout = view.findViewById(R.id.ledGridLayout);
-        m_ledCardTest = view.findViewById(R.id.ledCardTest);
         /*******************************************************************/
 
         m_bIsBookmarkView = false;
@@ -51,7 +49,7 @@ public class MyLEDFragment extends Fragment {
         m_ledGridToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if ( m_bIsBookmarkView ) {
+                if ( !m_bIsBookmarkView ) {
                     m_bIsBookmarkView = !m_bIsBookmarkView;
                     m_ledGridToggle.setImageResource(R.drawable.ic_cloud_download_black_selected);
                     m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
@@ -62,7 +60,7 @@ public class MyLEDFragment extends Fragment {
         m_bookmarkToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if ( !m_bIsBookmarkView ) {
+                if ( m_bIsBookmarkView ) {
                     m_bIsBookmarkView = !m_bIsBookmarkView;
                     m_ledGridToggle.setImageResource(R.drawable.ic_cloud_download_black);
                     m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
@@ -72,9 +70,23 @@ public class MyLEDFragment extends Fragment {
 
         ScrollingActivity mainActivity = (ScrollingActivity)getActivity();
 
-        m_ledCardTest.setOnClickCustomDialogEnable(ImageCardViewAddonText.DETAIL_DIALOG_TYPE, mainActivity);
+
 
         /*************************************************************/
+
+        /** Add cardview in gridlayout **/
+        LED ledModel = new LED.Builder()
+                .name("Character")
+                .creator("Xman")
+                .bookmarked(true)
+                .downloadCnt(2432)
+                .build();
+
+        ImageCardViewAddonText cardViewLED = new ImageCardViewAddonText(getActivity());
+        cardViewLED.setOnClickCustomDialogEnable(ImageCardViewAddonText.DETAIL_DIALOG_TYPE, ledModel, mainActivity);
+        cardViewLED.setName("Character");
+        cardViewLED.setImage(R.drawable.characters);
+        m_ledGridLayout.addView(cardViewLED);
 
         return view;
     }

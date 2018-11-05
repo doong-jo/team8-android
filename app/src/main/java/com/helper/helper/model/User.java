@@ -86,6 +86,20 @@ public class User {
             return this;
         }
 
+        public Builder ledIndicies(String ledIndicies) {
+
+            if( ledIndicies.contains(",") ) {
+                m_ledIndicies.add(ledIndicies);
+            } else {
+                String[] strArr = ledIndicies.split(",");
+
+                for (int i = 0; i < strArr.length; i++) {
+                    m_ledIndicies.add(strArr[i]);
+                }
+            }
+            return this;
+        }
+
 
         public User build() {
             return new User(this);
@@ -141,13 +155,14 @@ public class User {
     public String[] getUserLEDIndiciesURI(String baseUri) {
         String pureStr = getUserLEDIndicies();
         String[] ledArrStr = pureStr.split("\\[")[1].split("]")[0].split(",");
-
+        String[] resultArr = new String[ledArrStr.length*2];
 
         for (int i = 0; i < ledArrStr.length; i++) {
-            ledArrStr[i] =  baseUri + "/images/LED/" + ledArrStr[i] + ".png";
+            resultArr[i] =  baseUri + "/images/LED/" + ledArrStr[i] + ".png";
+            resultArr[i+1] = baseUri + "/images/LED/" + ledArrStr[i] + ".gif";
         }
 
-        return ledArrStr;
+        return resultArr;
     }
 
     public String getUserName() { return m_userName; }

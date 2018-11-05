@@ -30,11 +30,13 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -113,6 +115,8 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        final Activity activity = this;
+
         Log.d(TAG, "onCreate: ");
 
         /******************* Connect widgtes with layout *******************/
@@ -129,12 +133,30 @@ public class ScrollingActivity extends AppCompatActivity
 
         /** Set User Info **/
         try {
-            UserManager.setUser(FileManager.readXmlUserInfo(this));
-//            m_loadingDialog = makeLoadingDialog();
-//            m_loadingDialog.show();
+            m_loadingDialog = makeLoadingDialog();
+            m_loadingDialog.show();
+            m_loadingDialog.findViewById(R.id.confirm_button).setVisibility(View.GONE);
+            LinearLayout parentOfConfirmBtn = (LinearLayout)m_loadingDialog.findViewById(R.id.confirm_button).getParent();
+            parentOfConfirmBtn.setVisibility(View.GONE);
 
-            DownloadImageTask downloadUserDataLED = new DownloadImageTask();
-            downloadUserDataLED.execute(UserManager.getUser().getUserLEDIndiciesURI(getString(R.string.server_uri)));
+            UserManager.setUser(FileManager.readXmlUserInfo(this), new ValidateCallback() {
+                @Override
+                public void onDone(int resultCode) throws JSONException {
+                    if( resultCode == UserManager.DONE_SET_USER ) {
+                        DownloadImageTask downloadUserDataLED = new DownloadImageTask(activity, new ValidateCallback() {
+                            @Override
+                            public void onDone(int resultCode) throws JSONException {
+                                if( resultCode == DownloadImageTask.DONE_LOAD_LED_IMAGES ) {
+                                    m_loadingDialog.dismissWithAnimation();
+                                }
+                            }
+                        });
+                        downloadUserDataLED.execute(UserManager.getUser().getUserLEDIndiciesURI(getString(R.string.server_uri)));
+                    }
+                }
+            });
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -206,7 +228,6 @@ public class ScrollingActivity extends AppCompatActivity
         });
 
 
-        final Activity activity = this;
         /** Dialog **/
         m_accDialog = resetAccDialog();
 
@@ -278,8 +299,6 @@ public class ScrollingActivity extends AppCompatActivity
         dlg.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
         dlg.setTitleText(getString(R.string.loading_dialog_user_data));
         dlg.setCancelable(false);
-        dlg.show();
-
         return dlg;
     }
 

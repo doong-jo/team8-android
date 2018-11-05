@@ -302,7 +302,7 @@ public class FileManager {
         }
     }
 
-    public static User readXmlUserInfo(Context context, ValidateCallback callback) throws  IOException {
+    public static User readXmlUserInfo(Context context) throws  IOException {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = null;
@@ -331,11 +331,14 @@ public class FileManager {
         String led_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_INDICIES).getNodeValue();
 //              String track_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_TRACK_INDICIES).getNodeValue();
 
+        led_indicies = led_indicies.split("\\[")[1].split("]")[0];
+
         User user = new User.Builder()
                 .email(email)
                 .name(name)
                 .phone(phone)
                 .ridingType(riding_type)
+                .ledIndicies(led_indicies)
                 .build();
 
 
