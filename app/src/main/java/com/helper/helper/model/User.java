@@ -10,6 +10,7 @@ import android.location.Location;
 
 import com.helper.helper.enums.RidingType;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,7 +26,6 @@ public class User {
     private Boolean m_userEmergency;
     private Date m_userLastAccess;
     private Location m_lastPosition;
-    private ArrayList<Location> m_accPosition;
     private ArrayList<String> m_ledIndicies;
     private ArrayList<String> m_trackIndicies;
 
@@ -36,6 +36,7 @@ public class User {
         private String m_userPhone;
         private String m_userName;
         private String m_userRidingType;
+        private ArrayList<String> m_ledIndicies = new ArrayList<>();
 
         public Builder() {
             m_userEmail = "";
@@ -70,6 +71,22 @@ public class User {
             return this;
         }
 
+        public Builder ledIndicies(JSONArray ledIndicies) {
+            if (ledIndicies != null) {
+                int len = ledIndicies.length();
+                for (int i=0; i<len; i++){
+                    try {
+                        String test = ledIndicies.get(i).toString();
+                        m_ledIndicies.add(ledIndicies.get(i).toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return this;
+        }
+
+
         public User build() {
             return new User(this);
         }
@@ -85,8 +102,7 @@ public class User {
         m_userLastAccess = new Date();
         m_userEmergency = false;
         m_lastPosition = new Location("");
-        m_accPosition = new ArrayList<Location>();
-        m_ledIndicies = new ArrayList<String>();
+        m_ledIndicies = builder.m_ledIndicies;
         m_trackIndicies = new ArrayList<String>();
     }
 
@@ -116,6 +132,22 @@ public class User {
 
     public String getUserPhone() {
         return m_userPhone;
+    }
+
+    public String getUserLEDIndicies() {
+        return m_ledIndicies.toString();
+    }
+
+    public String[] getUserLEDIndiciesURI(String baseUri) {
+        String pureStr = getUserLEDIndicies();
+        String[] ledArrStr = pureStr.split("\\[")[1].split("]")[0].split(",");
+
+
+        for (int i = 0; i < ledArrStr.length; i++) {
+            ledArrStr[i] =  baseUri + "/images/LED/" + ledArrStr[i] + ".png";
+        }
+
+        return ledArrStr;
     }
 
     public String getUserName() { return m_userName; }

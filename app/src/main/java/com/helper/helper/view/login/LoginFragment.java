@@ -205,6 +205,7 @@ public class LoginFragment extends Fragment {
                                     .email(object.getString("email"))
                                     .name(object.getString("name"))
                                     .ridingType(object.getString("riding_type"))
+                                    .ledIndicies(object.getJSONArray("ledIndicies"))
                                     .build();
 
                             UserManager.setUser(existIdjsonArray.getJSONObject(0));

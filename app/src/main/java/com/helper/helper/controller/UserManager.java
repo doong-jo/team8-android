@@ -30,6 +30,7 @@ public class UserManager {
                 .name(jsonObject.getString("name"))
                 .phone(jsonObject.getString("phone"))
                 .ridingType(jsonObject.getString("riding_type"))
+                .ledIndicies(jsonObject.getJSONArray("ledIndicies"))
                 .build();
     }
 

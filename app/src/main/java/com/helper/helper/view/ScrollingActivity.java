@@ -10,6 +10,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -47,6 +48,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.helper.helper.R;
 import com.helper.helper.controller.AddressManager;
 import com.helper.helper.controller.BTManager;
+import com.helper.helper.controller.DownloadImageTask;
 import com.helper.helper.controller.EmergencyManager;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.GoogleMapManager;
@@ -97,9 +99,11 @@ public class ScrollingActivity extends AppCompatActivity
     private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
 
-    /**************************************************************/
 
     private SweetAlertDialog m_accDialog;
+    private SweetAlertDialog m_loadingDialog;
+    /**************************************************************/
+
 
 
     public ViewPager getViewPager() {
@@ -126,6 +130,11 @@ public class ScrollingActivity extends AppCompatActivity
         /** Set User Info **/
         try {
             UserManager.setUser(FileManager.readXmlUserInfo(this));
+//            m_loadingDialog = makeLoadingDialog();
+//            m_loadingDialog.show();
+
+            DownloadImageTask downloadUserDataLED = new DownloadImageTask();
+            downloadUserDataLED.execute(UserManager.getUser().getUserLEDIndiciesURI(getString(R.string.server_uri)));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -262,6 +271,16 @@ public class ScrollingActivity extends AppCompatActivity
                             }
                         }
                     });
+    }
+
+    private SweetAlertDialog makeLoadingDialog() {
+        SweetAlertDialog dlg = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+        dlg.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        dlg.setTitleText(getString(R.string.loading_dialog_user_data));
+        dlg.setCancelable(false);
+        dlg.show();
+
+        return dlg;
     }
 
     private void startAlertEmergencyContacts() {
