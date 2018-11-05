@@ -45,12 +45,12 @@ public class ImageCardViewAddonRank extends LinearLayout {
     }
 
     private void getAttrs(AttributeSet attrs) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.LedRankCardView);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.ImageCardViewAddonRank);
         setTypeArray(typedArray);
     }
 
     private void getAttrs(AttributeSet attrs, int defStyle) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.LedRankCardView, defStyle, 0);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.ImageCardViewAddonRank, defStyle, 0);
         setTypeArray(typedArray);
     }
 

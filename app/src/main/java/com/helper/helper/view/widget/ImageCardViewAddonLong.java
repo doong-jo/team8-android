@@ -44,12 +44,12 @@ public class ImageCardViewAddonLong extends FrameLayout{
     }
 
     private void getAttrs(AttributeSet attrs) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.LedLongCardView);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.ImageCardViewAddonLong);
         setTypeArray(typedArray);
     }
 
     private void getAttrs(AttributeSet attrs, int defStyle) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.LedLongCardView, defStyle, 0);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.ImageCardViewAddonLong, defStyle, 0);
         setTypeArray(typedArray);
     }
 

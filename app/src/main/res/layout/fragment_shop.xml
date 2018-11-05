@@ -50,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginBottom="13dp"
+        android:layout_marginBottom="3dp"
         android:text="@string/newLED"
         android:theme="@style/TitleTypo"
         android:textColor="@color/half_black"
@@ -71,7 +71,8 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginRight="11dp"
                     android:orientation="horizontal">
                     <com.helper.helper.view.widget.ImageCardViewAddonText
                         android:layout_width="wrap_content"
@@ -131,13 +132,14 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="39dp"
             android:layout_marginBottom="13dp"
-            android:background="@color/xxxxgray" />
+            android:alpha="0.13"
+            android:background="@color/black" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginBottom="13dp"
+            android:layout_marginBottom="3dp"
             android:text="@string/topCategories"
             android:theme="@style/TitleTypo"
             android:textColor="@color/half_black"
@@ -159,7 +161,8 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginRight="11dp"
                     android:orientation="horizontal">
                     <com.helper.helper.view.widget.ImageCardViewAddonLong
                         android:layout_width="wrap_content"
@@ -217,15 +220,16 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="39dp"
+            android:layout_marginTop="27dp"
             android:layout_marginBottom="13dp"
-            android:background="@color/xxxxgray" />
+            android:alpha="0.13"
+            android:background="@color/black" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginBottom="13dp"
+            android:layout_marginBottom="12dp"
             android:text="@string/freeRanking"
             android:theme="@style/TitleTypo"
             android:textColor="@color/half_black"
@@ -247,8 +251,8 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="21dp"
-                    android:layout_marginBottom="13dp"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginRight="11dp"
                     android:rowCount="3"
                     android:orientation="vertical">
                     <com.helper.helper.view.widget.ImageCardViewAddonRank
@@ -307,15 +311,16 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="39dp"
+            android:layout_marginTop="27dp"
             android:layout_marginBottom="13dp"
-            android:background="@color/xxxxgray" />
+            android:alpha="0.13"
+            android:background="@color/black" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginBottom="13dp"
+            android:layout_marginBottom="12dp"
             android:text="@string/paidRanking"
             android:theme="@style/TitleTypo"
             android:textColor="@color/half_black"
@@ -331,14 +336,15 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="27dp"
                 >
 
                 <GridLayout
                     android:layout_gravity="center_horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginBottom="13dp"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginRight="11dp"
                     android:rowCount="3"
                     android:orientation="vertical">
                     <com.helper.helper.view.widget.ImageCardViewAddonRank

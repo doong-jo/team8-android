@@ -14,10 +14,10 @@
     <declare-styleable name="LoadingButton">
 
     </declare-styleable>
-    <declare-styleable name="LedLongCardView">
+    <declare-styleable name="ImageCardViewAddonLong">
 
     </declare-styleable>
-    <declare-styleable name="LedRankCardView">
+    <declare-styleable name="ImageCardViewAddonRank">
 
     </declare-styleable>
 </resources>

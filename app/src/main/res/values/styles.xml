@@ -169,19 +169,24 @@
     <style name="ledCardLong" parent="CardView">
         <item name="android:layout_width">295dp</item>
         <item name="android:layout_height">135dp</item>
-        <item name="cardElevation">10dp</item>
         <item name="cardBackgroundColor">@color/cardViewBlue</item>
         <item name="cardCornerRadius">18dp</item>
-        <item name="android:layout_marginLeft">10dp</item>
-        <item name="android:layout_marginRight">10dp</item>
     </style>
+    <style name="ledCardLongLayout">
+        <item name="android:layout_width">315dp</item>
+        <item name="android:layout_height">155dp</item>
+    </style>
+
 
     <style name="ledCardRank" parent="CardView">
         <item name="android:layout_width">92dp</item>
         <item name="android:layout_height">92dp</item>
-        <item name="cardElevation">10dp</item>
+        <item name="cardElevation">5dp</item>
         <item name="cardBackgroundColor">@color/white</item>
         <item name="cardCornerRadius">18dp</item>
     </style>
-
+    <style name="ledCardRankLayout">
+        <item name="android:layout_width">204dp</item>
+        <item name="android:layout_height">105dp</item>
+    </style>
 </resources>
