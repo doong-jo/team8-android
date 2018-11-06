@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.helper.helper.R;
 import com.helper.helper.model.LED;
@@ -20,6 +21,8 @@ public class DialogLED extends FrameLayout {
     private boolean m_bIsBookmarked;
 
     private ImageView m_ImageLED;
+    private TextView m_createText;
+    private TextView m_downloadCnt;
 
     public DialogLED(Context context, int mode, LED ledData) {
         super(context);
@@ -56,9 +59,13 @@ public class DialogLED extends FrameLayout {
         }
         addView(v);
 
+        /****************** Connect widgtes with layout ********************/
         m_bookmarkToggle = v.findViewById(R.id.bookmarkToggle);
         m_ImageLED = v.findViewById(R.id.dlgImageLED);
-        m_ImageLED.setImage();
+        m_createText = v.findViewById(R.id.ledCreatorText);
+        m_downloadCnt = v.findViewById(R.id.ledDownloadCnt);
+        /*******************************************************************/
+//        m_ImageLED.setImage();
 
         m_bIsBookmarked = m_ledData.getBookmarked();
         if( m_bIsBookmarked ) {
@@ -67,6 +74,10 @@ public class DialogLED extends FrameLayout {
             m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
         }
 
+        m_createText.setText(m_ledData.getCreator());
+        m_downloadCnt.setText(String.valueOf(m_ledData.getDownloadCnt()));
+
+        /******************* Make Listener in View *******************/
         m_bookmarkToggle.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,6 +90,10 @@ public class DialogLED extends FrameLayout {
                 m_bIsBookmarked = !m_bIsBookmarked;
             }
         });
+        /*************************************************************/
+
+
+
 
         /** Do something about child widget **/
     }

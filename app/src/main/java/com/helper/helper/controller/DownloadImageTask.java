@@ -22,7 +22,7 @@ import java.io.InputStream;
 
 
 public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
-    private final static String DOWNLOAD_PATH = "user_data/LED";
+    public final static String DOWNLOAD_PATH = "user_data/LED";
     private final static String TAG = DownloadImageTask.class.getSimpleName() + "/DEV";
 
     public final static int DONE_LOAD_LED_IMAGES = 1;

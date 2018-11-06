@@ -76,7 +76,6 @@ public class User {
                 int len = ledIndicies.length();
                 for (int i=0; i<len; i++){
                     try {
-                        String test = ledIndicies.get(i).toString();
                         m_ledIndicies.add(ledIndicies.get(i).toString());
                     } catch (JSONException e) {
                         e.printStackTrace();

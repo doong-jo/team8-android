@@ -1,5 +1,7 @@
 package com.helper.helper.view.main.led;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -14,9 +16,15 @@ import android.widget.ImageView;
 
 //import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.helper.helper.R;
+import com.helper.helper.controller.DownloadImageTask;
 import com.helper.helper.model.LED;
 import com.helper.helper.view.ScrollingActivity;
 import com.helper.helper.view.widget.ImageCardViewAddonText;
+import com.snatik.storage.Storage;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class MyLEDFragment extends Fragment {
 
@@ -74,18 +82,39 @@ public class MyLEDFragment extends Fragment {
 
         /*************************************************************/
 
+        String ledName = "team8_bird";
+        String creator = "Xman";
+        int downloadCnt = 2432;
+        boolean bookmarked = true;
+
         /** Add cardview in gridlayout **/
         LED ledModel = new LED.Builder()
-                .name("Character")
-                .creator("Xman")
-                .bookmarked(true)
-                .downloadCnt(2432)
+                .name(ledName)
+                .creator(creator)
+                .bookmarked(bookmarked)
+                .downloadCnt(downloadCnt)
                 .build();
 
         ImageCardViewAddonText cardViewLED = new ImageCardViewAddonText(getActivity());
+        cardViewLED.setCardNameText(ledModel.getName().split("_")[1]);
+
+        Storage internalStorage = new Storage(getActivity());
+        String path = internalStorage.getInternalFilesDirectory();
+        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
+        String openFilePath = dir + File.separator + ledName + ".gif";
+
+        try {
+            File f=new File(openFilePath);
+            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
+            cardViewLED.setCardImageView(b);
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+
         cardViewLED.setOnClickCustomDialogEnable(ImageCardViewAddonText.DETAIL_DIALOG_TYPE, ledModel, mainActivity);
-        cardViewLED.setName("Character");
-        cardViewLED.setImage(R.drawable.characters);
         m_ledGridLayout.addView(cardViewLED);
 
         return view;

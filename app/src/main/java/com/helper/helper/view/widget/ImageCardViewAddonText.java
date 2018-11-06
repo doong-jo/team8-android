@@ -3,6 +3,7 @@ package com.helper.helper.view.widget;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -88,7 +89,7 @@ public class ImageCardViewAddonText extends FrameLayout {
     private SweetAlertDialog makeDownloadDlg(Context context, LED ledData) {
         return
                 new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
-                        .setTitleText(ledData.getName())
+                        .setTitleText(ledData.getName().split("_")[1])
                         .setCancelText(context.getString(R.string.led_dialog_cancel))
                         .setConfirmButton(context.getString(R.string.led_dialog_download), new SweetAlertDialog.OnSweetClickListener() {
                             @Override
@@ -102,7 +103,7 @@ public class ImageCardViewAddonText extends FrameLayout {
 
         return
                 new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
-                        .setTitleText(ledData.getName())
+                        .setTitleText(ledData.getName().split("_")[1])
                         .setCancelText(context.getString(R.string.led_dialog_cancel))
                         .setConfirmButton(context.getString(R.string.led_dialog_showon), new SweetAlertDialog.OnSweetClickListener() {
                             @Override
@@ -112,12 +113,12 @@ public class ImageCardViewAddonText extends FrameLayout {
                         });
     }
 
-    public void setImage(int resId) {
-        m_cardImage.setImageResource(resId);
+    public void setCardImageView(Bitmap bitmap) {
+        m_cardImage.setImageBitmap(bitmap);
     }
 
-    public void setName(String name) {
-        m_cardNameTxt.setText(name);
+    public void setCardNameText(String txt) {
+        m_cardNameTxt.setText(txt);
     }
 
     public void setOnClickCustomDialogEnable(final int mode, final LED ledModel, final Context context) {
