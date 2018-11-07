@@ -33,4 +33,8 @@
     <color name="loginBackgroundColor">#F5F5F5</color>
     <color name="softBlackColor">#313338</color>
 
+
+    <color name="cardViewBlue">#6FB8FF</color>
+    <color name="cardViewPink">#FF97D9</color>
+    <color name="cardViewGreen">#69D45E</color>
 </resources>
