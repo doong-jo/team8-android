@@ -14,10 +14,16 @@
     <declare-styleable name="LoadingButton">
 
     </declare-styleable>
+
     <declare-styleable name="ImageCardViewAddonLong">
 
     </declare-styleable>
+
     <declare-styleable name="ImageCardViewAddonRank">
+
+    </declare-styleable>
+
+    <declare-styleable name="DialogLED">
 
     </declare-styleable>
 </resources>

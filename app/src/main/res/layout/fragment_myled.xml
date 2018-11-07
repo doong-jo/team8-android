@@ -16,10 +16,10 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/ledGridView"
+            android:id="@+id/bookmarkView"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_border_all_black_selected"/>
+            android:src="@drawable/ic_bookmark_black_selected"/>
 
         <View
             android:layout_marginStart="15dp"
@@ -28,12 +28,11 @@
             android:layout_height="24dp"
             android:background="@color/black" />
 
-
         <ImageView
-            android:id="@+id/bookmarkView"
+            android:id="@+id/ledGridView"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_bookmark_black"/>
+            android:src="@drawable/ic_cloud_download_black"/>
 
     </LinearLayout>
 
@@ -49,6 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <GridLayout
+                android:id="@+id/ledGridLayout"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="@dimen/bottom_bar_height"
                 android:layout_width="wrap_content"
@@ -57,54 +57,11 @@
                 android:columnCount="2">
 
                 <com.helper.helper.view.widget.ImageCardViewAddonText
+                    android:id="@+id/ledCardTest"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     />
 
-                <com.helper.helper.view.widget.ImageCardViewAddonText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-
-                <com.helper.helper.view.widget.ImageCardViewAddonText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-
-                <com.helper.helper.view.widget.ImageCardViewAddonText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-
-                <com.helper.helper.view.widget.ImageCardViewAddonText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-
-                <com.helper.helper.view.widget.ImageCardViewAddonText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-
-                <com.helper.helper.view.widget.ImageCardViewAddonText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-
-                <com.helper.helper.view.widget.ImageCardViewAddonText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-
-                <com.helper.helper.view.widget.ImageCardViewAddonText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-
-                <com.helper.helper.view.widget.ImageCardViewAddonText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
             </GridLayout>
         </FrameLayout>
     </android.support.v4.widget.NestedScrollView>
