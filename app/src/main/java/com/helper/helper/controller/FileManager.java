@@ -61,6 +61,7 @@ public class FileManager {
     private static final String USER_INFO_XML_ELEM_ATTR_PHONE = "phone";
     private static final String USER_INFO_XML_ELEM_ATTR_RIDING_TYPE = "riding_type";
     private static final String USER_INFO_XML_ELEM_ATTR_LED_INDICIES = "ledIndicies";
+    private static final String USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED = "ledBookmarked";
     private static final String USER_INFO_XML_ELEM_ATTR_TRACK_INDICIES = "track_indicies";
 
     private static final String PROFILE_IMG_NAME = "user_profile.jpg";
@@ -268,6 +269,7 @@ public class FileManager {
             contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_PHONE, user.getUserPhone());
             contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_RIDING_TYPE, user.getUserRidingType());
             contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_LED_INDICIES, user.getUserLEDIndicies());
+            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED, user.getUserBookmarked());
 //            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_TRACK_INDICIES, user.());
 
             rootElement.appendChild(contactElement);
@@ -329,9 +331,11 @@ public class FileManager {
         String phone = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_PHONE).getNodeValue();
         String riding_type = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_RIDING_TYPE).getNodeValue();
         String led_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_INDICIES).getNodeValue();
+        String led_bookmarked = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED).getNodeValue();
 //              String track_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_TRACK_INDICIES).getNodeValue();
 
         led_indicies = led_indicies.split("\\[")[1].split("]")[0];
+        led_bookmarked = led_bookmarked.split("\\[")[1].split("]")[0];
 
         User user = new User.Builder()
                 .email(email)
@@ -339,6 +343,7 @@ public class FileManager {
                 .phone(phone)
                 .ridingType(riding_type)
                 .ledIndicies(led_indicies)
+                .ledBookmarked(led_bookmarked)
                 .build();
 
 

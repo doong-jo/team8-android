@@ -43,6 +43,9 @@ public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
     @Override
     protected Bitmap doInBackground(String... urls) {
         Bitmap bitmap = null;
+        FileOutputStream filestream = null;
+        InputStream in = null;
+
         Storage internalStorage = new Storage(m_parentContext);
         String path = internalStorage.getInternalFilesDirectory();
         String dir = path + File.separator + DOWNLOAD_PATH;
@@ -64,14 +67,12 @@ public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
 
             /** set file stream **/
             File file = new File(saveFilePath);
-            FileOutputStream filestream = null;
+
             try {
                 filestream = new FileOutputStream(file);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-
-            InputStream in = null;
 
             /** load image by url **/
             try {
@@ -106,15 +107,20 @@ public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
                     e.printStackTrace();
                 }
             }
+        }
 
-            /** close stream **/
-            try {
+        /** close stream **/
+        try {
+            if( filestream != null ) {
                 filestream.flush();
                 filestream.close();
-                in.close();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+
+            if( in != null ) {
+                in.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         try {

@@ -1,6 +1,7 @@
 package com.helper.helper.view.widget;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -121,25 +122,30 @@ public class ImageCardViewAddonText extends FrameLayout {
         m_cardNameTxt.setText(txt);
     }
 
-    public void setOnClickCustomDialogEnable(final int mode, final LED ledModel, final Context context) {
+    public void setOnClickCustomDialogEnable(final int mode, final LED ledModel, final Activity activity) {
         if( mode == NORMAL_DIALOG_TYPE ) { return; }
-
 //        m_dlgTargetContxt = context;
 
         m_cardLayout.setOnClickListener(new OnClickListener() {
             @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View view) {
-                if( mode == DETAIL_DIALOG_TYPE ) {
-                    m_detailDlg = makeDetailDlg(context, ledModel);
-                } else if( mode == DOWNLOAD_DIALOG_TYPE ) {
-                    m_detailDlg = makeDownloadDlg(context, ledModel);
-                }
 
-                m_detailDlg.setCustomView(new DialogLED(context, mode, ledModel));
-                m_detailDlg.show();
-                TextView titleText = m_detailDlg.findViewById(R.id.title_text);
-                titleText.setTextAppearance(R.style.HeadlineTypo);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if( mode == DETAIL_DIALOG_TYPE ) {
+                            m_detailDlg = makeDetailDlg(activity, ledModel);
+                        } else if( mode == DOWNLOAD_DIALOG_TYPE ) {
+                            m_detailDlg = makeDownloadDlg(activity, ledModel);
+                        }
+
+                        m_detailDlg.setCustomView(new DialogLED(activity, mode, ledModel));
+                        m_detailDlg.show();
+                        TextView titleText = m_detailDlg.findViewById(R.id.title_text);
+                        titleText.setTextAppearance(R.style.HeadlineTypo);
+                    }
+                });
             }
         });
     }

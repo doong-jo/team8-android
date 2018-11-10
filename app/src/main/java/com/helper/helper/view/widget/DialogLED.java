@@ -2,6 +2,8 @@ package com.helper.helper.view.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,11 +11,23 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.GlideBuilder;
+import com.bumptech.glide.GlideContext;
+import com.bumptech.glide.request.RequestOptions;
 import com.helper.helper.R;
+import com.helper.helper.controller.DownloadImageTask;
 import com.helper.helper.model.LED;
+import com.snatik.storage.Storage;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.concurrent.ExecutionException;
 
 public class DialogLED extends FrameLayout {
 
+    private Context m_context;
     private int m_dlgMode;
     private LED m_ledData;
 
@@ -26,6 +40,7 @@ public class DialogLED extends FrameLayout {
 
     public DialogLED(Context context, int mode, LED ledData) {
         super(context);
+        m_context = context;
         m_dlgMode = mode;
         m_ledData = ledData;
         initView();
@@ -65,7 +80,16 @@ public class DialogLED extends FrameLayout {
         m_createText = v.findViewById(R.id.ledCreatorText);
         m_downloadCnt = v.findViewById(R.id.ledDownloadCnt);
         /*******************************************************************/
-//        m_ImageLED.setImage();
+
+        Storage internalStorage = new Storage(m_context);
+        String path = internalStorage.getInternalFilesDirectory();
+        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
+        String openFilePath = dir + File.separator + m_ledData.getName() + ".gif";
+        File f=new File(openFilePath);
+
+        Glide.with(m_context)
+                .load(f)
+                .into(m_ImageLED);
 
         m_bIsBookmarked = m_ledData.getBookmarked();
         if( m_bIsBookmarked ) {
@@ -74,7 +98,6 @@ public class DialogLED extends FrameLayout {
             m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
         }
 
-        m_createText.setText(m_ledData.getCreator());
         m_downloadCnt.setText(String.valueOf(m_ledData.getDownloadCnt()));
 
         /******************* Make Listener in View *******************/

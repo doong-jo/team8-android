@@ -37,7 +37,7 @@ public class YoutubeActivity extends YouTubeBaseActivity implements
         @Override
         public void onLoading() {
         }
-
+//
         @Override
         public void onVideoEnded() {
             Intent intent = new Intent(YoutubeActivity.this, LoginActivity.class);

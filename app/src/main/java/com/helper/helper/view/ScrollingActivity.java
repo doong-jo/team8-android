@@ -133,11 +133,11 @@ public class ScrollingActivity extends AppCompatActivity
 
         /** Set User Info **/
         try {
-            m_loadingDialog = makeLoadingDialog();
-            m_loadingDialog.show();
-            m_loadingDialog.findViewById(R.id.confirm_button).setVisibility(View.GONE);
-            LinearLayout parentOfConfirmBtn = (LinearLayout)m_loadingDialog.findViewById(R.id.confirm_button).getParent();
-            parentOfConfirmBtn.setVisibility(View.GONE);
+//            m_loadingDialog = makeLoadingDialog();
+//            m_loadingDialog.show();
+//            m_loadingDialog.findViewById(R.id.confirm_button).setVisibility(View.GONE);
+//            LinearLayout parentOfConfirmBtn = (LinearLayout)m_loadingDialog.findViewById(R.id.confirm_button).getParent();
+//            parentOfConfirmBtn.setVisibility(View.GONE);
 
             UserManager.setUser(FileManager.readXmlUserInfo(this), new ValidateCallback() {
                 @Override

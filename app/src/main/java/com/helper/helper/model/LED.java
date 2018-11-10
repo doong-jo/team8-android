@@ -11,22 +11,28 @@ import org.json.JSONObject;
 
 
 public class LED {
+    public static final String LED_TYPE_FREE = "free";
+    public static final String LED_TYPE_PREMIUM = "premium";
+
     private String m_name;
     private String m_creator;
     private int m_downloadCnt;
     private boolean m_bookmared;
+    private String m_type;
 
     public static class Builder {
         private String m_builderName;
         private String m_builderCreator;
         private int m_builderDownloadCnt;
         private boolean m_builderBookmarked;
+        private String m_type;
 
         public Builder() {
             m_builderName = "";
             m_builderCreator = "";
             m_builderDownloadCnt = 0;
             m_builderBookmarked = false;
+            m_type = LED_TYPE_FREE;
         }
 
         public Builder name(String nameStr) {
@@ -49,6 +55,11 @@ public class LED {
             return this;
         }
 
+        public Builder type(String type) {
+            this.m_type = type;
+            return this;
+        }
+
         public LED build() {
             return new LED(this);
         }
@@ -60,6 +71,7 @@ public class LED {
         m_creator = builder.m_builderCreator;
         m_downloadCnt = builder.m_builderDownloadCnt;
         m_bookmared = builder.m_builderBookmarked;
+        m_type = builder.m_type;
     }
 
     public void setBookmarked(boolean isBookmarked) {

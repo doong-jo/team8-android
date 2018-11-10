@@ -17,6 +17,7 @@ import android.widget.ImageView;
 //import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.helper.helper.R;
 import com.helper.helper.controller.DownloadImageTask;
+import com.helper.helper.controller.UserManager;
 import com.helper.helper.model.LED;
 import com.helper.helper.view.ScrollingActivity;
 import com.helper.helper.view.widget.ImageCardViewAddonText;
@@ -79,43 +80,57 @@ public class MyLEDFragment extends Fragment {
         ScrollingActivity mainActivity = (ScrollingActivity)getActivity();
 
 
-
         /*************************************************************/
 
-        String ledName = "team8_bird";
+        // TODO: 08/11/2018 LOAD LED_INDICIES
+        String[] str = UserManager.getUser().getUserLEDIndicies().split("\\[")[1].split("]")[0].split(",");
+
+        /**
+         * LED Collection
+         * name : string (bird)
+         * creator : string (team8)
+         * downloadcnt : integer (3152)
+         * type : string (free or premium)
+         */
         String creator = "Xman";
         int downloadCnt = 2432;
         boolean bookmarked = true;
 
         /** Add cardview in gridlayout **/
-        LED ledModel = new LED.Builder()
-                .name(ledName)
-                .creator(creator)
-                .bookmarked(bookmarked)
-                .downloadCnt(downloadCnt)
-                .build();
+        for (int i = 0; i < str.length; i++) {
+            String ledName = str[i];
+            LED ledModel = new LED.Builder()
+                    .name(ledName)
+                    .creator(creator)
+                    .bookmarked(bookmarked)
+                    .type(LED.LED_TYPE_FREE)
+                    .downloadCnt(downloadCnt)
+                    .build();
 
-        ImageCardViewAddonText cardViewLED = new ImageCardViewAddonText(getActivity());
-        cardViewLED.setCardNameText(ledModel.getName().split("_")[1]);
+            ImageCardViewAddonText cardViewLED = new ImageCardViewAddonText(getActivity());
+            cardViewLED.setCardNameText(ledModel.getName().split("_")[1]);
 
-        Storage internalStorage = new Storage(getActivity());
-        String path = internalStorage.getInternalFilesDirectory();
-        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + ledName + ".gif";
+            Storage internalStorage = new Storage(getActivity());
+            String path = internalStorage.getInternalFilesDirectory();
+            String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
+            String openFilePath = dir + File.separator + ledName + ".gif";
 
-        try {
-            File f=new File(openFilePath);
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-            cardViewLED.setCardImageView(b);
+            try {
+                File f=new File(openFilePath);
+                Bitmap cardImageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
+                cardViewLED.setCardImageView(cardImageBitmap);
+            }
+            catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+
+            cardViewLED.setOnClickCustomDialogEnable(ImageCardViewAddonText.DETAIL_DIALOG_TYPE, ledModel, mainActivity);
+            m_ledGridLayout.addView(cardViewLED);
         }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
 
 
-        cardViewLED.setOnClickCustomDialogEnable(ImageCardViewAddonText.DETAIL_DIALOG_TYPE, ledModel, mainActivity);
-        m_ledGridLayout.addView(cardViewLED);
+
 
         return view;
     }
