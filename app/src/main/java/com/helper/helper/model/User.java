@@ -8,6 +8,7 @@ package com.helper.helper.model;
 
 import android.location.Location;
 
+import com.helper.helper.controller.CommonManager;
 import com.helper.helper.enums.RidingType;
 
 import org.json.JSONArray;
@@ -192,7 +193,7 @@ public class User {
 
         final Pattern p = Pattern.compile(SPLIT_COMMA_REGEX);
 
-        String[] ledArrStr = p.split(ledStr);
+        String[] ledArrStr = CommonManager.splitNoWhiteSpace(ledStr);
         String[] resultArr = new String[ledArrStr.length*2];
 
         int cnt = 0;
