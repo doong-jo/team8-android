@@ -8,6 +8,7 @@ package com.helper.helper.controller;
 
 import android.graphics.Bitmap;
 
+import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.User;
 
 import org.json.JSONException;
@@ -18,10 +19,22 @@ public class UserManager {
     private static Bitmap m_userProfileBitmap;
     private static User m_user;
 
+    public static int DONE_SET_USER = 1;
+
     public static User getUser() { return m_user; }
 
     public static void setUser(User user) {
         m_user = user;
+    }
+
+    public static void setUser(User user, ValidateCallback callback) {
+        m_user = user;
+
+        try {
+            callback.onDone(DONE_SET_USER);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void setUser(final JSONObject jsonObject) throws JSONException {
@@ -30,6 +43,7 @@ public class UserManager {
                 .name(jsonObject.getString("name"))
                 .phone(jsonObject.getString("phone"))
                 .ridingType(jsonObject.getString("riding_type"))
+                .ledIndicies(jsonObject.getJSONArray("ledIndicies"))
                 .build();
     }
 

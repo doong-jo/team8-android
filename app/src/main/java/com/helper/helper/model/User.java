@@ -8,15 +8,20 @@ package com.helper.helper.model;
 
 import android.location.Location;
 
+import com.helper.helper.controller.CommonManager;
 import com.helper.helper.enums.RidingType;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class User {
+    private static final String SPLIT_COMMA_REGEX = ",\\s*";
+
     private String m_userEmail;
     private String m_userPw;
     private String m_userPhone;
@@ -25,9 +30,10 @@ public class User {
     private Boolean m_userEmergency;
     private Date m_userLastAccess;
     private Location m_lastPosition;
-    private ArrayList<Location> m_accPosition;
     private ArrayList<String> m_ledIndicies;
+    private ArrayList<String> m_ledBookmarked;
     private ArrayList<String> m_trackIndicies;
+
 
     public static class Builder {
 
@@ -36,6 +42,8 @@ public class User {
         private String m_userPhone;
         private String m_userName;
         private String m_userRidingType;
+        private ArrayList<String> m_ledIndicies = new ArrayList<>();
+        private ArrayList<String> m_ledBookmarked = new ArrayList<>();
 
         public Builder() {
             m_userEmail = "";
@@ -70,6 +78,65 @@ public class User {
             return this;
         }
 
+        public Builder ledIndicies(JSONArray ledIndicies) {
+            if (ledIndicies != null) {
+                int len = ledIndicies.length();
+                for (int i=0; i<len; i++){
+                    try {
+                        m_ledIndicies.add(ledIndicies.get(i).toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return this;
+        }
+
+        public Builder ledIndicies(String ledIndicies) {
+
+            if( !ledIndicies.contains(",") ) {
+                m_ledIndicies.add(ledIndicies);
+            } else {
+                String[] ledStrArr = ledIndicies.split(",");
+
+                for (String str :
+                        ledStrArr) {
+                    m_ledIndicies.add(str);
+                }
+            }
+            return this;
+        }
+
+        public Builder ledBookmarked(JSONArray ledBookmarked) {
+            if (ledBookmarked != null) {
+                int len = ledBookmarked.length();
+                for (int i=0; i<len; i++){
+                    try {
+                        m_ledBookmarked.add(ledBookmarked.get(i).toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return this;
+        }
+
+        public Builder ledBookmarked(String ledBookmarked) {
+
+            if( !ledBookmarked.contains(",") ) {
+                m_ledBookmarked.add(ledBookmarked);
+            } else {
+                String[] ledBookmakredArr = ledBookmarked.split(",");
+
+                for (String str :
+                        ledBookmakredArr) {
+                    m_ledBookmarked.add(str);
+                }
+            }
+            return this;
+        }
+
+
         public User build() {
             return new User(this);
         }
@@ -85,8 +152,8 @@ public class User {
         m_userLastAccess = new Date();
         m_userEmergency = false;
         m_lastPosition = new Location("");
-        m_accPosition = new ArrayList<Location>();
-        m_ledIndicies = new ArrayList<String>();
+        m_ledIndicies = builder.m_ledIndicies;
+        m_ledBookmarked = builder.m_ledBookmarked;
         m_trackIndicies = new ArrayList<String>();
     }
 
@@ -116,6 +183,31 @@ public class User {
 
     public String getUserPhone() {
         return m_userPhone;
+    }
+
+    public String getUserLEDIndicies() {
+        return m_ledIndicies.toString();
+    }
+
+    public String[] getUserLEDIndiciesURI(String baseUri) {
+        String pureStr = getUserLEDIndicies();
+        String ledStr = pureStr.split("\\[")[1].split("]")[0];
+
+        String[] ledArrStr = CommonManager.splitNoWhiteSpace(ledStr);
+        String[] resultArr = new String[ledArrStr.length*2];
+
+        int cnt = 0;
+        for (int i = 0; i < ledArrStr.length*2; i+=2) {
+            resultArr[i] =  baseUri + "/images/LED/" + ledArrStr[cnt] + ".png";
+            resultArr[i+1] = baseUri + "/images/LED/" + ledArrStr[cnt] + ".gif";
+            cnt++;
+        }
+
+        return resultArr;
+    }
+
+    public String getUserBookmarked() {
+        return m_ledBookmarked.toString();
     }
 
     public String getUserName() { return m_userName; }

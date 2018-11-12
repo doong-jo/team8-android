@@ -19,6 +19,10 @@
 
     </declare-styleable>
 
+    <declare-styleable name="LEDCardView">
+
+    </declare-styleable>
+
     <declare-styleable name="ImageCardViewAddonLong">
 
     </declare-styleable>

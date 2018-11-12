@@ -118,22 +118,22 @@
                     android:layout_height="1dp"
                     android:layout_marginStart="9.12dp"/>
 
-                <com.helper.helper.view.widget.ImageCardViewAddonText
+                <com.helper.helper.view.widget.LEDCardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     />
 
-                <com.helper.helper.view.widget.ImageCardViewAddonText
+                <com.helper.helper.view.widget.LEDCardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     />
 
-                <com.helper.helper.view.widget.ImageCardViewAddonText
+                <com.helper.helper.view.widget.LEDCardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     />
 
-                <com.helper.helper.view.widget.ImageCardViewAddonText
+                <com.helper.helper.view.widget.LEDCardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     />

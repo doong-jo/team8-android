@@ -5,7 +5,11 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="LEDCreateFragment" />
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="현재 페이지는 개발중입니다."
+        android:textColor="@color/black"
+        android:alpha="0.79"
+        style="@style/HeadlineTypo"/>
 </android.support.constraint.ConstraintLayout>
