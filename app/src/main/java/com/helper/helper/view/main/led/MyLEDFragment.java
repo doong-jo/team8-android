@@ -3,7 +3,6 @@ package com.helper.helper.view.main.led;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -18,7 +17,7 @@ import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.model.LED;
-import com.helper.helper.view.widget.ImageCardViewAddonText;
+import com.helper.helper.view.widget.LEDCardView;
 import com.snatik.storage.Storage;
 
 import org.json.JSONArray;
@@ -168,7 +167,7 @@ public class MyLEDFragment extends Fragment {
             if( ledInfo.getIndex().equals(bookmarkedStr)) {
                 ledInfo.setBookmarked(true);
 
-                ImageCardViewAddonText cardViewLED = new ImageCardViewAddonText(getActivity());
+                LEDCardView cardViewLED = new LEDCardView(getActivity());
                 cardViewLED.setCardNameText(ledInfo.getIndex().split("_")[1]);
 
                 try {
@@ -181,7 +180,7 @@ public class MyLEDFragment extends Fragment {
                     e.printStackTrace();
                 }
 
-                cardViewLED.setOnClickCustomDialogEnable(ImageCardViewAddonText.DETAIL_DIALOG_TYPE, ledInfo, getActivity());
+                cardViewLED.setOnClickCustomDialogEnable(LEDCardView.DETAIL_DIALOG_TYPE, ledInfo, getActivity());
                 m_ledGridLayout.addView(cardViewLED);
             }
         }
@@ -199,7 +198,7 @@ public class MyLEDFragment extends Fragment {
 
         ledInfo.setBookmarked(IsBookmakred);
 
-        ImageCardViewAddonText cardViewLED = new ImageCardViewAddonText(getActivity());
+        LEDCardView cardViewLED = new LEDCardView(getActivity());
         cardViewLED.setCardNameText(ledInfo.getIndex().split("_")[1]);
 
         try {
@@ -212,7 +211,7 @@ public class MyLEDFragment extends Fragment {
             e.printStackTrace();
         }
 
-        cardViewLED.setOnClickCustomDialogEnable(ImageCardViewAddonText.DETAIL_DIALOG_TYPE, ledInfo, getActivity());
+        cardViewLED.setOnClickCustomDialogEnable(LEDCardView.DETAIL_DIALOG_TYPE, ledInfo, getActivity());
         m_ledGridLayout.addView(cardViewLED);
     }
 

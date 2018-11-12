@@ -14,11 +14,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.helper.helper.R;
+import com.helper.helper.controller.BTManager;
 import com.helper.helper.model.LED;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class ImageCardViewAddonText extends FrameLayout {
+public class LEDCardView extends FrameLayout {
 
     public static final int NORMAL_DIALOG_TYPE = 0;
     public static final int DETAIL_DIALOG_TYPE = 1;
@@ -29,14 +30,14 @@ public class ImageCardViewAddonText extends FrameLayout {
     private ImageView m_cardImage;
     private SweetAlertDialog m_detailDlg;
 
-    public ImageCardViewAddonText(Context context) {
+    public LEDCardView(Context context) {
 
         super(context);
         initView();
 
     }
 
-    public ImageCardViewAddonText(Context context, AttributeSet attrs) {
+    public LEDCardView(Context context, AttributeSet attrs) {
 
         super(context, attrs);
 
@@ -44,7 +45,7 @@ public class ImageCardViewAddonText extends FrameLayout {
         getAttrs(attrs);
     }
 
-    public ImageCardViewAddonText(Context context, AttributeSet attrs, int defStyle) {
+    public LEDCardView(Context context, AttributeSet attrs, int defStyle) {
 
         super(context, attrs);
         initView();
@@ -66,13 +67,13 @@ public class ImageCardViewAddonText extends FrameLayout {
     }
 
     private void getAttrs(AttributeSet attrs) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.ImageCardViewAddonText);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.LEDCardView);
         setTypeArray(typedArray);
     }
 
 
     private void getAttrs(AttributeSet attrs, int defStyle) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.ImageCardViewAddonText, defStyle, 0);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.LEDCardView, defStyle, 0);
         setTypeArray(typedArray);
     }
 
@@ -100,7 +101,7 @@ public class ImageCardViewAddonText extends FrameLayout {
                         });
     }
 
-    private SweetAlertDialog makeDetailDlg(Context context, LED ledData) {
+    private SweetAlertDialog makeDetailDlg(final Context context, final LED ledData) {
 
         return
                 new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
@@ -109,6 +110,7 @@ public class ImageCardViewAddonText extends FrameLayout {
                         .setConfirmButton(context.getString(R.string.led_dialog_showon), new SweetAlertDialog.OnSweetClickListener() {
                             @Override
                             public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                BTManager.setShowOnDevice(context, ledData.getIndex());
                                 m_detailDlg.dismissWithAnimation();
                             }
                         });
@@ -122,6 +124,7 @@ public class ImageCardViewAddonText extends FrameLayout {
         m_cardNameTxt.setText(txt);
     }
 
+    /** LED Dialog **/
     public void setOnClickCustomDialogEnable(final int mode, final LED ledModel, final Activity activity) {
         if( mode == NORMAL_DIALOG_TYPE ) { return; }
 //        m_dlgTargetContxt = context;

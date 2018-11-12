@@ -2,8 +2,6 @@ package com.helper.helper.view.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,18 +10,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.GlideBuilder;
-import com.bumptech.glide.GlideContext;
-import com.bumptech.glide.request.RequestOptions;
 import com.helper.helper.R;
 import com.helper.helper.controller.DownloadImageTask;
 import com.helper.helper.model.LED;
 import com.snatik.storage.Storage;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.concurrent.ExecutionException;
 
 public class DialogLED extends FrameLayout {
 
@@ -67,9 +59,9 @@ public class DialogLED extends FrameLayout {
         LayoutInflater li = (LayoutInflater) getContext().getSystemService(infService);
 
         View v = null;
-        if( m_dlgMode == ImageCardViewAddonText.DETAIL_DIALOG_TYPE ) {
+        if( m_dlgMode == LEDCardView.DETAIL_DIALOG_TYPE ) {
             v = li.inflate(R.layout.widget_detail_myled_dialog, this, false);
-        } else if( m_dlgMode == ImageCardViewAddonText.DOWNLOAD_DIALOG_TYPE ) {
+        } else if( m_dlgMode == LEDCardView.DOWNLOAD_DIALOG_TYPE ) {
             v = li.inflate(R.layout.widget_detail_ledshop_dialog, this, false);
         }
         addView(v);

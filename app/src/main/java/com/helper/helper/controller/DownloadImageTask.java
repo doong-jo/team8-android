@@ -107,6 +107,8 @@ public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
                     e.printStackTrace();
                 }
             }
+
+            bitmap.recycle();
         }
 
         /** close stream **/
@@ -128,6 +130,7 @@ public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         return bitmap;
     }
 
