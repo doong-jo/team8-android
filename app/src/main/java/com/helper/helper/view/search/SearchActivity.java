@@ -1,4 +1,4 @@
-package com.helper.helper.view.main.led;
+package com.helper.helper.view.search;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -69,7 +69,7 @@ public class SearchActivity extends AppCompatActivity
             @Override
             public void afterTextChanged(Editable s) {
                 String inputText = m_searchInput.getText();
-                    search(inputText);
+                search(inputText);
             }
         });
 
@@ -87,8 +87,8 @@ public class SearchActivity extends AppCompatActivity
     // search method
     public void search(String charText) {
         m_listItems.clear();
-        if (charText.length() != 0) {
 
+        if (charText.length() != 0) {
             for(int i = 0;i < m_arrayList.size(); i++)
             {
                 if (m_arrayList.get(i).getTitle().toLowerCase().contains(charText))
