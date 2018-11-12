@@ -71,7 +71,7 @@ public class InfoFragment extends Fragment {
                         BTManager.BLUETOOTH_SIGNAL_BRIGHTNESS
                                 + BTManager.BLUETOOTH_SIGNAL_SEPERATE
                                 + seekValToString
-                                + "-0"; // option
+                                + BTManager.BLUETOOTH_SIGNAL_SEPERATE+"0"; // option
 
                 BTManager.writeToBluetoothDevice(resultStr.getBytes());
             }
@@ -96,7 +96,7 @@ public class InfoFragment extends Fragment {
                         BTManager.BLUETOOTH_SIGNAL_SPEED
                                 + BTManager.BLUETOOTH_SIGNAL_SEPERATE
                                 + seekValToString
-                                + "-0"; // option
+                                + BTManager.BLUETOOTH_SIGNAL_SEPERATE+"0"; // option
 
                 BTManager.writeToBluetoothDevice(resultStr.getBytes());
             }

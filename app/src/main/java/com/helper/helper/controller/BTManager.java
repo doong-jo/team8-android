@@ -46,7 +46,7 @@ public class BTManager {
      */
 
     /** Bluetooth Signal Rules **/
-    public static final String BLUETOOTH_SIGNAL_SEPERATE = "-";
+    public static final String BLUETOOTH_SIGNAL_SEPERATE = "!S!";
 
     public static final String BLUETOOTH_SIGNAL_LED = "0";
     public static final String BLUETOOTH_SIGNAL_SPEED = "1";
@@ -326,9 +326,9 @@ public class BTManager {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
 
-            String optionalFileName = "-" + ledIndex + ".png";
+            String optionalFileName = BLUETOOTH_SIGNAL_SEPERATE + ledIndex + ".png";
 
-            byte[] signalByteArray = "3-".getBytes();
+            byte[] signalByteArray = ("3"+BLUETOOTH_SIGNAL_SEPERATE).getBytes();
             byte[] bitmapByteArray = stream.toByteArray();
             byte[] optionalByteArray = optionalFileName.getBytes();
 
