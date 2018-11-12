@@ -65,6 +65,7 @@
             android:name=".view.ScrollingActivity"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
@@ -84,7 +85,7 @@
             android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".view.looking.LookingActivity"
+        <activity android:name=".view.main.led.SearchActivity"
             android:parentActivityName=".view.ScrollingActivity"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait">

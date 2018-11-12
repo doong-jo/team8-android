@@ -108,6 +108,8 @@
     <string name="RankNum">n</string>
     <string name="RankName">Mario</string>
 
+    <!--Search Activity-->
+    <string name="search_hint">Type something...</string>
     <!--MyLED-->
 
 
