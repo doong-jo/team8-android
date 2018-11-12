@@ -56,14 +56,14 @@ public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
             internalStorage.createDirectory(dir);
         }
 
-        for (int i = 0; i < urls.length; i++) {
-            String urldisplay = urls[i];
+        for (String urldisplay :
+                urls) {
             String saveFilePath = dir + File.separator + urldisplay.split("LED/")[1];
 
             /** exist image -> pass **/
-//            if( internalStorage.isFileExist(saveFilePath) ) {
-//                continue;
-//            }
+            if( internalStorage.isFileExist(saveFilePath) ) {
+                continue;
+            }
 
             /** set file stream **/
             File file = new File(saveFilePath);
@@ -96,7 +96,7 @@ public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
                 BufferedInputStream bis = new BufferedInputStream(in);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-                int current = 0;
+                int current;
 
                 try {
                     while ((current = bis.read()) != -1) {

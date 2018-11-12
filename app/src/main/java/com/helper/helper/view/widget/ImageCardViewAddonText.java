@@ -66,13 +66,13 @@ public class ImageCardViewAddonText extends FrameLayout {
     }
 
     private void getAttrs(AttributeSet attrs) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.FloatingEditTextAddonControl);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.ImageCardViewAddonText);
         setTypeArray(typedArray);
     }
 
 
     private void getAttrs(AttributeSet attrs, int defStyle) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.FloatingEditTextAddonControl, defStyle, 0);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.ImageCardViewAddonText, defStyle, 0);
         setTypeArray(typedArray);
     }
 
@@ -90,7 +90,7 @@ public class ImageCardViewAddonText extends FrameLayout {
     private SweetAlertDialog makeDownloadDlg(Context context, LED ledData) {
         return
                 new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
-                        .setTitleText(ledData.getName().split("_")[1])
+                        .setTitleText(ledData.getIndex().split("_")[1])
                         .setCancelText(context.getString(R.string.led_dialog_cancel))
                         .setConfirmButton(context.getString(R.string.led_dialog_download), new SweetAlertDialog.OnSweetClickListener() {
                             @Override
@@ -104,7 +104,7 @@ public class ImageCardViewAddonText extends FrameLayout {
 
         return
                 new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
-                        .setTitleText(ledData.getName().split("_")[1])
+                        .setTitleText(ledData.getIndex().split("_")[1])
                         .setCancelText(context.getString(R.string.led_dialog_cancel))
                         .setConfirmButton(context.getString(R.string.led_dialog_showon), new SweetAlertDialog.OnSweetClickListener() {
                             @Override

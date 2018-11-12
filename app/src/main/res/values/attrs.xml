@@ -15,6 +15,10 @@
 
     </declare-styleable>
 
+    <declare-styleable name="ImageCardViewAddonText">
+
+    </declare-styleable>
+
     <declare-styleable name="ImageCardViewAddonLong">
 
     </declare-styleable>

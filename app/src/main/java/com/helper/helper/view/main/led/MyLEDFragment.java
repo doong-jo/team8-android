@@ -28,6 +28,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MyLEDFragment extends Fragment {
     private final static String TAG = MyLEDFragment.class.getSimpleName() + "/DEV";
@@ -36,10 +38,10 @@ public class MyLEDFragment extends Fragment {
     private ImageView m_ledGridToggle;
     private ImageView m_bookmarkToggle;
     private GridLayout m_ledGridLayout;
-
-    private boolean m_bIsBookmarkView = true;
     /**************************************************************/
 
+    private boolean m_bIsBookmarkView = true;
+    private Map<String, LED> m_mapDataLED;
     public MyLEDFragment() {
 
     }
@@ -77,8 +79,57 @@ public class MyLEDFragment extends Fragment {
                 }
             }
         });
+        String[] ledIndicies = CommonManager.splitNoWhiteSpace(UserManager.getUser()
+                .getUserLEDIndicies()
+                .split("\\[")[1]
+                .split("]")[0]);
 
-        startchangingLEDinGrid();
+        /** get LED Information from server **/
+
+        m_mapDataLED = new HashMap<>();
+
+        if( HttpManager.useCollection("led") ) {
+            try {
+                JSONObject reqObject = new JSONObject();
+                JSONObject inObject = new JSONObject();
+
+                inObject.put("$in", ledIndicies);
+                reqObject.put("index", inObject);
+
+                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray jsonArray) throws JSONException {
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            LED led = new LED(
+                                    new LED.Builder()
+                                            .index(jsonObject.getString("index"))
+                                            .name(jsonObject.getString("name"))
+                                            .creator(jsonObject.getString("creator"))
+                                            .downloadCnt(jsonObject.getInt("downloadcnt"))
+                                            .type(jsonObject.getString("type"))
+                            );
+                            m_mapDataLED.put(led.getIndex(), led);
+                        }
+
+                        /** Add GridView (Bookmared or Downloaded) **/
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                startchangingLEDinGrid();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String err) {
+
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
         /*************************************************************/
 
@@ -98,63 +149,30 @@ public class MyLEDFragment extends Fragment {
                 .split("\\[")[1]
                 .split("]")[0]);
 
-        // TODO: 11/11/2018 get LED Information from server
-        // name, creator, type, downloadCnt
-
-
-        try {
-            JSONObject reqObject = new JSONObject();
-            JSONObject inObject = new JSONObject();
-
-            inObject.put("$in", ledIndicies);
-            reqObject.put("name", inObject);
-
-            HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
-                @Override
-                public void onSuccess(JSONArray jsonArray) {
-                    Log.d(TAG, "onSuccess: " + jsonArray.toString());
-                }
-
-                @Override
-                public void onError(String err) {
-
-                }
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
         for (int i = 0; i < ledIndicies.length; i++) {
-            String ledName = ledIndicies[i];
+            String ledIndex = ledIndicies[i];
 
+            LED led = m_mapDataLED.get(ledIndex);
             if( m_bIsBookmarkView ) {
-                showBookmarkedLED(bookmakred, ledName);
+                showBookmarkedLED(bookmakred, led);
             } else {
-                showDownloadedLED(bookmakred, ledName);
+                showDownloadedLED(bookmakred, led);
             }
         }
         m_bIsBookmarkView = !m_bIsBookmarkView;
     }
 
-    private void showBookmarkedLED(String[] bookmarked, String ledName) {
-        String creator = "Xman";
-        int downloadCnt = 2432;
-
-        for (int j = 0; j < bookmarked.length; j++) {
-            if( ledName.equals(bookmarked[j])) {
-                LED ledModel = new LED.Builder()
-                        .name(ledName)
-                        .creator(creator)
-                        .bookmarked(true)
-                        .type(LED.LED_TYPE_FREE)
-                        .downloadCnt(downloadCnt)
-                        .build();
+    private void showBookmarkedLED(String[] bookmarkedArr, LED ledInfo) {
+        for (String bookmarkedStr:
+                bookmarkedArr) {
+            if( ledInfo.getIndex().equals(bookmarkedStr)) {
+                ledInfo.setBookmarked(true);
 
                 ImageCardViewAddonText cardViewLED = new ImageCardViewAddonText(getActivity());
-                cardViewLED.setCardNameText(ledModel.getName().split("_")[1]);
+                cardViewLED.setCardNameText(ledInfo.getIndex().split("_")[1]);
 
                 try {
-                    File f=new File(getOpenFilePath(ledName));
+                    File f=new File(getOpenFilePath(ledInfo.getIndex()));
                     Bitmap cardImageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
                     cardViewLED.setCardImageView(cardImageBitmap);
                 }
@@ -163,36 +181,29 @@ public class MyLEDFragment extends Fragment {
                     e.printStackTrace();
                 }
 
-                cardViewLED.setOnClickCustomDialogEnable(ImageCardViewAddonText.DETAIL_DIALOG_TYPE, ledModel, getActivity());
+                cardViewLED.setOnClickCustomDialogEnable(ImageCardViewAddonText.DETAIL_DIALOG_TYPE, ledInfo, getActivity());
                 m_ledGridLayout.addView(cardViewLED);
             }
         }
     }
 
-    private void showDownloadedLED(String[] bookmarked, String ledName) {
-        String creator = "Xman";
-        int downloadCnt = 2432;
+    private void showDownloadedLED(String[] bookmarkedArr, LED ledInfo) {
         boolean IsBookmakred = false;
 
-        for (int j = 0; j < bookmarked.length; j++) {
-            if( ledName.equals(bookmarked[j])) {
+        for (String bookmarkedStr:
+                bookmarkedArr) {
+            if( ledInfo.getIndex().equals(bookmarkedStr)) {
                 IsBookmakred = true;
             }
         }
 
-        LED ledModel = new LED.Builder()
-                .name(ledName)
-                .creator(creator)
-                .bookmarked(IsBookmakred)
-                .type(LED.LED_TYPE_FREE)
-                .downloadCnt(downloadCnt)
-                .build();
+        ledInfo.setBookmarked(IsBookmakred);
 
         ImageCardViewAddonText cardViewLED = new ImageCardViewAddonText(getActivity());
-        cardViewLED.setCardNameText(ledModel.getName().split("_")[1]);
+        cardViewLED.setCardNameText(ledInfo.getIndex().split("_")[1]);
 
         try {
-            File f=new File(getOpenFilePath(ledName));
+            File f=new File(getOpenFilePath(ledInfo.getIndex()));
             Bitmap cardImageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
             cardViewLED.setCardImageView(cardImageBitmap);
         }
@@ -201,15 +212,15 @@ public class MyLEDFragment extends Fragment {
             e.printStackTrace();
         }
 
-        cardViewLED.setOnClickCustomDialogEnable(ImageCardViewAddonText.DETAIL_DIALOG_TYPE, ledModel, getActivity());
+        cardViewLED.setOnClickCustomDialogEnable(ImageCardViewAddonText.DETAIL_DIALOG_TYPE, ledInfo, getActivity());
         m_ledGridLayout.addView(cardViewLED);
     }
 
-    private String getOpenFilePath(String ledName) {
+    private String getOpenFilePath(String ledIndex) {
         Storage internalStorage = new Storage(getActivity());
         String path = internalStorage.getInternalFilesDirectory();
         String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + ledName + ".gif";
+        String openFilePath = dir + File.separator + ledIndex + ".gif";
 
         return openFilePath;
     }

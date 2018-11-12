@@ -97,10 +97,11 @@ public class User {
             if( !ledIndicies.contains(",") ) {
                 m_ledIndicies.add(ledIndicies);
             } else {
-                String[] strArr = ledIndicies.split(",");
+                String[] ledStrArr = ledIndicies.split(",");
 
-                for (int i = 0; i < strArr.length; i++) {
-                    m_ledIndicies.add(strArr[i]);
+                for (String str :
+                        ledStrArr) {
+                    m_ledIndicies.add(str);
                 }
             }
             return this;
@@ -125,10 +126,11 @@ public class User {
             if( !ledBookmarked.contains(",") ) {
                 m_ledBookmarked.add(ledBookmarked);
             } else {
-                String[] strArr = ledBookmarked.split(",");
+                String[] ledBookmakredArr = ledBookmarked.split(",");
 
-                for (int i = 0; i < strArr.length; i++) {
-                    m_ledBookmarked.add(strArr[i]);
+                for (String str :
+                        ledBookmakredArr) {
+                    m_ledBookmarked.add(str);
                 }
             }
             return this;
@@ -190,8 +192,6 @@ public class User {
     public String[] getUserLEDIndiciesURI(String baseUri) {
         String pureStr = getUserLEDIndicies();
         String ledStr = pureStr.split("\\[")[1].split("]")[0];
-
-        final Pattern p = Pattern.compile(SPLIT_COMMA_REGEX);
 
         String[] ledArrStr = CommonManager.splitNoWhiteSpace(ledStr);
         String[] resultArr = new String[ledArrStr.length*2];

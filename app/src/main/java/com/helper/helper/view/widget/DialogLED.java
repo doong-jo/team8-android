@@ -84,7 +84,7 @@ public class DialogLED extends FrameLayout {
         Storage internalStorage = new Storage(m_context);
         String path = internalStorage.getInternalFilesDirectory();
         String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + m_ledData.getName() + ".gif";
+        String openFilePath = dir + File.separator + m_ledData.getIndex() + ".gif";
         File f=new File(openFilePath);
 
         Glide.with(m_context)

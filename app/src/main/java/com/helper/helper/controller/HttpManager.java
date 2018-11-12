@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class HttpManager {
@@ -62,34 +63,49 @@ public class HttpManager {
         m_serverURI = uri;
     }
 
-    private static String getAllKeyValueJSONObject(JSONObject obj) {
+    private static String getAllKeyValueJSONObject(JSONObject obj) throws JSONException {
         StringBuilder resultStr = new StringBuilder();
 
         Iterator<String> keys = obj.keys();
         while(keys.hasNext()) {
             String key = keys.next();
             String value = "";
+
             try {
-                try {
-                    value = (String) obj.get(key);
-                } catch (ClassCastException e) {
-                    if( obj.get(key).getClass().getName().equals("java.lang.Boolean") ) {
-                        value = String.valueOf(obj.get(key));
+                value = (String) obj.get(key);
+            } catch (ClassCastException e) {
+                if( obj.get(key).getClass().getName().equals("java.lang.Boolean") ) {
+                    value = String.valueOf(obj.get(key));
+                }
+                /** mongoDB ($in ...) syntax case **/
+                else if ( obj.get(key).getClass().getName().equals("org.json.JSONObject")) {
+                    JSONObject jsonObject = obj.getJSONObject(key);
+
+                    Iterator<String> keysInValue = jsonObject.keys();
+                    if(keysInValue.hasNext()) {
+                        while( keysInValue.hasNext() ) {
+                            String keyOfValue = keysInValue.next();
+                            String[] ValueOfKeyOfValue = (String[])jsonObject.get(keyOfValue);
+                            for (int i = 0; i < ValueOfKeyOfValue.length; i++) {
+                                ValueOfKeyOfValue[i] = "\"" + ValueOfKeyOfValue[i] + "\"";
+                            }
+
+                            //http://175.123.140.145/led?index={"$in":["team8_bird","team8_thunder"]}
+                            value = "{\"" + keyOfValue + "\":" + Arrays.deepToString(ValueOfKeyOfValue) + "}";
+                        }
                     }
-                    else if ( obj.get(key).getClass().getName().equals("org.json.JSONObject")) {
+                     else {
                         value = obj.get(key).toString();
-                        Log.d(TAG, "getAllKeyValueJSONObject: " + value);
                     }
+                    Log.d(TAG, "getAllKeyValueJSONObject: " + value);
                 }
-
-
-                if( !resultStr.toString().equals("") ) {
-                    resultStr.append("&");
-                }
-                resultStr.append(key).append("=").append(value);
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
+
+
+            if( !resultStr.toString().equals("") ) {
+                resultStr.append("&");
+            }
+            resultStr.append(key).append("=").append(value);
         }
 
         return resultStr.toString();
