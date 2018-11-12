@@ -6,6 +6,10 @@
         <attr name="hint_text" format="reference|integer" />
         <attr name="text_length" format="reference|integer" />
     </declare-styleable>
+    <declare-styleable name="SearchEditTextAddonControl">
+        <attr name="search_clear_control" format="reference|boolean" />
+        <attr name="search_hint_text" format="reference|integer" />
+    </declare-styleable>
 
     <declare-styleable name="SnackBar">
 

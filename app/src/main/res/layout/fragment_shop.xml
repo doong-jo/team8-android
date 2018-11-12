@@ -21,6 +21,8 @@
             android:textColorLink="@color/black"
             android:layout_marginLeft="41dp"
             android:layout_marginRight="8dp"
+            android:focusableInTouchMode="true"
+            android:focusable="false"
             />
 
         <ImageView

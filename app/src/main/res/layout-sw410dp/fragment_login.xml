@@ -140,41 +140,30 @@
                     style="@style/BodyTypo"
                     />
 
-                <FrameLayout
-                    android:layout_marginTop="18.24dp"
-                    android:layout_marginStart="17.1dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
 
                     <com.helper.helper.view.widget.FloatingEditTextAddonControl
                         android:id="@+id/loginEmailInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="18.24dp"
+                        android:layout_marginStart="17.1dp"
                         app:hint_text="@string/join_email"
                         app:clear_control="true"
                         app:check_control="true"
                         app:text_length="@integer/email_length" />
 
 
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:layout_marginTop="37.62dp"
-                    android:layout_marginStart="17.1dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
                     <com.helper.helper.view.widget.FloatingEditTextAddonControl
                         android:id="@+id/loginPwInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="37.62dp"
+                        android:layout_marginStart="17.1dp"
                         app:hint_text="@string/join_password"
                         app:clear_control="true"
                         app:check_control="true"
                         app:text_length="@integer/pw_length" />
 
-                </FrameLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -205,6 +194,7 @@
 
                 <com.helper.helper.view.widget.LoadingButton
                     android:layout_marginTop="28.5dp"
+                    android:layout_marginBottom="28.5dp"
                     android:layout_gravity="center"
                     android:id="@+id/loginLoadingBtn"
                     android:layout_height="wrap_content"
