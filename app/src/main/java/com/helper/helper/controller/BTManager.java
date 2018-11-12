@@ -15,13 +15,20 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.helper.helper.interfaces.BluetoothReadCallback;
 import com.helper.helper.interfaces.ValidateCallback;
+import com.snatik.storage.Storage;
 
 import org.json.JSONException;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -46,7 +53,7 @@ public class BTManager {
     public static final String BLUETOOTH_SIGNAL_BRIGHTNESS = "2";
 
     private static final String BLUETOOTH_UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee";
-    private static final String DEVICE_ALIAS = "EIGHT_";
+    private static final String DEVICE_ALIAS = "EIGHT_1002";
 
     public static final int SUCCESS_BLUETOOTH_CONNECT = 1001;
     public static final int FAIL_BLUETOOTH_CONNECT = 1002;
@@ -294,6 +301,50 @@ public class BTManager {
             m_bluetoothInput = null;
             m_bluetoothOutput = null;
 
+        }
+    }
+
+    private static String getOpenFilePath(Context context, String ledIndex) {
+        Storage internalStorage = new Storage(context);
+        String path = internalStorage.getInternalFilesDirectory();
+        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
+        String openFilePath = dir + File.separator + ledIndex + ".png";
+
+        return openFilePath;
+    }
+
+    public static void setShowOnDevice(Context context, String ledIndex) {
+
+        Bitmap imageBitmap = null;
+        /** 1. Read Image File **/
+        try {
+            File f=new File(getOpenFilePath(context, ledIndex));
+            imageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
+//            cardViewLED.setCardImageView(cardImageBitmap);
+
+            /** Send File Data(byte) to Device **/
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+            String optionalFileName = "-" + ledIndex + ".png";
+
+            byte[] signalByteArray = "3-".getBytes();
+            byte[] bitmapByteArray = stream.toByteArray();
+            byte[] optionalByteArray = optionalFileName.getBytes();
+
+
+            byte[] resultByteArray = new byte[signalByteArray.length + bitmapByteArray.length + optionalByteArray.length];
+            System.arraycopy(signalByteArray, 0, resultByteArray, 0, signalByteArray.length);
+            System.arraycopy(bitmapByteArray, 0, resultByteArray, signalByteArray.length, bitmapByteArray.length);
+            System.arraycopy(optionalByteArray, 0, resultByteArray, signalByteArray.length + bitmapByteArray.length, optionalByteArray.length);
+
+            writeToBluetoothDevice(resultByteArray);
+
+            imageBitmap.recycle();
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
         }
     }
 }

@@ -1,20 +1,25 @@
 package com.helper.helper.view.widget;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.helper.helper.R;
+import com.helper.helper.controller.BTManager;
+import com.helper.helper.model.LED;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class ImageCardViewAddonText extends FrameLayout {
+public class LEDCardView extends FrameLayout {
 
     public static final int NORMAL_DIALOG_TYPE = 0;
     public static final int DETAIL_DIALOG_TYPE = 1;
@@ -22,16 +27,17 @@ public class ImageCardViewAddonText extends FrameLayout {
 
     private LinearLayout m_cardLayout;
     private TextView m_cardNameTxt;
+    private ImageView m_cardImage;
     private SweetAlertDialog m_detailDlg;
 
-    public ImageCardViewAddonText(Context context) {
+    public LEDCardView(Context context) {
 
         super(context);
         initView();
 
     }
 
-    public ImageCardViewAddonText(Context context, AttributeSet attrs) {
+    public LEDCardView(Context context, AttributeSet attrs) {
 
         super(context, attrs);
 
@@ -39,7 +45,7 @@ public class ImageCardViewAddonText extends FrameLayout {
         getAttrs(attrs);
     }
 
-    public ImageCardViewAddonText(Context context, AttributeSet attrs, int defStyle) {
+    public LEDCardView(Context context, AttributeSet attrs, int defStyle) {
 
         super(context, attrs);
         initView();
@@ -54,19 +60,20 @@ public class ImageCardViewAddonText extends FrameLayout {
         addView(v);
 
         m_cardLayout = v.findViewById(R.id.cardLayout);
+        m_cardImage = v.findViewById(R.id.cardViewImage);
         m_cardNameTxt = v.findViewById(R.id.cardNameText);
 
         /** Do something about child widget **/
     }
 
     private void getAttrs(AttributeSet attrs) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.FloatingEditTextAddonControl);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.LEDCardView);
         setTypeArray(typedArray);
     }
 
 
     private void getAttrs(AttributeSet attrs, int defStyle) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.FloatingEditTextAddonControl, defStyle, 0);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.LEDCardView, defStyle, 0);
         setTypeArray(typedArray);
     }
 
@@ -81,10 +88,10 @@ public class ImageCardViewAddonText extends FrameLayout {
         typedArray.recycle();
     }
 
-    private SweetAlertDialog makeDownloadDlg(Context context, String ledName) {
+    private SweetAlertDialog makeDownloadDlg(Context context, LED ledData) {
         return
                 new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
-                        .setTitleText(ledName)
+                        .setTitleText(ledData.getIndex().split("_")[1])
                         .setCancelText(context.getString(R.string.led_dialog_cancel))
                         .setConfirmButton(context.getString(R.string.led_dialog_download), new SweetAlertDialog.OnSweetClickListener() {
                             @Override
@@ -94,39 +101,54 @@ public class ImageCardViewAddonText extends FrameLayout {
                         });
     }
 
-    private SweetAlertDialog makeDetailDlg(Context context, String ledName) {
+    private SweetAlertDialog makeDetailDlg(final Context context, final LED ledData) {
 
         return
                 new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
-                        .setTitleText(ledName)
+                        .setTitleText(ledData.getIndex().split("_")[1])
                         .setCancelText(context.getString(R.string.led_dialog_cancel))
                         .setConfirmButton(context.getString(R.string.led_dialog_showon), new SweetAlertDialog.OnSweetClickListener() {
                             @Override
                             public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                BTManager.setShowOnDevice(context, ledData.getIndex());
                                 m_detailDlg.dismissWithAnimation();
                             }
                         });
     }
 
-    public void setOnClickCustomDialogEnable(final int mode, final Context context) {
-        if( mode == NORMAL_DIALOG_TYPE ) { return; }
+    public void setCardImageView(Bitmap bitmap) {
+        m_cardImage.setImageBitmap(bitmap);
+    }
 
+    public void setCardNameText(String txt) {
+        m_cardNameTxt.setText(txt);
+    }
+
+    /** LED Dialog **/
+    public void setOnClickCustomDialogEnable(final int mode, final LED ledModel, final Activity activity) {
+        if( mode == NORMAL_DIALOG_TYPE ) { return; }
 //        m_dlgTargetContxt = context;
 
         m_cardLayout.setOnClickListener(new OnClickListener() {
             @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View view) {
-                if( mode == DETAIL_DIALOG_TYPE ) {
-                    m_detailDlg = makeDetailDlg(context, "Bird");
-                } else if( mode == DOWNLOAD_DIALOG_TYPE ) {
-                    m_detailDlg = makeDownloadDlg(context, "Bird");
-                }
 
-                m_detailDlg.setCustomView(new DialogLED(context, mode));
-                m_detailDlg.show();
-                TextView titleText = m_detailDlg.findViewById(R.id.title_text);
-                titleText.setTextAppearance(R.style.HeadlineTypo);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if( mode == DETAIL_DIALOG_TYPE ) {
+                            m_detailDlg = makeDetailDlg(activity, ledModel);
+                        } else if( mode == DOWNLOAD_DIALOG_TYPE ) {
+                            m_detailDlg = makeDownloadDlg(activity, ledModel);
+                        }
+
+                        m_detailDlg.setCustomView(new DialogLED(activity, mode, ledModel));
+                        m_detailDlg.show();
+                        TextView titleText = m_detailDlg.findViewById(R.id.title_text);
+                        titleText.setTextAppearance(R.style.HeadlineTypo);
+                    }
+                });
             }
         });
     }

@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.ContactItem;
 import com.helper.helper.model.TrackingData;
 import com.helper.helper.model.User;
@@ -59,7 +60,8 @@ public class FileManager {
     private static final String USER_INFO_XML_ELEM_ATTR_NAME = "name";
     private static final String USER_INFO_XML_ELEM_ATTR_PHONE = "phone";
     private static final String USER_INFO_XML_ELEM_ATTR_RIDING_TYPE = "riding_type";
-    private static final String USER_INFO_XML_ELEM_ATTR_LED_INDICIES = "led_indicies";
+    private static final String USER_INFO_XML_ELEM_ATTR_LED_INDICIES = "ledIndicies";
+    private static final String USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED = "ledBookmarked";
     private static final String USER_INFO_XML_ELEM_ATTR_TRACK_INDICIES = "track_indicies";
 
     private static final String PROFILE_IMG_NAME = "user_profile.jpg";
@@ -266,7 +268,8 @@ public class FileManager {
             contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_NAME, user.getUserName());
             contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_PHONE, user.getUserPhone());
             contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_RIDING_TYPE, user.getUserRidingType());
-//            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_LED_INDICIES, user.());
+            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_LED_INDICIES, user.getUserLEDIndicies());
+            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED, user.getUserBookmarked());
 //            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_TRACK_INDICIES, user.());
 
             rootElement.appendChild(contactElement);
@@ -302,58 +305,49 @@ public class FileManager {
     }
 
     public static User readXmlUserInfo(Context context) throws  IOException {
-        List<User> userItems = null;
+
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = null;
         try {
-            userItems = new ArrayList<>();
-
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-            Storage internalStorage = new Storage(context);
-            String path = internalStorage.getInternalFilesDirectory();
-            String dir = path + File.separator + DIR_NAME;
-            String xmlFilePath = dir + File.separator + USER_XML_NAME;
-
-            boolean fileExists = internalStorage.isFileExist(xmlFilePath);
-
-            Document doc = docBuilder.newDocument();
-
-            Element rootElement;
-            if (fileExists) {
-                doc = docBuilder.parse(new File(xmlFilePath));
-                rootElement = (Element) doc.getDocumentElement();
-            } else {
-                return null;
-            }
-
-            NodeList userInfo = doc.getElementsByTagName(USER_INFO_XML_ELEM_USER);
-
-            for (int i = 0; i < userInfo.getLength(); i++) {
-                Node map = userInfo.item(i);
-
-                String email = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_EMAIL).getNodeValue();
-                String name = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_NAME).getNodeValue();
-                String phone = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_PHONE).getNodeValue();
-                String riding_type = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_RIDING_TYPE).getNodeValue();
-//                String led_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_INDICIES).getNodeValue();
-//                String track_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_TRACK_INDICIES).getNodeValue();
-
-                User user = new User.Builder()
-                        .email(email)
-                        .name(name)
-                        .phone(phone)
-                        .ridingType(riding_type)
-                        .build();
-
-                userItems.add(user);
-
-            }
-
-        } catch (ParserConfigurationException | SAXException pce) {
-            pce.printStackTrace();
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
         }
+        Storage internalStorage = new Storage(context);
+        String path = internalStorage.getInternalFilesDirectory();
+        String dir = path + File.separator + DIR_NAME;
+        String xmlFilePath = dir + File.separator + USER_XML_NAME;
+        boolean fileExists = internalStorage.isFileExist(xmlFilePath);
+        Document doc = docBuilder.newDocument();
+        Element rootElement;
+        if (fileExists) {
+            try {
+                doc = docBuilder.parse(new File(xmlFilePath)); } catch (SAXException e) {
+                e.printStackTrace(); }rootElement = (Element) doc.getDocumentElement(); } else {
+            return null; }NodeList userInfo = doc.getElementsByTagName(USER_INFO_XML_ELEM_USER);
+        Node map = userInfo.item(0);
+        String email = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_EMAIL).getNodeValue();
+        String name = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_NAME).getNodeValue();
+        String phone = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_PHONE).getNodeValue();
+        String riding_type = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_RIDING_TYPE).getNodeValue();
+        String led_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_INDICIES).getNodeValue();
+        String led_bookmarked = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED).getNodeValue();
+//              String track_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_TRACK_INDICIES).getNodeValue();
 
-        return userItems.get(0);
+        led_indicies = led_indicies.split("\\[")[1].split("]")[0];
+        led_bookmarked = led_bookmarked.split("\\[")[1].split("]")[0];
+
+        User user = new User.Builder()
+                .email(email)
+                .name(name)
+                .phone(phone)
+                .ridingType(riding_type)
+                .ledIndicies(led_indicies)
+                .ledBookmarked(led_bookmarked)
+                .build();
+
+
+        return user;
     }
 
     /** Tracking **/
