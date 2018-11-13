@@ -1,5 +1,7 @@
 package com.helper.helper.view.main.myeight;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,10 +18,15 @@ import android.widget.TextView;
 import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
+import com.helper.helper.controller.DownloadImageTask;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.BluetoothReadCallback;
 import com.helper.helper.interfaces.ValidateCallback;
+import com.snatik.storage.Storage;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 
 public class InfoFragment extends Fragment {
@@ -58,62 +65,6 @@ public class InfoFragment extends Fragment {
         // TODO: 01/11/2018 get UserManager getUser Name
         m_userName.setText(tempName + "'s EIGHT");
 
-        // TODO: 01/11/2018 get ThumbImage From Server
-//        m_thumbImg.setImageResource();
-
-        /******************* Make Listener in View *******************/
-        m_brightnessSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                final String seekValToString = setSeekValueCalculate(i);
-
-                String resultStr =
-                        BTManager.BLUETOOTH_SIGNAL_BRIGHTNESS
-                                + BTManager.BLUETOOTH_SIGNAL_SEPERATE
-                                + seekValToString
-                                + BTManager.BLUETOOTH_SIGNAL_SEPERATE+"0"; // option
-
-                BTManager.writeToBluetoothDevice(resultStr.getBytes());
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        m_speedSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                final String seekValToString = setSeekValueCalculate(i);
-
-                String resultStr =
-                        BTManager.BLUETOOTH_SIGNAL_SPEED
-                                + BTManager.BLUETOOTH_SIGNAL_SEPERATE
-                                + seekValToString
-                                + BTManager.BLUETOOTH_SIGNAL_SEPERATE+"0"; // option
-
-                BTManager.writeToBluetoothDevice(resultStr.getBytes());
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-        /*************************************************************/
-
-
         /** Read Bluetooth Signal -> Callback **/
         m_bluetoothReadCallback = new BluetoothReadCallback() {
             @Override
@@ -140,9 +91,17 @@ public class InfoFragment extends Fragment {
         if( signalStr.equals("") ) { return; }
         String[] splitStr = signalStr.split("/");
 
-        int ledInd = Integer.parseInt(splitStr[1]);
+        String ledVal = splitStr[1];
         float spdVal = Float.parseFloat(splitStr[2]);
         float brtVal = Float.parseFloat(splitStr[3]);
+
+        File f=new File(getOpenFilePath(ledVal));
+        try {
+            Bitmap imageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
+            m_thumbImg.setImageBitmap(imageBitmap);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             m_brightnessSeek.setProgress((int)(brtVal*100), true);
@@ -151,6 +110,65 @@ public class InfoFragment extends Fragment {
             m_brightnessSeek.setProgress((int)(brtVal*100));
             m_speedSeek.setProgress((int)(spdVal*100));
         }
+
+        /******************* Make Listener in View *******************/
+        m_brightnessSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                final String seekValToString = setSeekValueCalculate(i);
+
+                String resultStr =
+                        BTManager.BT_SIGNAL_BRIGHTNESS
+                                + BTManager.BLUETOOTH_SIGNAL_SEPARATE
+                                + seekValToString;
+
+                BTManager.writeToBluetoothDevice(resultStr.getBytes());
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        m_speedSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                final String seekValToString = setSeekValueCalculate(i);
+
+                String resultStr =
+                        BTManager.BT_SIGNAL_SPEED
+                                + BTManager.BLUETOOTH_SIGNAL_SEPARATE
+                                + seekValToString;
+
+                BTManager.writeToBluetoothDevice(resultStr.getBytes());
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        /*************************************************************/
+    }
+
+    private String getOpenFilePath(String ledIndex) {
+        Storage internalStorage = new Storage(getActivity());
+        String path = internalStorage.getInternalFilesDirectory();
+        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
+        String openFilePath = dir + File.separator + ledIndex + ".gif";
+
+        return openFilePath;
     }
 
     private String setSeekValueCalculate(int val) {

@@ -122,7 +122,7 @@ public class MyLEDFragment extends Fragment {
 
                     @Override
                     public void onError(String err) {
-
+                        startchangingLEDinGrid();
                     }
                 });
             } catch (JSONException e) {
