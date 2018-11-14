@@ -17,6 +17,7 @@ public class LED {
     private String m_index;
     private String m_name;
     private String m_creator;
+    private String m_category;
     private int m_downloadCnt;
     private boolean m_bookmared; // not include collection only use app
     private String m_type;
@@ -25,6 +26,7 @@ public class LED {
         private String m_builderIndex;
         private String m_builderName;
         private String m_builderCreator;
+        private String m_builderCategory;
         private int m_builderDownloadCnt;
         private boolean m_builderBookmarked;
         private String m_type;
@@ -33,6 +35,7 @@ public class LED {
             m_builderIndex = "";
             m_builderName = "";
             m_builderCreator = "";
+            m_builderCategory = "";
             m_builderDownloadCnt = 0;
             m_builderBookmarked = false;
             m_type = LED_TYPE_FREE;
@@ -50,6 +53,11 @@ public class LED {
 
         public Builder creator(String creatorStr) {
             this.m_builderCreator = creatorStr;
+            return this;
+        }
+
+        public Builder category(String categoryStr) {
+            this.m_builderCategory = categoryStr;
             return this;
         }
 
@@ -78,6 +86,7 @@ public class LED {
         m_index = builder.m_builderIndex;
         m_name = builder.m_builderName;
         m_creator = builder.m_builderCreator;
+        m_category = builder.m_builderCategory;
         m_downloadCnt = builder.m_builderDownloadCnt;
         m_bookmared = builder.m_builderBookmarked;
         m_type = builder.m_type;
@@ -91,7 +100,9 @@ public class LED {
         m_downloadCnt = downloadCnt;
     }
 
-    public void setName(String nameStr) {m_name = nameStr; }
+    public void setName(String nameStr) { m_name = nameStr; }
+
+    public void setCategory(String categoryStr) { m_category = categoryStr; }
 
     public String getIndex() {
         return m_index;
@@ -102,6 +113,8 @@ public class LED {
     public String getCreator() {
         return m_creator;
     }
+
+    public String getCategory() { return m_category; }
 
     public String getType() { return m_type; }
 
@@ -122,6 +135,9 @@ public class LED {
             }
             if( !m_name.equals("")) {
                 obj.put("name", m_name);
+            }
+            if( !m_category.equals("") ) {
+                obj.put("category", m_category);
             }
             if( !m_creator.equals("")) {
                 obj.put("creator", m_creator);
