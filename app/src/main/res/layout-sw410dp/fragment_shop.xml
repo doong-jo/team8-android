@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:id="@+id/newLedTopBar"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="59.28dp"
+        android:orientation="horizontal">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/ledShopSearchEditTxt"
+            android:layout_width="316.92dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textColorLink="@color/black"
+            android:layout_marginLeft="46.74dp"
+            android:layout_marginRight="9.12dp"
+            android:focusableInTouchMode="true"
+            android:focusable="false"
+            />
+
+        <ImageView
+            android:id="@+id/ledShopSearchBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="19.38dp"
+            android:src="@drawable/ic_search" />
+
+    </LinearLayout>
+
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_marginTop="59.28dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="63.84dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="22.8dp"
+                android:layout_marginBottom="3.42dp"
+                android:text="@string/newLED"
+                android:theme="@style/TitleTypo"
+                android:textColor="@color/half_black"
+                />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fillViewport="true"
+                android:scrollbars="none"
+                >
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+                    <GridLayout
+                        android:layout_gravity="center_horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12.54dp"
+                        android:layout_marginRight="12.54dp"
+                        android:orientation="horizontal">
+                        <com.helper.helper.view.widget.LEDCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.LEDCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.LEDCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.LEDCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.LEDCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.LEDCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.LEDCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.LEDCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.LEDCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.LEDCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+                    </GridLayout>
+                </FrameLayout>
+            </HorizontalScrollView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.14dp"
+                android:layout_marginStart="22.8dp"
+                android:layout_marginTop="44.46dp"
+                android:layout_marginBottom="14.82dp"
+                android:alpha="0.13"
+                android:background="@color/black" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="22.8dp"
+                android:layout_marginBottom="3.42dp"
+                android:text="@string/topCategories"
+                android:theme="@style/TitleTypo"
+                android:textColor="@color/half_black"
+                />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fillViewport="true"
+                android:scrollbars="none"
+                >
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+
+                    <GridLayout
+                        android:layout_gravity="center_horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12.54dp"
+                        android:layout_marginRight="12.54dp"
+                        android:orientation="horizontal">
+                        <com.helper.helper.view.widget.ImageCardViewAddonLong
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonLong
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonLong
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonLong
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonLong
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonLong
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonLong
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonLong
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonLong
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonLong
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+                    </GridLayout>
+                </FrameLayout>
+            </HorizontalScrollView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.14dp"
+                android:layout_marginStart="22.8dp"
+                android:layout_marginTop="30.78dp"
+                android:layout_marginBottom="14.82dp"
+                android:alpha="0.13"
+                android:background="@color/black" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="22.8dp"
+                android:layout_marginBottom="13.68dp"
+                android:text="@string/freeRanking"
+                android:theme="@style/TitleTypo"
+                android:textColor="@color/half_black"
+                />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fillViewport="true"
+                android:scrollbars="none"
+                >
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+
+                    <GridLayout
+                        android:layout_gravity="center_horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12.54dp"
+                        android:layout_marginRight="12.54dp"
+                        android:rowCount="3"
+                        android:orientation="vertical">
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+                    </GridLayout>
+                </FrameLayout>
+            </HorizontalScrollView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.14dp"
+                android:layout_marginStart="22.8dp"
+                android:layout_marginTop="30.78dp"
+                android:layout_marginBottom="14.82dp"
+                android:alpha="0.13"
+                android:background="@color/black" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="22.8dp"
+                android:layout_marginBottom="13.68dp"
+                android:text="@string/paidRanking"
+                android:theme="@style/TitleTypo"
+                android:textColor="@color/half_black"
+                />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fillViewport="true"
+                android:scrollbars="none"
+                >
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="30.78dp"
+                    >
+
+                    <GridLayout
+                        android:layout_gravity="center_horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12.54dp"
+                        android:layout_marginRight="12.54dp"
+                        android:rowCount="3"
+                        android:orientation="vertical">
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.helper.helper.view.widget.ImageCardViewAddonRank
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+                    </GridLayout>
+                </FrameLayout>
+            </HorizontalScrollView>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+
+</RelativeLayout>
+

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/ledCardRankLayout">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_marginLeft="11.4dp"
+        android:layout_marginTop="1.14dp"
+        android:layout_marginBottom="13.68dp"
+        style="@style/ledCardRank">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/bird" />
+    </android.support.v7.widget.CardView>
+
+    <TextView
+        android:id="@+id/cardRank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="13.68dp"
+        android:layout_marginTop="1.14dp"
+        android:layout_marginBottom="13.68dp"
+        android:gravity="center"
+        android:textColor="@color/xgray"
+        style="@style/OptionTypo"
+        android:text="@string/RankNum" />
+
+    <TextView
+        android:id="@+id/cardRankName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="15.96dp"
+        android:layout_marginTop="1.14dp"
+        android:layout_marginBottom="13.68dp"
+        android:gravity="center"
+        android:textColor="@color/xgray"
+        style="@style/OptionTypo"
+        android:text="@string/RankName" />
+</LinearLayout>
+

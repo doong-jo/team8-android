@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.helper.helper.R;
+import com.helper.helper.view.search.SearchActivity;
 
 public class LEDShopFragment extends Fragment {
 
@@ -33,21 +34,21 @@ public class LEDShopFragment extends Fragment {
         m_ledShopSearchBtn = view.findViewById(R.id.ledShopSearchBtn);
 
         /******************* Make Listener in View *******************/
-//        m_ledShopSearchEditTxt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent=new Intent(getActivity(),SearchActivity.class);
-//                startActivity(intent);
-//            }
-//        });
-//
-//        m_ledShopSearchBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent=new Intent(getActivity(),SearchActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+        m_ledShopSearchEditTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getActivity(),SearchActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        m_ledShopSearchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getActivity(),SearchActivity.class);
+                startActivity(intent);
+            }
+        });
 
         return view;
     }
