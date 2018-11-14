@@ -277,13 +277,13 @@ public class LookingActivity extends Activity {
         if ( bIsSuccess ) {
             m_retryBtn.setVisibility(View.INVISIBLE);
             m_resultTitle.setText(getString(R.string.pairing_succesful));
-            m_resultSymbol.setImageResource(R.drawable.ic_check_circle);
+            m_resultSymbol.setImageResource(R.drawable.ic_success_circle);
             m_resultCircle.setImageResource(R.drawable.pairing_success_circle);
         } else {
             m_retryBtn.setVisibility(View.VISIBLE);
             m_retryBtn.startAnimation(retryBtnAnim);
             m_resultTitle.setText(getString(R.string.pairing_fail));
-            m_resultSymbol.setImageResource(R.drawable.ic_warning_circle);
+            m_resultSymbol.setImageResource(R.drawable.ic_fail_circle);
             m_resultCircle.setImageResource(R.drawable.pairing_fail_circle);
             m_backMainImg.setVisibility(View.VISIBLE);
         }
