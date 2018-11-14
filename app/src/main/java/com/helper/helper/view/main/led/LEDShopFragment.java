@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import com.helper.helper.R;
 import com.helper.helper.view.search.SearchActivity;
 
-
 public class LEDShopFragment extends Fragment {
 
     private TextInputEditText m_ledShopSearchEditTxt;
