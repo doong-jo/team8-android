@@ -2,20 +2,16 @@ package com.helper.helper.view.main.led;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-//import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.helper.helper.R;
-import com.helper.helper.view.ScrollingActivity;
+import com.helper.helper.view.search.SearchActivity;
+
 
 public class LEDShopFragment extends Fragment {
 
