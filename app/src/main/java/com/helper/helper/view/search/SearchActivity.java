@@ -53,9 +53,9 @@ public class SearchActivity extends AppCompatActivity
         m_listItems = new ArrayList<SearchItem>();
         m_arrayList = new ArrayList<SearchItem>();
         m_searchLEDItems = new ArrayList<LED>();
-        settingList();
+        //settingList();
 
-        m_adapter = new SearchItemListAdapter(this, m_listItems);
+        m_adapter = new SearchItemListAdapter(this, m_searchLEDItems);
         m_listView.setAdapter(m_adapter);
 
         /******************* Make Listener in View *******************/
@@ -68,8 +68,13 @@ public class SearchActivity extends AppCompatActivity
 
             @Override
             public void afterTextChanged(Editable s) {
-                String inputText = m_searchInput.getText();
-                search(inputText);
+
+                if ( !m_searchInput.getText().equals("") ) {
+                    trySearch();
+                } else {
+                    m_searchLEDItems.clear();
+                    m_adapter.notifyDataSetChanged();
+                }
             }
         });
 
@@ -84,22 +89,6 @@ public class SearchActivity extends AppCompatActivity
         /*************************************************************/
     }
 
-    // search method
-    public void search(String charText) {
-        m_listItems.clear();
-
-        if (charText.length() != 0) {
-            for(int i = 0;i < m_arrayList.size(); i++)
-            {
-                if (m_arrayList.get(i).getTitle().toLowerCase().contains(charText))
-                {
-                    m_listItems.add(m_arrayList.get(i));
-                }
-            }
-        }
-
-        m_adapter.notifyDataSetChanged();
-    }
 
     private void settingList(){
         m_arrayList.add(new SearchItem("girl","character"));
@@ -143,51 +132,68 @@ public class SearchActivity extends AppCompatActivity
         m_arrayList.add(new SearchItem("matt","character"));
     }
 
-    public void trySearch(){
+    // search method
+    public void search(String charText) {
+        m_listItems.clear();
+
+        if (charText.length() != 0) {
+            trySearch();
+        }
+
+        m_adapter.notifyDataSetChanged();
+    }
+
+    public void trySearch() {
         String name = m_searchInput.getText();
 
-        if(HttpManager.useCollection("user")){
+        if (HttpManager.useCollection("led")) {
             JSONObject reqObject = new JSONObject();
-            try{
+            try {
+                name = "^"+name;
                 reqObject.put("name", name);
             }
-            catch (JSONException e){
+            catch (JSONException e) {
                 e.printStackTrace();
             }
+            try {
+                HttpManager.requestHttp(reqObject, "GET", "regex", new HttpCallback() {
 
-            try{
-                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
                     @Override
                     public void onSuccess(JSONArray searchNamejsonArray) throws JSONException {
                         int arrLen = searchNamejsonArray.length();
+                        // clear
+                        m_searchLEDItems.clear();
 
-                        if(arrLen != 0){
-                            for(int i=0; i<arrLen; ++i){
+                        if (arrLen != 0) {
+                            for (int i = 0; i < arrLen; ++i) {
                                 JSONObject object = searchNamejsonArray.getJSONObject(i);
                                 LED led = new LED.Builder()
                                         .index(object.getString("index"))
                                         .name(object.getString("name"))
                                         .creator(object.getString("creator"))
-                                        .downloadCnt(object.getInt("downloadCnt"))
+                                        .downloadCnt(object.getInt("downloadcnt"))
                                         .type(object.getString("type"))
                                         .build();
 
                                 m_searchLEDItems.add(led);
-                             }
+                            }
+
+                            //nodify
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    m_adapter.notifyDataSetChanged();
+                                }
+                            });
+
                         }
-                        else{
-                            m_searchLEDItems.clear();
-                        }
-                        m_adapter.notifyDataSetChanged();
                     }
 
                     @Override
                     public void onError(String err) throws JSONException {
-                        Log.d(TAG, "SearchActivity onError: " + err);
-                    }
-                });
+                        Log.d(TAG, "SearchActivity onError: " + err); }});
             }
-            catch (JSONException e){
+            catch (JSONException e) {
                 e.printStackTrace();
             }
         }

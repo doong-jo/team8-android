@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.helper.helper.R;
-import com.helper.helper.model.SearchItem;
+import com.helper.helper.model.LED;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ public class SearchItemListAdapter extends BaseAdapter{
     private Context context;
     private LayoutInflater li;
     private ViewHolder viewHolder;
-    private List<SearchItem> list;
+    private List<LED> list;
 
-    public SearchItemListAdapter(Context context, List<SearchItem> items) {
+    public SearchItemListAdapter(Context context, List<LED> items) {
         this.list = items;
         this.context = context;
         li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -45,7 +45,7 @@ public class SearchItemListAdapter extends BaseAdapter{
             convertView = li.inflate(R.layout.widget_search_item,null);
 
             viewHolder = new ViewHolder();
-            viewHolder.title = (TextView) convertView.findViewById(R.id.search_title);
+            viewHolder.name = (TextView) convertView.findViewById(R.id.search_title);
             viewHolder.type = (TextView)convertView.findViewById(R.id.search_type);
 
             convertView.setTag(viewHolder);
@@ -55,8 +55,8 @@ public class SearchItemListAdapter extends BaseAdapter{
 
         // 리스트에 있는 데이터를 리스트뷰 셀에 뿌린다.
         if(list != null) {
-            System.out.println("test : "+ list.get(position).getTitle());
-            viewHolder.title.setText(list.get(position).getTitle());
+            System.out.println("test : "+ list.get(position).getName());
+            viewHolder.name.setText(list.get(position).getName());
             viewHolder.type.setText(list.get(position).getType());
         }
 
@@ -64,7 +64,7 @@ public class SearchItemListAdapter extends BaseAdapter{
     }
 
     class ViewHolder{
-        public TextView title;
+        public TextView name;
         public TextView type;
 
     }

@@ -85,7 +85,7 @@
             android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".view.main.led.SearchActivity"
+        <activity android:name=".view.search.SearchActivity"
             android:parentActivityName=".view.ScrollingActivity"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait">

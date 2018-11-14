@@ -19,6 +19,8 @@
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/ic_search"
         android:focusableInTouchMode="true"
+        android:singleLine="true"
+        android:imeOptions="normal"
         android:textColor="@color/xxxgray"/>
 
     <Button
