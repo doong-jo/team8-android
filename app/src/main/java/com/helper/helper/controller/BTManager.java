@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.util.Log;
 
 import com.helper.helper.interfaces.BluetoothReadCallback;
@@ -25,13 +26,20 @@ import com.snatik.storage.Storage;
 
 import org.json.JSONException;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -60,7 +68,7 @@ public class BTManager {
 
     public static final String BLUETOOTH_UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee";
     /** Android RFCOMM = 990byte(PAYLOAD) + 34byte(LC2CAP) **/
-    public static final int BLUETOOTH_RFCOMM_PAYLOAD = 990;
+    public static final int BLUETOOTH_RFCOMM_PAYLOAD = 900;
     public static final String DEVICE_ALIAS = "EIGHT_";
 
     public static final int SUCCESS_BLUETOOTH_CONNECT = 1001;
@@ -100,7 +108,12 @@ public class BTManager {
     private static BluetoothReadCallback m_readResultCb;
     private static BluetoothReadCallback m_downloadLEDResultCb;
     private static String m_lastSignalStr = "";
-    private static ProgressDialog m_loadingDlg;
+
+    /** Send bytearray of Bitmap (LED) **/
+    private static ByteArrayOutputStream m_outBitmapByteArrLED;
+    private static byte[] m_outBitmapByteArr;
+    private static int m_cntSendByteArr;
+    private static int m_copyCursor;
 
     public static boolean getConnected() {
         if( m_bluetoothSocket == null ) {
@@ -328,73 +341,169 @@ public class BTManager {
         return openFilePath;
     }
 
-    private static void sendBitmapByteArray(Context context, String ledIndex) {
-        Bitmap imageBitmap = null;
-
+    private static void setBitmapByteArray(Context context, String ledIndex) throws IOException {
         /** 1. Read Image File **/
-        try {
-            File f=new File(getOpenFilePath(context, ledIndex));
-            imageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
-//            cardViewLED.setCardImageView(cardImageBitmap);
+//        Bitmap imageBitmap;
+//
+//        File f=new File(getOpenFilePath(context, ledIndex));
+//        imageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
+////            cardViewLED.setCardImageView(cardImageBitmap);
+//
+//        FileInputStream fstream = new FileInputStream(f);
+//
+//        /** Send File Data(byte) to Device **/
+//        m_outBitmapByteArrLED = new ByteArrayOutputStream();
+////        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, m_outBitmapByteArrLED);
+////        imageBitmap.recycle();
+//
+//        byte data[] = new byte[1024];
+//        long total = 0;
+//        int count = 0;
+//        try {
+//            while ((count = fstream.read(data)) != -1) {
+//                total += count;
+//                m_outBitmapByteArrLED.write(data, 0, count);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        try {
+//            fstream.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
-            /** Send File Data(byte) to Device **/
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            imageBitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+//        m_outBitmapByteArr = getByte(getOpenFilePath(context, ledIndex));
 
+        String path = getOpenFilePath(context, ledIndex);
 
-            byte[] signalByteArray = (BT_SIGNAL_DOWNLOAD_LED+BLUETOOTH_SIGNAL_SEPARATE).getBytes();
-            byte[] bitmapByteArray = stream.toByteArray();
+        File file = new File(path);
+        FileInputStream fis = new FileInputStream(file);
+//        byte[] data = new byte[(int) file.length()];
+//        fis.read(data);
+//        fis.close();
+//
+//        Path fileLocation = null;
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//            fileLocation = Paths.get(getOpenFilePath(context, ledIndex));
+//            byte[] java_7_byte = Files.readAllBytes(fileLocation);
+//            System.out.println(java_7_byte);
+//        }
 
+        m_outBitmapByteArr = new byte[(int) file.length()];
+        DataInputStream dis = new DataInputStream(fis);
+        dis.readFully(m_outBitmapByteArr);
 
-            /** Divide 990byte(PAYLOAD) **/
-            byte[] resultByteArray;
-
-            if( bitmapByteArray.length > BLUETOOTH_RFCOMM_PAYLOAD ) {
-                int divideSize = bitmapByteArray.length / BLUETOOTH_RFCOMM_PAYLOAD;
-
-                if( divideSize % bitmapByteArray.length != 0 ) { divideSize++; }
-
-                for (int i = 0; i < divideSize; i++) {
-                    byte[] subBitmapByteArray;
-
-                    int copySize;
-                    if( i+1 == divideSize ) {
-                        copySize = bitmapByteArray.length % BLUETOOTH_RFCOMM_PAYLOAD;
-                        resultByteArray = new byte[signalByteArray.length + copySize];
-                    } else {
-                        copySize = BLUETOOTH_RFCOMM_PAYLOAD;
-                        resultByteArray = new byte[signalByteArray.length + copySize];
-                    }
-
-                    subBitmapByteArray = new byte[copySize];
-                    System.arraycopy(bitmapByteArray, copySize * i, subBitmapByteArray, 0, copySize);
-
-                    System.arraycopy(signalByteArray, 0, resultByteArray, 0, signalByteArray.length);
-                    System.arraycopy(subBitmapByteArray, 0, resultByteArray, signalByteArray.length, subBitmapByteArray.length);
-
-                    writeToBluetoothDevice(resultByteArray);
-                }
-            } else {
-                resultByteArray = new byte[signalByteArray.length + bitmapByteArray.length];
-                System.arraycopy(signalByteArray, 0, resultByteArray, 0, signalByteArray.length);
-                System.arraycopy(bitmapByteArray, 0, resultByteArray, signalByteArray.length, bitmapByteArray.length);
-
-                writeToBluetoothDevice(resultByteArray);
-            }
-
-            // TODO: 13/11/2018 After write(DOWNLOAD_LED) signal receive
-            writeToBluetoothDevice(
-                    BT_SIGNAL_DOWNLOAD_DONE_LED
-                    .getBytes()
-            );
-            m_downloadLEDResultCb = null;
-
-            imageBitmap.recycle();
+        File fi = new File(path);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            m_outBitmapByteArr = Files.readAllBytes(fi.toPath());
         }
-        catch (FileNotFoundException e)
-        {
+
+        RandomAccessFile f = new RandomAccessFile(path, "r");
+        m_outBitmapByteArr = new byte[(int) f.length()];
+        f.read(m_outBitmapByteArr);
+        f.close();
+
+//        m_outBitmapByteArr = data;
+    }
+
+    private static byte[] getByte(String path) {
+        byte[] getBytes = {};
+        try {
+            File file = new File(path);
+            getBytes = new byte[(int) file.length()];
+            InputStream is = new FileInputStream(file);
+            is.read(getBytes);
+            is.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
+        return getBytes;
+    }
+
+//    public static byte[] extractBytes (String ImageName) throws IOException {
+//        // open image
+//        File imgPath = new File(ImageName);
+//        BufferedImage bufferedImage = ImageIO.read(imgPath);
+//
+//        // get DataBufferBytes from Raster
+//        WritableRaster raster = bufferedImage .getRaster();
+//        DataBufferByte data   = (DataBufferByte) raster.getDataBuffer();
+//
+//        return ( data.getData() );
+//    }
+
+    private static void sendBitmapByteArray(int cntByteArray) throws IOException {
+        byte[] signalByteArray = (BT_SIGNAL_DOWNLOAD_LED+BLUETOOTH_SIGNAL_SEPARATE).getBytes();
+//        byte[] bitmapByteArray = m_outBitmapByteArrLED.toByteArray();
+
+        /** Divide 990byte(PAYLOAD) **/
+        byte[] resultByteArray;
+
+        int divideSize = m_outBitmapByteArr.length / BLUETOOTH_RFCOMM_PAYLOAD;
+
+        if( m_outBitmapByteArr.length > BLUETOOTH_RFCOMM_PAYLOAD ) {
+            if( divideSize % m_outBitmapByteArr.length != 0 ) { divideSize++; }
+
+            byte[] subBitmapByteArray;
+            int copySize = 0;
+
+            /** Done Sending **/
+            if( cntByteArray == divideSize ) {
+                writeToBluetoothDevice(
+                        BT_SIGNAL_DOWNLOAD_DONE_LED.getBytes()
+                );
+                doneOutputBitmap();
+                return;
+            }
+
+            /** Send Last ByteArray **/
+            else if( cntByteArray+1 == divideSize ) {
+                copySize = m_outBitmapByteArr.length % BLUETOOTH_RFCOMM_PAYLOAD;
+            } else {
+                copySize = BLUETOOTH_RFCOMM_PAYLOAD;
+            }
+
+            resultByteArray = new byte[signalByteArray.length + copySize];
+            subBitmapByteArray = new byte[copySize];
+
+            // src, srcPos, dest, destPos, length
+            System.arraycopy(m_outBitmapByteArr, m_copyCursor, subBitmapByteArray, 0, copySize);
+
+            System.arraycopy(signalByteArray, 0, resultByteArray, 0, signalByteArray.length);
+            System.arraycopy(subBitmapByteArray, 0, resultByteArray, signalByteArray.length, subBitmapByteArray.length);
+
+            writeToBluetoothDevice(resultByteArray);
+
+            m_copyCursor += BLUETOOTH_RFCOMM_PAYLOAD;
+
+        } else {
+            /** Done Sending **/
+            if( cntByteArray == 1 ) {
+                writeToBluetoothDevice(
+                        BT_SIGNAL_DOWNLOAD_DONE_LED.getBytes()
+                );
+                doneOutputBitmap();
+                return;
+            } else {
+                resultByteArray = new byte[signalByteArray.length + m_outBitmapByteArr.length];
+                System.arraycopy(signalByteArray, 0, resultByteArray, 0, signalByteArray.length);
+                System.arraycopy(m_outBitmapByteArr, 0, resultByteArray, signalByteArray.length, m_outBitmapByteArr.length);
+                writeToBluetoothDevice(resultByteArray);
+            }
+        }
+    }
+
+    private static void doneOutputBitmap() throws IOException {
+        m_cntSendByteArr = 0;
+        m_copyCursor = 0;
+        m_downloadLEDResultCb = null;
+        m_outBitmapByteArr = null;
+//        m_outBitmapByteArrLED.close();
+//        m_outBitmapByteArrLED = null;
     }
 
     public static void setShowOnDevice(final Context context, final String ledIndex) {
@@ -412,7 +521,20 @@ public class BTManager {
                         if( valueData.equals(BT_SIGNAL_RES_EXIST_LED) ) {
                             break;
                         } else if ( valueData.equals(BT_SIGNAL_RES_DOWNLOAD_LED) ) {
-                            sendBitmapByteArray(context, ledIndex);
+                            try {
+                                setBitmapByteArray(context, ledIndex);
+                                sendBitmapByteArray(m_cntSendByteArr++);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
+
+                    case BT_SIGNAL_DOWNLOAD_LED:
+                        try {
+                            sendBitmapByteArray(m_cntSendByteArr++);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                         break;
 
