@@ -16,6 +16,7 @@ public class LEDShopFragment extends Fragment {
 
     private TextInputEditText m_ledShopSearchEditTxt;
     private ImageView m_ledShopSearchBtn;
+
     public LEDShopFragment() {
 
     }
@@ -50,6 +51,12 @@ public class LEDShopFragment extends Fragment {
             }
         });
 
+        setCategoryData();
+
         return view;
+    }
+
+    private void setCategoryData() {
+
     }
 }

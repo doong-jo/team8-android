@@ -13,6 +13,7 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.ContactItem;
+import com.helper.helper.model.LEDCategory;
 import com.helper.helper.model.TrackingData;
 import com.helper.helper.model.User;
 import com.snatik.storage.Storage;
@@ -41,8 +42,17 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 public class FileManager {
-
+    private static final String TAG = FileManager.class.getSimpleName() + "/DEV";
     private static final String DIR_NAME = "user_data";
+
+    private static final String CATEGORY_XML_NAME = "category_info.xml";
+
+    private static final String CATEGORY_XML_ELEM_ROOT = "categories";
+    private static final String CATEGORY_XML_ELEM = "category";
+    private static final String CATEGORY_XML_ELEM_ATTR_NAME = "name";
+    private static final String CATEGORY_XML_ELEM_ATTR_BKG = "background_color";
+    private static final String CATEGORY_XML_ELEM_ATTR_NOTICE = "notice";
+    private static final String CATEGORY_XML_ELEM_ATTR_CHARACTER = "character";
 
     private static final String EMERGENCY_CONTACTS_XML_NAME = "emergency_contacts.xml";
 
@@ -50,7 +60,6 @@ public class FileManager {
     private static final String EMERGENCY_CONTACTS_XML_ELEM_CONTACT = "contact";
     private static final String EMERGENCY_CONTACTS_XML_ELEM_ATTR_NAME = "name";
     private static final String EMERGENCY_CONTACTS_XML_ELEM_ATTR_PHONE = "phone";
-
 
     private static final String USER_XML_NAME = "user_info.xml";
 
@@ -66,7 +75,6 @@ public class FileManager {
 
     private static final String PROFILE_IMG_NAME = "user_profile.jpg";
 
-
     private static final String TRACKING_XML_NAME = "tracking.xml";
 
     private static final String TRACKING_XML_ELEM_ROOT = "tracking";
@@ -78,8 +86,126 @@ public class FileManager {
     private static final String TRACKING_XML_ELEM_LOCATION = "location";
     private static final String TRACKING_XML_ELEM_LATITUDE = "latitude";
     private static final String TRACKING_XML_ELEM_LONGITUDE = "longitude";
-    private static final String TAG = FileManager.class.getSimpleName() + "/DEV";
 
+    /** Category **/
+    public static void writeXmlCategory(Context context, List<LEDCategory> categoriesData) throws IOException {
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            Storage internalStorage = new Storage(context);
+
+            String path = internalStorage.getInternalFilesDirectory();
+            String dir = path + File.separator + DIR_NAME;
+            String xmlFilePath =  dir + File.separator + CATEGORY_XML_NAME;
+
+            boolean fileExists = internalStorage.isFileExist(xmlFilePath);
+
+            Document doc = docBuilder.newDocument();
+
+            Element rootElement;
+//            if( fileExists ) {
+//                doc = docBuilder.parse(new File(xmlFilePath));
+//                rootElement = (Element) doc.getDocumentElement();
+//            } else {
+//                rootElement = doc.createElement(EMERGENCY_CONTACTS_XML_ELEM_ROOT);
+//            }
+
+            rootElement = doc.createElement(CATEGORY_XML_ELEM_ROOT);
+
+            /* Make elements start */
+
+
+            for (LEDCategory data :
+                    categoriesData) {
+                Element contactElement = doc.createElement(CATEGORY_XML_ELEM);
+                /* Make elements end */
+
+                /* Define attributes start */
+                contactElement.setAttribute(CATEGORY_XML_ELEM_ATTR_NAME, data.getName());
+                contactElement.setAttribute(CATEGORY_XML_ELEM_ATTR_BKG, data.getBkgColor());
+                contactElement.setAttribute(CATEGORY_XML_ELEM_ATTR_NOTICE, data.getNotice());
+                contactElement.setAttribute(CATEGORY_XML_ELEM_ATTR_CHARACTER, data.getCharacter());
+
+                rootElement.appendChild(contactElement);
+            }
+
+//            if( !fileExists ) {
+//                doc.appendChild(rootElement);
+//            }
+            doc.appendChild(rootElement);
+
+            // XML 파일로 쓰기
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            DOMSource source = new DOMSource(doc);
+
+            final boolean dirExists = internalStorage.isDirectoryExists(dir);
+
+            if( !dirExists ) {
+                internalStorage.createDirectory(dir);
+            }
+
+            StreamResult result = new StreamResult(new FileOutputStream(new File(xmlFilePath), false));
+
+            transformer.transform(source, result);
+            Log.d(TAG, "writeXmlEmergencyContacts: \n" + source.getNode().getTextContent());
+
+
+        }
+        catch (ParserConfigurationException | TransformerException pce)
+        {
+            pce.printStackTrace();
+        }
+    }
+
+    public static List<LEDCategory> readXmlCategory(Context context) throws IOException {
+        List<LEDCategory> categoriesList = null;
+        try {
+            categoriesList = new ArrayList<>();
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            Storage internalStorage = new Storage(context);
+
+            String path = internalStorage.getInternalFilesDirectory();
+            String dir = path + File.separator + DIR_NAME;
+            String xmlFilePath = dir + File.separator + CATEGORY_XML_NAME;
+
+            boolean fileExists = internalStorage.isFileExist(xmlFilePath);
+
+            Document doc = docBuilder.newDocument();
+
+            Element rootElement;
+            if (fileExists) {
+                doc = docBuilder.parse(new File(xmlFilePath));
+                rootElement = (Element) doc.getDocumentElement();
+            } else {
+                return null;
+            }
+
+            NodeList categories = doc.getElementsByTagName(CATEGORY_XML_ELEM);
+
+            for (int i = 0; i < categories.getLength(); i++) {
+                Node map = categories.item(i);
+
+                String name = map.getAttributes().getNamedItem(CATEGORY_XML_ELEM_ATTR_NAME).getNodeValue();
+                String bkgColor = map.getAttributes().getNamedItem(CATEGORY_XML_ELEM_ATTR_BKG).getNodeValue();
+                String notice = map.getAttributes().getNamedItem(CATEGORY_XML_ELEM_ATTR_NOTICE).getNodeValue();
+                String character = map.getAttributes().getNamedItem(CATEGORY_XML_ELEM_ATTR_CHARACTER).getNodeValue();
+
+                categoriesList.add(new LEDCategory(name, bkgColor, notice, character));
+            }
+
+        } catch (ParserConfigurationException | SAXException pce) {
+            pce.printStackTrace();
+        }
+
+        return categoriesList;
+    }
 
     /** Emergency Contacts **/
     public static void writeXmlEmergencyContacts(Context context, List<ContactItem> contactsData) throws IOException {
@@ -198,7 +324,6 @@ public class FileManager {
     }
 
     /** User **/
-
     // TODO: 29/10/2018 Insert Profile Bitmap Image in Server
     public static void writeUserProfile(Context context, Bitmap bitmap) {
         Storage internalStorage = new Storage(context);

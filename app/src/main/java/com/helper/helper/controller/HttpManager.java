@@ -53,6 +53,10 @@ public class HttpManager {
                 m_collection = Collection.TRACKING;
                 return true;
 
+            case "category" :
+                m_collection = Collection.CATEGORY;
+                return true;
+
             default:
                 return false;
         }
@@ -242,7 +246,12 @@ public class HttpManager {
                 /** Create URL **/
                 URL serverEndPoint = null;
                 try {
-                    serverEndPoint = new URL(m_serverURI + "/" + m_collection.getValue() + "?" + queryString);
+                    if( !queryString.equals("") ) {
+                        serverEndPoint = new URL(m_serverURI + "/" + m_collection.getValue() + "?" + queryString);
+                    } else {
+                        serverEndPoint = new URL(m_serverURI + "/" + m_collection.getValue());
+                    }
+
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }

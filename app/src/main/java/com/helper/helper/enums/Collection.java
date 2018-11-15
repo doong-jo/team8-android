@@ -10,7 +10,8 @@ public enum Collection {
     USER("user"),
     ACCIDENT("accident"),
     LED("led"),
-    TRACKING("tracking");
+    TRACKING("tracking"),
+    CATEGORY("category");
 
     private String value;
 
