@@ -59,6 +59,7 @@ import com.helper.helper.controller.UserManager;
 import com.helper.helper.controller.ViewStateManager;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
+import com.helper.helper.model.LEDCategory;
 import com.helper.helper.model.User;
 import com.helper.helper.view.assist.AssistActivity;
 import com.helper.helper.view.main.myeight.EightFragment;
@@ -76,6 +77,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -119,6 +122,9 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /** Http Server **/
+        HttpManager.setServerURI(getString(R.string.server_uri));
+
         final Activity activity = this;
 
         Log.d(TAG, "onCreate: ");
@@ -165,14 +171,7 @@ public class ScrollingActivity extends AppCompatActivity
         }
 
         /** Set Shop Data **/
-
-        // 1. get Data from server
         startInitializeShopData();
-
-        //  1.1. write xml file
-
-
-        // 2. read xml file
 
         /** ToolBar **/
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -251,9 +250,6 @@ public class ScrollingActivity extends AppCompatActivity
         /*************************************************************/
 
 
-        /** Http Server **/
-        HttpManager.setServerURI(getString(R.string.server_uri));
-
         /** Request permissions **/
         if (!PermissionManager.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION) ||
                 !PermissionManager.checkPermissions(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
@@ -296,8 +292,25 @@ public class ScrollingActivity extends AppCompatActivity
                     @Override
                     public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
                         int arrLen = existIdjsonArray.length();
-
                         // write category xml file
+                        List<LEDCategory> ledCategoryList = new ArrayList<>();
+
+                        for (int i = 0; i < existIdjsonArray.length(); i++) {
+                            JSONObject categoryObj = existIdjsonArray.getJSONObject(i);
+
+                            LEDCategory category = new LEDCategory(
+                                    categoryObj.getString("name"),
+                                    categoryObj.getString("backgroundColor"),
+                                    categoryObj.getString("notice"),
+                                    categoryObj.getString("character")
+                            );
+                            ledCategoryList.add(category);
+                        }
+                        try {
+                            FileManager.writeXmlCategory(getApplicationContext(), ledCategoryList);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override

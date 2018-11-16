@@ -67,7 +67,11 @@ public class HttpManager {
         m_serverURI = uri;
     }
 
-    private static String getAllKeyValueJSONObject(JSONObject obj) throws JSONException {
+    public static String getServerURI() {
+        return m_serverURI;
+    }
+
+    public static String getAllKeyValueJSONObject(JSONObject obj) throws JSONException {
         StringBuilder resultStr = new StringBuilder();
 
         Iterator<String> keys = obj.keys();
@@ -247,9 +251,14 @@ public class HttpManager {
                 URL serverEndPoint = null;
                 try {
                     if( !queryString.equals("") ) {
-                        serverEndPoint = new URL(m_serverURI + "/" + m_collection.getValue() + "?" + queryString);
+                        serverEndPoint = new URL(m_serverURI.concat("/")
+                                .concat(m_collection.getValue())
+                                .concat("?")
+                                .concat(queryString));
                     } else {
-                        serverEndPoint = new URL(m_serverURI + "/" + m_collection.getValue());
+                        serverEndPoint = new URL(m_serverURI
+                                .concat("/")
+                                .concat(m_collection.getValue()));
                     }
 
                 } catch (MalformedURLException e) {

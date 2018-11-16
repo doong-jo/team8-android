@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
 import com.helper.helper.model.LED;
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -78,13 +79,6 @@ public class LEDCardView extends FrameLayout {
     }
 
     private void setTypeArray(TypedArray typedArray) {
-//        m_hasClear = typedArray.getBoolean(R.styleable.FloatingEditTextAddonControl_clear_control, false);
-//        m_hasCheck = typedArray.getBoolean(R.styleable.FloatingEditTextAddonControl_check_control, false);
-//        String hintText = typedArray.getString(R.styleable.FloatingEditTextAddonControl_hint_text);
-//        m_textLength = typedArray.getInteger(R.styleable.FloatingEditTextAddonControl_text_length, 30);
-
-//        m_floatingLblEditTxt.setHint(hintText);
-
         typedArray.recycle();
     }
 
@@ -118,6 +112,10 @@ public class LEDCardView extends FrameLayout {
 
     public void setCardImageView(Bitmap bitmap) {
         m_cardImage.setImageBitmap(bitmap);
+    }
+
+    public void setCardImageView(String url) {
+        UrlImageViewHelper.setUrlDrawable(m_cardImage, url);
     }
 
     public void setCardNameText(String txt) {
