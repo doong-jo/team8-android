@@ -53,6 +53,10 @@ public class HttpManager {
                 m_collection = Collection.TRACKING;
                 return true;
 
+            case "category" :
+                m_collection = Collection.CATEGORY;
+                return true;
+
             default:
                 return false;
         }
@@ -63,7 +67,11 @@ public class HttpManager {
         m_serverURI = uri;
     }
 
-    private static String getAllKeyValueJSONObject(JSONObject obj) throws JSONException {
+    public static String getServerURI() {
+        return m_serverURI;
+    }
+
+    public static String getAllKeyValueJSONObject(JSONObject obj) throws JSONException {
         StringBuilder resultStr = new StringBuilder();
 
         Iterator<String> keys = obj.keys();
@@ -242,7 +250,17 @@ public class HttpManager {
                 /** Create URL **/
                 URL serverEndPoint = null;
                 try {
-                    serverEndPoint = new URL(m_serverURI + "/" + m_collection.getValue() + "?" + queryString);
+                    if( !queryString.equals("") ) {
+                        serverEndPoint = new URL(m_serverURI.concat("/")
+                                .concat(m_collection.getValue())
+                                .concat("?")
+                                .concat(queryString));
+                    } else {
+                        serverEndPoint = new URL(m_serverURI
+                                .concat("/")
+                                .concat(m_collection.getValue()));
+                    }
+
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }

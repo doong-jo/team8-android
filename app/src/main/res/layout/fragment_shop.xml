@@ -66,7 +66,7 @@
             >
 
             <FrameLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 >
                 <GridLayout
@@ -155,66 +155,19 @@
             >
 
             <FrameLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 >
 
                 <GridLayout
+                    android:id="@+id/categoryGrid"
                     android:layout_gravity="center_horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="11dp"
                     android:layout_marginRight="11dp"
                     android:orientation="horizontal">
-                    <com.helper.helper.view.widget.ImageCardViewAddonLong
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
 
-                    <com.helper.helper.view.widget.ImageCardViewAddonLong
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <com.helper.helper.view.widget.ImageCardViewAddonLong
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <com.helper.helper.view.widget.ImageCardViewAddonLong
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <com.helper.helper.view.widget.ImageCardViewAddonLong
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <com.helper.helper.view.widget.ImageCardViewAddonLong
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <com.helper.helper.view.widget.ImageCardViewAddonLong
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <com.helper.helper.view.widget.ImageCardViewAddonLong
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <com.helper.helper.view.widget.ImageCardViewAddonLong
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <com.helper.helper.view.widget.ImageCardViewAddonLong
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
                 </GridLayout>
             </FrameLayout>
         </HorizontalScrollView>
@@ -245,7 +198,7 @@
             >
 
             <FrameLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 >
 
@@ -336,7 +289,7 @@
             >
 
             <FrameLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="27dp"
                 >

@@ -57,7 +57,10 @@ import com.helper.helper.controller.GoogleMapManager;
 import com.helper.helper.controller.SMSManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.controller.ViewStateManager;
+import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
+import com.helper.helper.model.LEDCategory;
+import com.helper.helper.model.User;
 import com.helper.helper.view.assist.AssistActivity;
 import com.helper.helper.view.main.myeight.EightFragment;
 import com.helper.helper.view.main.myeight.InfoFragment;
@@ -68,10 +71,14 @@ import com.helper.helper.controller.PermissionManager;
 import com.helper.helper.view.widget.WrapContentViewPager;
 import com.snatik.storage.Storage;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -115,6 +122,9 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /** Http Server **/
+        HttpManager.setServerURI(getString(R.string.server_uri));
+
         final Activity activity = this;
 
         Log.d(TAG, "onCreate: ");
@@ -151,15 +161,17 @@ public class ScrollingActivity extends AppCompatActivity
                                 }
                             }
                         });
+                        /** Download User's LED **/
                         downloadUserDataLED.execute(UserManager.getUser().getUserLEDIndiciesURI(getString(R.string.server_uri)));
                     }
                 }
             });
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        /** Set Shop Data **/
+        startInitializeShopData();
 
         /** ToolBar **/
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -238,9 +250,6 @@ public class ScrollingActivity extends AppCompatActivity
         /*************************************************************/
 
 
-        /** Http Server **/
-        HttpManager.setServerURI(getString(R.string.server_uri));
-
         /** Request permissions **/
         if (!PermissionManager.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION) ||
                 !PermissionManager.checkPermissions(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
@@ -271,6 +280,48 @@ public class ScrollingActivity extends AppCompatActivity
         GyroManager.m_sensorAccel = GyroManager.m_sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         GyroManager.m_sensorMag = GyroManager.m_sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         /* Sensor end */
+    }
+
+    private void startInitializeShopData() {
+        if( HttpManager.useCollection("category") ) {
+
+            JSONObject reqObject = new JSONObject();
+            String str = reqObject.toString();
+            try {
+                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
+                        int arrLen = existIdjsonArray.length();
+                        // write category xml file
+                        List<LEDCategory> ledCategoryList = new ArrayList<>();
+
+                        for (int i = 0; i < existIdjsonArray.length(); i++) {
+                            JSONObject categoryObj = existIdjsonArray.getJSONObject(i);
+
+                            LEDCategory category = new LEDCategory(
+                                    categoryObj.getString("name"),
+                                    categoryObj.getString("backgroundColor"),
+                                    categoryObj.getString("notice"),
+                                    categoryObj.getString("character")
+                            );
+                            ledCategoryList.add(category);
+                        }
+                        try {
+                            FileManager.writeXmlCategory(getApplicationContext(), ledCategoryList);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(String err) {
+                        Log.d(TAG, "startInitializeShopData onError: " + err);
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /** Dialog **/

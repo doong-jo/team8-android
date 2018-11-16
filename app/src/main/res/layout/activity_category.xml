@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/parentConstraint"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/gray">
+
+    <LinearLayout
+        android:id="@+id/viewTopBar"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="18dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/backCategory"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:layout_marginTop="18dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_back_white"/>
+
+            <TextView
+                android:id="@+id/categoryName"
+                app:layout_constraintLeft_toRightOf="@id/backCategory"
+                app:layout_constraintTop_toBottomOf="@id/backCategory"
+                android:layout_marginTop="31dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                style="@style/HeadlineTypo"
+                android:text="No Category"/>
+
+            <TextView
+                android:id="@+id/categoryNotice"
+                app:layout_constraintLeft_toRightOf="@id/backCategory"
+                app:layout_constraintTop_toBottomOf="@id/categoryName"
+                android:layout_marginTop="26dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                style="@style/CategoryCardTitleTypo"
+                android:text="No notice"/>
+
+            <ImageView
+                android:id="@+id/categoryChar"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="24dp"
+                android:alpha="0.52"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+        </android.support.constraint.ConstraintLayout>
+
+
+    </LinearLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        app:layout_constraintTop_toBottomOf="@id/viewTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <GridLayout
+                android:id="@+id/categoryLEDGrid"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="@dimen/bottom_bar_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:columnCount="2">
+
+
+            </GridLayout>
+        </FrameLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+</android.support.constraint.ConstraintLayout>
+
