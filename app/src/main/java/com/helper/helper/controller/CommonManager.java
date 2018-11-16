@@ -18,4 +18,14 @@ public class CommonManager {
 
         return p.split(str);
     }
+
+    public static String[] getUriStringArrOfLED(String serverURI, String ledIndex) {
+        final int ledResourcesSize = 2;
+        String[] resultArr = new String[ledResourcesSize];
+
+        resultArr[0] = serverURI.concat("/images/LED/").concat(ledIndex).concat(".png");
+        resultArr[1] = serverURI.concat("/images/LED/").concat(ledIndex).concat(".gif");
+
+        return resultArr;
+    }
 }

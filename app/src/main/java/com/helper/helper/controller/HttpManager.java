@@ -67,10 +67,6 @@ public class HttpManager {
         m_serverURI = uri;
     }
 
-    public static String getServerURI() {
-        return m_serverURI;
-    }
-
     public static String getAllKeyValueJSONObject(JSONObject obj) throws JSONException {
         StringBuilder resultStr = new StringBuilder();
 

@@ -25,6 +25,7 @@
 
         <ImageView
             android:id="@+id/dlgImageLED"
+            app:layout_constraintTop_toBottomOf="@id/bookmarkToggle"
             android:layout_gravity="center_horizontal"
             android:layout_width="193.8dp"
             android:layout_height="193.8dp"
