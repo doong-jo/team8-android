@@ -91,6 +91,7 @@
     <string name="led_dialog_showon">디바이스에 적용</string>
     <string name="led_dialog_cancel">닫기</string>
     <string name="loading_dialog_user_data">사용자 데이터를 불러오는 중입니다..</string>
+    <string name="led_download_complete">Download Completely!</string>
 
     <!--LED Fragment-->
     <string name="cardTitleLEDDetail">Current LED</string>

@@ -76,12 +76,35 @@ public class DialogLED extends FrameLayout {
         Storage internalStorage = new Storage(m_context);
         String path = internalStorage.getInternalFilesDirectory();
         String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + m_ledData.getIndex() + ".gif";
-        File f=new File(openFilePath);
+        String openFilePath = dir.concat(File.separator)
+                .concat(m_ledData.getIndex())
+                .concat(".gif");
 
-        Glide.with(m_context)
-                .load(f)
-                .into(m_ImageLED);
+        if( internalStorage.isFileExist(openFilePath) ) {
+            File f=new File(openFilePath);
+
+            Glide.with(m_context)
+                    .load(f)
+                    .into(m_ImageLED);
+        } else {
+            /* Placeholder
+
+            Glide.with(getContext()).load(item[position])
+                .thumbnail(Glide.with(getContext()).load(R.drawable.preloader))
+                .fitCenter()
+                .crossFade()
+                .into(imageView);
+             */
+            Glide.with(m_context)
+                    .load(m_context.getString(R.string.server_uri)
+                            .concat("/images/LED/")
+                            .concat(m_ledData.getIndex())
+                            .concat(".gif"))
+                    .into(m_ImageLED);
+        }
+
+
+
 
         m_bIsBookmarked = m_ledData.getBookmarked();
         if( m_bIsBookmarked ) {
@@ -106,9 +129,6 @@ public class DialogLED extends FrameLayout {
             }
         });
         /*************************************************************/
-
-
-
 
         /** Do something about child widget **/
     }

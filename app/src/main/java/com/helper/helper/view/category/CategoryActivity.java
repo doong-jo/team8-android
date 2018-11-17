@@ -66,7 +66,7 @@ public class CategoryActivity extends AppCompatActivity
         categoryName.setText(m_thisCategory.getName());
         categoryNotice.setText(m_thisCategory.getNotice());
 
-        String url = HttpManager.getServerURI()
+        String url = getString(R.string.server_uri)
                 .concat("/")
                 .concat("images/LED/")
                 .concat(m_thisCategory.getCharacter())
@@ -94,7 +94,7 @@ public class CategoryActivity extends AppCompatActivity
                         //2. Add LED into GridView
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            LED led = new LED(
+                            final LED led = new LED(
                                     new LED.Builder()
                                             .index(jsonObject.getString("index"))
                                             .name(jsonObject.getString("name"))
@@ -106,11 +106,7 @@ public class CategoryActivity extends AppCompatActivity
                             LEDCardView cardViewLED = new LEDCardView(m_thisActivity);
                             cardViewLED.setCardNameText(led.getName());
 
-                            // TODO: 16/11/2018 get url Image
-//                            File f=new File(getOpenFilePath(ledInfo.getIndex()));
-//                            Bitmap cardImageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
-
-                            String url = HttpManager.getServerURI()
+                            String url = getString(R.string.server_uri)
                                     .concat("/")
                                     .concat("images/LED/")
                                     .concat(led.getIndex())
@@ -118,25 +114,19 @@ public class CategoryActivity extends AppCompatActivity
 
                             cardViewLED.setCardImageView(url);
 
-                            // TODO: 16/11/2018 SET DOWNLOAD_DIALOG_TYPE
-                            cardViewLED.setOnClickCustomDialogEnable(LEDCardView.NORMAL_DIALOG_TYPE, led, m_thisActivity);
-
                             final LEDCardView targetCardView = cardViewLED;
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    targetCardView.setOnClickCustomDialogEnable(LEDCardView.DOWNLOAD_DIALOG_TYPE, led, m_thisActivity);
                                     m_categoryLEDGrid.addView(targetCardView);
                                 }
                             });
                         }
-
-                        /** Add GridView (Bookmared or Downloaded) **/
                     }
 
                     @Override
-                    public void onError(String err) {
-
-                    }
+                    public void onError(String err) { }
                 });
             } catch (JSONException e) {
                 e.printStackTrace();
