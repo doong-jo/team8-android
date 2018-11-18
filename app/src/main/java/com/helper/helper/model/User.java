@@ -36,6 +36,9 @@ public class User {
     private ArrayList<String> m_ledBookmarked;
     private ArrayList<String> m_trackIndicies;
 
+    /** Not Collection field **/
+    private String m_userLEDIndex;
+
     public static final String KEY_LASTPOSITON = "lastPosition";
     public static final String KEY_LED_INDICIES = "ledIndicies";
     public static final String KEY_LED_BOOKMARKED = "ledBookmarked";
@@ -221,6 +224,10 @@ public class User {
         m_userRidingType = ridingType;
     }
 
+    public void setLEDIndex(String ledIndex) {
+        m_userLEDIndex = ledIndex;
+    }
+
     public String getUserEmail() {
         return m_userEmail;
     }
@@ -291,5 +298,9 @@ public class User {
             e.printStackTrace();
         }
         return obj;
+    }
+
+    public String getUserLEDIndex() {
+        return m_userLEDIndex;
     }
 }
