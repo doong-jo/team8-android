@@ -182,7 +182,7 @@ public class LoginFragment extends Fragment {
             return;
         }
 
-        if( HttpManager.useCollection("user") ) {
+        if( HttpManager.useCollection(getString(R.string.collection_user)) ) {
             JSONObject reqObject = new JSONObject();
             try {
                 reqObject.put("email", email);
@@ -192,7 +192,7 @@ public class LoginFragment extends Fragment {
             }
 
             try {
-                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override
                     public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
                         int arrLen = existIdjsonArray.length();

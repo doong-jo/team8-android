@@ -283,12 +283,12 @@ public class ScrollingActivity extends AppCompatActivity
     }
 
     private void startInitializeShopData() {
-        if( HttpManager.useCollection("category") ) {
+        if( HttpManager.useCollection(getString(R.string.collection_category)) ) {
 
             JSONObject reqObject = new JSONObject();
             String str = reqObject.toString();
             try {
-                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override
                     public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
                         int arrLen = existIdjsonArray.length();
@@ -326,6 +326,7 @@ public class ScrollingActivity extends AppCompatActivity
 
     /** Dialog **/
     private SweetAlertDialog resetAccDialog() {
+        final Context thisContext = this;
         return
             new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
                     .setTitleText("Are you Ok?")
@@ -337,7 +338,7 @@ public class ScrollingActivity extends AppCompatActivity
                         public void onClick(final SweetAlertDialog sDialog) {
                             startAlertEmergencyContacts();
                             try {
-                                EmergencyManager.insertAccidentinServer(UserManager.getUser(), EmergencyManager.getAccLocation(), true);
+                                EmergencyManager.insertAccidentinServer(thisContext, UserManager.getUser(), EmergencyManager.getAccLocation(), true);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

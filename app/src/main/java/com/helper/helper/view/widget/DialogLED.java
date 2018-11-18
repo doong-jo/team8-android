@@ -105,29 +105,35 @@ public class DialogLED extends FrameLayout {
 
 
 
+        if( m_dlgMode == LEDCardView.DETAIL_DIALOG_TYPE ) {
+            m_bIsBookmarked = m_ledData.getBookmarked();
+            if (m_bIsBookmarked) {
+                m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
+            } else {
+                m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
+            }
 
-        m_bIsBookmarked = m_ledData.getBookmarked();
-        if( m_bIsBookmarked ) {
-            m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
+            m_downloadCnt.setText(String.valueOf(m_ledData.getDownloadCnt()));
         } else {
-            m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
+            m_bookmarkToggle.setVisibility(View.GONE);
         }
 
-        m_downloadCnt.setText(String.valueOf(m_ledData.getDownloadCnt()));
-
         /******************* Make Listener in View *******************/
-        m_bookmarkToggle.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if( m_bIsBookmarked ) {
-                    m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
-                } else {
-                    m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
-                }
+        if( m_dlgMode == LEDCardView.DETAIL_DIALOG_TYPE ) {
+            m_bookmarkToggle.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if( m_bIsBookmarked ) {
+                        m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
+                    } else {
+                        m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
+                    }
 
-                m_bIsBookmarked = !m_bIsBookmarked;
-            }
-        });
+                    m_bIsBookmarked = !m_bIsBookmarked;
+                }
+            });
+        }
+
         /*************************************************************/
 
         /** Do something about child widget **/

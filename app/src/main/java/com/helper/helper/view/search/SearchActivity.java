@@ -146,7 +146,7 @@ public class SearchActivity extends AppCompatActivity
     public void trySearch() {
         String name = m_searchInput.getText();
 
-        if (HttpManager.useCollection("led")) {
+        if (HttpManager.useCollection(getString(R.string.collection_led))) {
             JSONObject reqObject = new JSONObject();
             try {
                 name = "^"+name;
@@ -156,7 +156,7 @@ public class SearchActivity extends AppCompatActivity
                 e.printStackTrace();
             }
             try {
-                HttpManager.requestHttp(reqObject, "GET", "regex", new HttpCallback() {
+                HttpManager.requestHttp(reqObject, "", "GET", "regex", new HttpCallback() {
 
                     @Override
                     public void onSuccess(JSONArray searchNamejsonArray) throws JSONException {

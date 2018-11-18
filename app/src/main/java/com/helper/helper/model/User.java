@@ -227,6 +227,10 @@ public class User {
         return m_ledIndicies.toString();
     }
 
+    public ArrayList<String> getUserLEDArray() {
+        return m_ledIndicies;
+    }
+
     public String[] getUserLEDIndiciesURI(String baseUri) {
         String pureStr = getUserLEDIndicies();
         String ledStr = pureStr.split("\\[")[1].split("]")[0];

@@ -339,14 +339,14 @@ public class JoinFragment extends Fragment {
     }
 
     private void getResultExistEmail(User user, final ValidateCallback callback) throws  JSONException {
-        if( HttpManager.useCollection("user") ) {
+        if( HttpManager.useCollection(getString(R.string.collection_user)) ) {
 
             JSONObject reqObject = user.getTransformUserToJSON();
             reqObject.remove("emergency");
             reqObject.remove("lastAccess");
 
 
-            HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
+            HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                 @Override
                 public void onSuccess(JSONArray jsonArray) throws JSONException {
                     if( jsonArray.length() != 0  ) {

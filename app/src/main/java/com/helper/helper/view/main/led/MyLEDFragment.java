@@ -87,7 +87,7 @@ public class MyLEDFragment extends Fragment {
 
         m_mapDataLED = new HashMap<>();
 
-        if( HttpManager.useCollection("led") ) {
+        if( HttpManager.useCollection(getString(R.string.collection_led)) ) {
             try {
                 JSONObject reqObject = new JSONObject();
                 JSONObject inObject = new JSONObject();
@@ -95,7 +95,7 @@ public class MyLEDFragment extends Fragment {
                 inObject.put("$in", ledIndicies);
                 reqObject.put("index", inObject);
 
-                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override
                     public void onSuccess(JSONArray jsonArray) throws JSONException {
                         for (int i = 0; i < jsonArray.length(); i++) {

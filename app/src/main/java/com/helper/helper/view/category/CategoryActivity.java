@@ -83,12 +83,12 @@ public class CategoryActivity extends AppCompatActivity
 
     private void addLEDintoCategoryGrid() {
         //1/ get List of category
-        if( HttpManager.useCollection("led") ) {
+        if( HttpManager.useCollection(getString(R.string.collection_led)) ) {
             try {
                 final JSONObject reqObject = new JSONObject();
                 reqObject.put("category", m_thisCategory.getName());
 
-                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override
                     public void onSuccess(JSONArray jsonArray) throws JSONException {
                         //2. Add LED into GridView

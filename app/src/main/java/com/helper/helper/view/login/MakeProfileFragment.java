@@ -135,7 +135,7 @@ public class MakeProfileFragment extends Fragment {
                 JSONObject jsonObject = UserManager.getUser().getTransformUserToJSON();
 
                 try {
-                    HttpManager.requestHttp(jsonObject, "POST", new HttpCallback() {
+                    HttpManager.requestHttp(jsonObject, "", "POST", "", new HttpCallback() {
                         @Override
                         public void onSuccess(JSONArray jsonArray) throws JSONException {
                             JSONObject obj = (JSONObject)jsonArray.get(0);
