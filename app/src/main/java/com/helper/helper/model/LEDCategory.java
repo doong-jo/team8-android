@@ -1,10 +1,16 @@
 package com.helper.helper.model;
 
+/** Compatible Collection **/
 public class LEDCategory {
     private String m_name;
     private String m_bkgColor;
     private String m_notice;
     private String m_character;
+
+    public static final String KEY_NAME = "name";
+    public static final String KEY_BKGCOLOR = "backgroundColor";
+    public static final String KEY_NOTICE = "notice";
+    public static final String KEY_CHARACTER = "character";
 
     public LEDCategory(String name, String bkgColor, String notice, String character) {
         super();

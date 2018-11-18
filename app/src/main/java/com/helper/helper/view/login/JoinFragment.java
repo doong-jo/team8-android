@@ -7,18 +7,11 @@
 
 package com.helper.helper.view.login;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatCheckBox;
-import android.telephony.TelephonyManager;
-import android.text.Editable;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,9 +24,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.ahmadrosid.library.FloatingLabelEditText;
 import com.helper.helper.R;
 import com.helper.helper.controller.FormManager;
 import com.helper.helper.controller.UserManager;
@@ -42,7 +33,6 @@ import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.User;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.controller.HttpManager;
-import com.helper.helper.controller.PermissionManager;
 import com.helper.helper.view.widget.FloatingEditTextAddonControl;
 import com.helper.helper.view.widget.SnackBar;
 
@@ -342,8 +332,8 @@ public class JoinFragment extends Fragment {
         if( HttpManager.useCollection(getString(R.string.collection_user)) ) {
 
             JSONObject reqObject = user.getTransformUserToJSON();
-            reqObject.remove("emergency");
-            reqObject.remove("lastAccess");
+            reqObject.remove(User.KEY_EMERGENCY);
+            reqObject.remove(User.KEY_LAST_ACCESS);
 
 
             HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {

@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-//import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.helper.helper.R;
 import com.helper.helper.controller.ViewStateManager;
 
@@ -34,7 +33,7 @@ public class LEDFragment extends Fragment {
 
         setChildFragment(new LEDShopFragment());
 
-        bottomNavigationView = (BottomNavigationView) view.findViewById(R.id.bottomNavigationView_led_menu);
+        bottomNavigationView = view.findViewById(R.id.bottomNavigationView_led_menu);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {

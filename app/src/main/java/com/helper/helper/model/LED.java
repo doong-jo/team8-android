@@ -9,10 +9,17 @@ package com.helper.helper.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
+/** Compatible Collection **/
 public class LED {
     public static final String LED_TYPE_FREE = "free";
     public static final String LED_TYPE_PREMIUM = "premium";
+
+    public static final String KEY_INDEX = "index";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_CREATOR = "creator";
+    public static final String KEY_CATEGORY = "category";
+    public static final String KEY_DOWNLOADCNT = "downloadcnt";
+    public static final String KEY_TYPE = "type";
 
     private String m_index;
     private String m_name;
@@ -131,21 +138,21 @@ public class LED {
 
         try {
             if( !m_index.equals("")) {
-                obj.put("index", m_index);
+                obj.put(LED.KEY_INDEX, m_index);
             }
             if( !m_name.equals("")) {
-                obj.put("name", m_name);
+                obj.put(LED.KEY_NAME, m_name);
             }
             if( !m_category.equals("") ) {
-                obj.put("category", m_category);
+                obj.put(LED.KEY_CATEGORY, m_category);
             }
             if( !m_creator.equals("")) {
-                obj.put("creator", m_creator);
+                obj.put(LED.KEY_CREATOR, m_creator);
             }
-            obj.put("downloadcnt", m_downloadCnt);
+            obj.put(LED.KEY_DOWNLOADCNT, m_downloadCnt);
 
             if( !m_type.equals("")) {
-                obj.put("type", m_type);
+                obj.put(LED.KEY_TYPE, m_type);
             }
 
         } catch (JSONException e) {

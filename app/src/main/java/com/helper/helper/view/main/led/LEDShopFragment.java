@@ -112,10 +112,10 @@ public class LEDShopFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     Intent intent=new Intent(getActivity(),CategoryActivity.class);
-                    intent.putExtra("name", categoryData.getName());
-                    intent.putExtra("bkgColor", categoryData.getBkgColor());
-                    intent.putExtra("notice", categoryData.getNotice());
-                    intent.putExtra("character", categoryData.getCharacter());
+                    intent.putExtra(LEDCategory.KEY_NAME, categoryData.getName());
+                    intent.putExtra(LEDCategory.KEY_BKGCOLOR, categoryData.getBkgColor());
+                    intent.putExtra(LEDCategory.KEY_NOTICE, categoryData.getNotice());
+                    intent.putExtra(LEDCategory.KEY_CHARACTER, categoryData.getCharacter());
                     startActivity(intent);
                 }
             });
@@ -126,7 +126,7 @@ public class LEDShopFragment extends Fragment {
         Storage internalStorage = new Storage(getActivity());
         String path = internalStorage.getInternalFilesDirectory();
         String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + ledIndex + ".gif";
+        String openFilePath = dir + File.separator + ledIndex + getString(R.string.gif_format);
 
         return openFilePath;
     }
