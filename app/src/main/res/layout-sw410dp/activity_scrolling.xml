@@ -16,18 +16,18 @@
         android:fitsSystemWindows="true"
         tools:context=".view.ScrollingActivity">
 
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/app_bar"
+        <com.helper.helper.view.layout.HeaderLayout
+            android:id="@+id/header_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
+            android:orientation="vertical"
+            app:layout_behavior="com.helper.helper.view.layout.HeaderScrollBehavior">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_scrollFlags="scroll|enterAlways|snap"
-
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:navigationIcon="@drawable/ic_menu"
                 app:navigationContentDescription="user navigation"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
@@ -54,7 +54,7 @@
                 app:tabIndicatorHeight="4.56dp"
                 app:tabTextColor="@color/xxxgray" />
 
-        </android.support.design.widget.AppBarLayout>
+        </com.helper.helper.view.layout.HeaderLayout>
 
         <include layout="@layout/content_scrolling" />
 
@@ -69,3 +69,6 @@
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />
 </android.support.v4.widget.DrawerLayout>
+
+<!--scroll|exitUntilCollapsed-->
+<!--app:layout_scrollFlags="scroll|enterAlways|snap"-->
