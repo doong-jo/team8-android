@@ -7,6 +7,11 @@
 package com.helper.helper.controller;
 
 
+import android.content.Context;
+
+import com.snatik.storage.Storage;
+
+import java.io.File;
 import java.util.regex.Pattern;
 
 public class CommonManager {
@@ -27,5 +32,14 @@ public class CommonManager {
         resultArr[1] = serverURI.concat("/images/LED/").concat(ledIndex).concat(".gif");
 
         return resultArr;
+    }
+
+    public static String getOpenLEDFilePath(Context context, String ledIndex, String format) {
+        Storage internalStorage = new Storage(context);
+        String path = internalStorage.getInternalFilesDirectory();
+        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
+        String openFilePath = dir + File.separator + ledIndex + format;
+
+        return openFilePath;
     }
 }

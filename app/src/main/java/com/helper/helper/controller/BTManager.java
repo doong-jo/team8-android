@@ -21,6 +21,8 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.google.android.gms.common.internal.service.Common;
+import com.helper.helper.R;
 import com.helper.helper.interfaces.BluetoothReadCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.snatik.storage.Storage;
@@ -283,16 +285,18 @@ public class BTManager {
         }
     }
 
-    public static void writeToBluetoothDevice(byte[] bytes) {
+    public static boolean writeToBluetoothDevice(byte[] bytes) {
         if( m_bluetoothOutput == null ) {
-            return;
+            return false;
         }
 
         try {
             m_bluetoothOutput.write(bytes);
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
             stopReadThread();
+            return false;
 //            Toast.makeText(m_activity, "블루투스 신호 전송에 실패했습니다.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -339,17 +343,8 @@ public class BTManager {
         }
     }
 
-    private static String getOpenFilePath(Context context, String ledIndex) {
-        Storage internalStorage = new Storage(context);
-        String path = internalStorage.getInternalFilesDirectory();
-        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + ledIndex + ".png";
-
-        return openFilePath;
-    }
-
     private static void setBitmapByteArray(Context context, String ledIndex) throws IOException {
-        String path = getOpenFilePath(context, ledIndex);
+        String path = CommonManager.getOpenLEDFilePath(context, ledIndex, context.getString(R.string.gif_format));
 
         File file = new File(path);
 
@@ -362,22 +357,6 @@ public class BTManager {
             DataInputStream dis = new DataInputStream(fis);
             dis.readFully(m_outBitmapByteArr);
         }
-    }
-
-    private static byte[] getByte(String path) {
-        byte[] getBytes = {};
-        try {
-            File file = new File(path);
-            getBytes = new byte[(int) file.length()];
-            InputStream is = new FileInputStream(file);
-            is.read(getBytes);
-            is.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return getBytes;
     }
 
 //    public static byte[] extractBytes (String ImageName) throws IOException {
@@ -443,7 +422,6 @@ public class BTManager {
                         BT_SIGNAL_DOWNLOAD_DONE_LED.getBytes()
                 );
                 doneOutputBitmap();
-                return;
             } else {
                 resultByteArray = new byte[signalByteArray.length + m_outBitmapByteArr.length];
                 System.arraycopy(signalByteArray, 0, resultByteArray, 0, signalByteArray.length);
@@ -502,9 +480,11 @@ public class BTManager {
         };
 
         /** 0. Ask Device about exists **/
-        writeToBluetoothDevice(BT_SIGNAL_ASK_LED
+        if( writeToBluetoothDevice(BT_SIGNAL_ASK_LED
                 .concat(BLUETOOTH_SIGNAL_SEPARATE)
                 .concat(ledIndex)
-                .getBytes());
+                .getBytes()) ) {
+            UserManager.setUserLEDcurShowOn(context, ledIndex);
+        }
     }
 }

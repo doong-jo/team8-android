@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
+import com.helper.helper.controller.CommonManager;
 import com.helper.helper.controller.DownloadImageTask;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.BluetoothReadCallback;
@@ -43,6 +44,8 @@ public class InfoFragment extends Fragment {
     private ImageView m_thumbImg;
     /**************************************************************/
 
+    private static boolean m_bIsSetDeviceInfo;
+
     public InfoFragment() {
 
     }
@@ -59,6 +62,8 @@ public class InfoFragment extends Fragment {
         m_thumbImg = view.findViewById(R.id.curledImageThumb);
         /*******************************************************************/
 
+        UserManager.setUserLEDDeviceShowOnThumb(m_thumbImg);
+
         String tempName = "조성동";
         m_myledsLayout.bringToFront();
 
@@ -68,9 +73,15 @@ public class InfoFragment extends Fragment {
         /** Read Bluetooth Signal -> Callback **/
         m_bluetoothReadCallback = new BluetoothReadCallback() {
             @Override
-            public void onResult(String signalStr) {
+            public void onResult(final String signalStr) {
                 if( signalStr.split("info").length != 0 ) {
-                    setDeviceInfo(signalStr);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setDeviceInfo(signalStr);
+                        }
+                    });
+
                 }
             }
         };
@@ -78,10 +89,14 @@ public class InfoFragment extends Fragment {
         BTManager.setReadResultCb(m_bluetoothReadCallback);
 
         /** Initialize Device info from bluetooth signal After pairing complete**/
-        String lastSignalStr = BTManager.getLastSignalStr();
 
-        if( lastSignalStr.split("/").length != 0 ) {
-            setDeviceInfo(BTManager.getLastSignalStr());
+        if( !m_bIsSetDeviceInfo ) {
+            m_bIsSetDeviceInfo = true;
+            String lastSignalStr = BTManager.getLastSignalStr();
+
+            if( lastSignalStr.split("/").length != 0 ) {
+                setDeviceInfo(BTManager.getLastSignalStr());
+            }
         }
 
         return view;
@@ -90,12 +105,21 @@ public class InfoFragment extends Fragment {
     private void setDeviceInfo(String signalStr) {
         if( signalStr.equals("") ) { return; }
         String[] splitStr = signalStr.split("/");
+        if( splitStr.length <= 1 ) {
+            return;
+        }
 
         String ledVal = splitStr[1];
         float spdVal = Float.parseFloat(splitStr[2]);
         float brtVal = Float.parseFloat(splitStr[3]);
 
-        File f=new File(getOpenFilePath(ledVal));
+        UserManager.getUser().setLEDIndex(ledVal);
+
+        File f=new File(
+                CommonManager.getOpenLEDFilePath(
+                        getContext(),
+                        ledVal,
+                        getString(R.string.gif_format)));
         try {
             Bitmap imageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
             m_thumbImg.setImageBitmap(imageBitmap);
@@ -160,15 +184,6 @@ public class InfoFragment extends Fragment {
             }
         });
         /*************************************************************/
-    }
-
-    private String getOpenFilePath(String ledIndex) {
-        Storage internalStorage = new Storage(getActivity());
-        String path = internalStorage.getInternalFilesDirectory();
-        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + ledIndex + ".gif";
-
-        return openFilePath;
     }
 
     private String setSeekValueCalculate(int val) {

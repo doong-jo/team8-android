@@ -8,6 +8,8 @@ package com.helper.helper.controller;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.widget.ImageView;
 
 import com.helper.helper.R;
 import com.helper.helper.enums.Collection;
@@ -19,12 +21,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class UserManager {
     private final static String TAG = UserManager.class.getSimpleName() + "/DEV";
     private static Bitmap m_userProfileBitmap;
     private static User m_user;
+    private static ImageView m_userLEDcurShowOn;
 
     public static int DONE_SET_USER = 1;
 
@@ -64,6 +70,29 @@ public class UserManager {
 
     public static void setUserProfileBitmap(Bitmap bitmap) { m_userProfileBitmap = bitmap; }
 
+    public static void setUserLEDDeviceShowOnThumb(ImageView view ) {
+        m_userLEDcurShowOn = view;
+    }
+
+    public static void setUserLEDcurShowOn(Context context, String ledIndex) {
+        m_user.setLEDIndex(ledIndex);
+
+        if ( m_userLEDcurShowOn != null ) {
+            File f=new File(
+                    CommonManager.getOpenLEDFilePath(
+                        context,
+                        ledIndex,
+                        context.getString(R.string.gif_format))
+            );
+            try {
+                Bitmap imageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
+                UserManager.getuserLEDcurShowOn().setImageBitmap(imageBitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static String getUserEmail() {
         return m_user.getUserEmail();
     }
@@ -84,6 +113,10 @@ public class UserManager {
 
     public static Bitmap getUserProfileBitmap() {
         return m_userProfileBitmap;
+    }
+
+    public static ImageView getuserLEDcurShowOn() {
+        return m_userLEDcurShowOn;
     }
 
     public static void updateUserInfoServerAndXml(Context context) {
