@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.helper.helper.R;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.snatik.storage.Storage;
 
@@ -81,7 +82,7 @@ public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
                 e.printStackTrace();
             }
 
-            if( saveFilePath.contains(".png") ) {
+            if( saveFilePath.contains(m_parentContext.getString(R.string.png_format)) ) {
                 try {
                     bitmap = BitmapFactory.decodeStream(in);
                 } catch (Exception e) {
@@ -92,7 +93,7 @@ public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
                 /** Bitmap to png file **/
                 bitmap.compress(Bitmap.CompressFormat.PNG, 0, filestream);
 
-            } else if( saveFilePath.contains(".gif") ) {
+            } else if( saveFilePath.contains(m_parentContext.getString(R.string.gif_format)) ) {
                 BufferedInputStream bis = new BufferedInputStream(in);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

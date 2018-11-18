@@ -68,9 +68,9 @@ public class CategoryActivity extends AppCompatActivity
 
         String url = getString(R.string.server_uri)
                 .concat("/")
-                .concat("images/LED/")
+                .concat(getString(R.string.led_resource_uri))
                 .concat(m_thisCategory.getCharacter())
-                .concat(".gif");
+                .concat(getString(R.string.gif_format));
 
         /** load image by url **/
 
@@ -108,9 +108,9 @@ public class CategoryActivity extends AppCompatActivity
 
                             String url = getString(R.string.server_uri)
                                     .concat("/")
-                                    .concat("images/LED/")
+                                    .concat(getString(R.string.led_resource_uri))
                                     .concat(led.getIndex())
-                                    .concat(".gif");
+                                    .concat(getString(R.string.gif_format));
 
                             cardViewLED.setCardImageView(url);
 

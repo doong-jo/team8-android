@@ -18,6 +18,7 @@ import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
 import com.helper.helper.controller.CommonManager;
 import com.helper.helper.controller.DownloadImageTask;
+import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LED;
@@ -27,6 +28,7 @@ import com.snatik.storage.Storage;
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.IOException;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -94,7 +96,6 @@ public class LEDCardView extends FrameLayout {
 
     private SweetAlertDialog makeDownloadDlg(final Activity activity, final LED ledData) {
         // TODO: 16/11/2018 if exist LED -> disable confirm button
-
 //        Storage internalStorage = new Storage(activity);
 //        String path = internalStorage.getInternalFilesDirectory();
 //        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
@@ -118,6 +119,7 @@ public class LEDCardView extends FrameLayout {
                 new SweetAlertDialog(activity, SweetAlertDialog.NORMAL_TYPE)
                         .setTitleText(ledData.getIndex().split("_")[1])
                         .setCancelText(activity.getString(R.string.led_dialog_cancel))
+                        /** Click Download **/
                         .setConfirmButton(activity.getString(R.string.led_dialog_download), new SweetAlertDialog.OnSweetClickListener() {
                             @Override
                             public void onClick(final SweetAlertDialog sweetAlertDialog) {
@@ -125,14 +127,27 @@ public class LEDCardView extends FrameLayout {
                                     @Override
                                     public void onDone(int resultCode) throws JSONException {
                                         if( resultCode == DownloadImageTask.DONE_LOAD_LED_IMAGES ) {
+                                            /** Update user info **/
+                                            UserManager.getUser().addLEDIndex(ledData.getIndex());
+
+                                            try {
+                                                FileManager.writeXmlUserInfo(activity, UserManager.getUser());
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
                                             activity.runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
                                                     sweetAlertDialog
                                                             .setTitleText(activity.getString(R.string.led_download_complete))
-                                                            .setConfirmText("OK")
-                                                            .showCancelButton(false)
-                                                            .setConfirmClickListener(null)
+                                                            /** Click Show 8 **/
+                                                            .setConfirmButton(activity.getString(R.string.led_dialog_showon), new SweetAlertDialog.OnSweetClickListener()
+                                                            {
+                                                                @Override
+                                                                public void onClick(final SweetAlertDialog sweetAlertDialog) {
+                                                                    BTManager.setShowOnDevice(activity, ledData.getIndex());
+                                                                    sweetAlertDialog.dismissWithAnimation();
+                                                                }})
                                                             .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
                                                 }
                                             });

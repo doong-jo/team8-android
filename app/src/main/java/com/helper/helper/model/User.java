@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
 public class User {
@@ -97,7 +98,7 @@ public class User {
             if( !ledIndicies.contains(",") ) {
                 m_ledIndicies.add(ledIndicies);
             } else {
-                String[] ledStrArr = ledIndicies.split(",");
+                String[] ledStrArr = ledIndicies.split(", ");
 
                 for (String str :
                         ledStrArr) {
@@ -155,6 +156,43 @@ public class User {
         m_ledIndicies = builder.m_ledIndicies;
         m_ledBookmarked = builder.m_ledBookmarked;
         m_trackIndicies = new ArrayList<String>();
+    }
+
+    public void addLEDIndex(String ledIndex) {
+        m_ledIndicies.add(ledIndex);
+    }
+
+    public void addBookmarkLEDIndex(String ledIndex) {
+        m_ledBookmarked.add(ledIndex);
+    }
+
+    /*
+    for (Iterator i = data.iterator(); i.hasNext(); ) {
+    Object element = i.next();
+
+    if ((..your conition..)) {
+       i.remove();
+    }
+}
+     */
+    public void removeLEDIndex(String targetIndex) {
+        for (Iterator i = m_ledIndicies.iterator(); i.hasNext(); ) {
+            String listOfIndex = (String) i.next();
+
+            if ( targetIndex.equals(listOfIndex) ) {
+                i.remove();
+            }
+        }
+    }
+
+    public void removeBookmarkLEDIndex(String targetIndex) {
+        for (Iterator i = m_ledBookmarked.iterator(); i.hasNext(); ) {
+            String listOfIndex = (String) i.next();
+
+            if ( targetIndex.equals(listOfIndex) ) {
+                i.remove();
+            }
+        }
     }
 
     public void setUserName(String name) {
