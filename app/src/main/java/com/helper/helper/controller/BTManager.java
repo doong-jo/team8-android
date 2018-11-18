@@ -18,6 +18,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.helper.helper.interfaces.BluetoothReadCallback;
@@ -66,6 +67,8 @@ public class BTManager {
     public static final String BT_SIGNAL_BRIGHTNESS = "B";
     public static final String BT_SIGNAL_SPEED = "S";
 
+    private static final int BT_READ_CLOCK_SLEEP = 100;
+
     public static final String BLUETOOTH_UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee";
     /** Android RFCOMM = 990byte(PAYLOAD) + 34byte(LC2CAP) **/
     public static final int BLUETOOTH_RFCOMM_PAYLOAD = 900;
@@ -74,6 +77,8 @@ public class BTManager {
     public static final int SUCCESS_BLUETOOTH_CONNECT = 1001;
     public static final int FAIL_BLUETOOTH_CONNECT = 1002;
     public static final int REQUEST_ENABLE_BT = 2001;
+
+
 
     /************************************************************/
 
@@ -91,8 +96,8 @@ public class BTManager {
                         bluetoothSignalHandler(result);
                     }
                 });
+                SystemClock.sleep(BT_READ_CLOCK_SLEEP);
             }
-
         }
     }
 
@@ -293,7 +298,7 @@ public class BTManager {
     }
 
     public static void readFromBluetoothDevice(BluetoothReadCallback callback) {
-        if (m_bluetoothInput == null) {
+        if (m_bluetoothInput == null ) {
             stopReadThread();
             return;
         }
@@ -306,6 +311,7 @@ public class BTManager {
             String readMessage = new String(buffer, 0, bytes);
             callback.onResult(readMessage);
         } catch (IOException e) {
+            Log.e(TAG, "readFromBluetoothDevice: StopBluetoothReadThread");
             stopReadThread();
             e.printStackTrace();
         }
@@ -319,6 +325,7 @@ public class BTManager {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            stopReadThread();
         }
     }
 
@@ -342,70 +349,19 @@ public class BTManager {
     }
 
     private static void setBitmapByteArray(Context context, String ledIndex) throws IOException {
-        /** 1. Read Image File **/
-//        Bitmap imageBitmap;
-//
-//        File f=new File(getOpenFilePath(context, ledIndex));
-//        imageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
-////            cardViewLED.setCardImageView(cardImageBitmap);
-//
-//        FileInputStream fstream = new FileInputStream(f);
-//
-//        /** Send File Data(byte) to Device **/
-//        m_outBitmapByteArrLED = new ByteArrayOutputStream();
-////        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, m_outBitmapByteArrLED);
-////        imageBitmap.recycle();
-//
-//        byte data[] = new byte[1024];
-//        long total = 0;
-//        int count = 0;
-//        try {
-//            while ((count = fstream.read(data)) != -1) {
-//                total += count;
-//                m_outBitmapByteArrLED.write(data, 0, count);
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        try {
-//            fstream.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-//        m_outBitmapByteArr = getByte(getOpenFilePath(context, ledIndex));
-
         String path = getOpenFilePath(context, ledIndex);
 
         File file = new File(path);
-        FileInputStream fis = new FileInputStream(file);
-//        byte[] data = new byte[(int) file.length()];
-//        fis.read(data);
-//        fis.close();
-//
-//        Path fileLocation = null;
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//            fileLocation = Paths.get(getOpenFilePath(context, ledIndex));
-//            byte[] java_7_byte = Files.readAllBytes(fileLocation);
-//            System.out.println(java_7_byte);
-//        }
 
-        m_outBitmapByteArr = new byte[(int) file.length()];
-        DataInputStream dis = new DataInputStream(fis);
-        dis.readFully(m_outBitmapByteArr);
-
-        File fi = new File(path);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            m_outBitmapByteArr = Files.readAllBytes(fi.toPath());
+            m_outBitmapByteArr = Files.readAllBytes(file.toPath());
+        } else {
+            FileInputStream fis = new FileInputStream(file);
+
+            m_outBitmapByteArr = new byte[(int) file.length()];
+            DataInputStream dis = new DataInputStream(fis);
+            dis.readFully(m_outBitmapByteArr);
         }
-
-        RandomAccessFile f = new RandomAccessFile(path, "r");
-        m_outBitmapByteArr = new byte[(int) f.length()];
-        f.read(m_outBitmapByteArr);
-        f.close();
-
-//        m_outBitmapByteArr = data;
     }
 
     private static byte[] getByte(String path) {
@@ -507,6 +463,7 @@ public class BTManager {
     }
 
     public static void setShowOnDevice(final Context context, final String ledIndex) {
+
         m_downloadLEDResultCb = new BluetoothReadCallback() {
             @Override
             public void onResult(String result) {

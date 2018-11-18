@@ -124,12 +124,12 @@ public class EmergencyManager {
 //        insertAccidentinServer(UserManager.getUser(), accLocation);
     }
 
-    public static void insertAccidentinServer(User user, Location accLocation, boolean bIsAlerted) throws JSONException {
+    public static void insertAccidentinServer(Context context, User user, Location accLocation, boolean bIsAlerted) throws JSONException {
         JSONObject locationObject = new JSONObject();
         locationObject.put("latitude", accLocation.getLatitude());
         locationObject.put("longitude", accLocation.getLongitude());
 
-        if (HttpManager.useCollection("accident")) {
+        if (HttpManager.useCollection(context.getString(R.string.collection_accident))) {
             JSONObject reqObject = new JSONObject();
             reqObject.put("user_id", user.getUserEmail());
             reqObject.put("riding_type", user.getUserRidingType());
@@ -143,7 +143,7 @@ public class EmergencyManager {
             reqObject.put("position", locationObject);
 
 
-            HttpManager.requestHttp(reqObject, "POST", new HttpCallback() {
+            HttpManager.requestHttp(reqObject, "", "POST", "", new HttpCallback() {
                 @Override
                 public void onSuccess(JSONArray jsonArray) throws JSONException {
                     Log.d(TAG, "insertAccidentinServer: onSuccess!");

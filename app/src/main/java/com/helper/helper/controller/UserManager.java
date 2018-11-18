@@ -6,13 +6,20 @@
 
 package com.helper.helper.controller;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
+import com.helper.helper.R;
+import com.helper.helper.enums.Collection;
+import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.User;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class UserManager {
     private final static String TAG = UserManager.class.getSimpleName() + "/DEV";
@@ -77,5 +84,42 @@ public class UserManager {
 
     public static Bitmap getUserProfileBitmap() {
         return m_userProfileBitmap;
+    }
+
+    public static void updateUserInfoServerAndXml(Context context) {
+        User curUser = UserManager.getUser();
+        try {
+            FileManager.writeXmlUserInfo(context, curUser);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject jsonQuery = new JSONObject();
+        try {
+            jsonQuery.put("email", curUser.getUserEmail());
+            jsonQuery.put("ledIndicies", curUser.getUserLEDIndicies());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+//        jsonQuery.put("ledIndicies", UserManager.getUser().getled);
+
+        if ( HttpManager.useCollection(context.getString(R.string.collection_user)) ) {
+            try {
+                HttpManager.requestHttp(jsonQuery, "email", "PUT", "", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray jsonArray) throws JSONException {
+                        int a = 1;
+//                        jsonArray
+                    }
+
+                    @Override
+                    public void onError(String err) throws JSONException {
+//                        err
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

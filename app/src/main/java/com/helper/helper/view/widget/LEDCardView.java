@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,6 +19,7 @@ import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
 import com.helper.helper.controller.CommonManager;
 import com.helper.helper.controller.DownloadImageTask;
+import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LED;
@@ -27,6 +29,7 @@ import com.snatik.storage.Storage;
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.IOException;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -94,57 +97,76 @@ public class LEDCardView extends FrameLayout {
 
     private SweetAlertDialog makeDownloadDlg(final Activity activity, final LED ledData) {
         // TODO: 16/11/2018 if exist LED -> disable confirm button
+        Storage internalStorage = new Storage(activity);
+        String path = internalStorage.getInternalFilesDirectory();
+        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
+        String openFilePathGif = dir.concat(File.separator)
+                .concat(ledData.getIndex())
+                .concat(".gif");
 
-//        Storage internalStorage = new Storage(activity);
-//        String path = internalStorage.getInternalFilesDirectory();
-//        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-//        String openFilePathGif = dir.concat(File.separator)
-//                .concat(ledData.getIndex())
-//                .concat(".gif");
-//
-//        String openFilePathpng = dir.concat(File.separator)
-//                .concat(ledData.getIndex())
-//                .concat(".png");
-//
-//        String confirmText;
+        String openFilePathpng = dir.concat(File.separator)
+                .concat(ledData.getIndex())
+                .concat(".png");
 
-//        if( internalStorage.isFileExist(openFilePathGif) && internalStorage.isFileExist(openFilePathpng) ) {
-//            confirmText = "";
-//        } else {
-//            confirmText = activity.getString(R.string.led_dialog_download);
-//        }
+        String confirmText;
 
-        return
-                new SweetAlertDialog(activity, SweetAlertDialog.NORMAL_TYPE)
-                        .setTitleText(ledData.getIndex().split("_")[1])
-                        .setCancelText(activity.getString(R.string.led_dialog_cancel))
-                        .setConfirmButton(activity.getString(R.string.led_dialog_download), new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(final SweetAlertDialog sweetAlertDialog) {
-                                DownloadImageTask downloadUserDataLED = new DownloadImageTask(activity, new ValidateCallback() {
-                                    @Override
-                                    public void onDone(int resultCode) throws JSONException {
-                                        if( resultCode == DownloadImageTask.DONE_LOAD_LED_IMAGES ) {
-                                            activity.runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    sweetAlertDialog
-                                                            .setTitleText(activity.getString(R.string.led_download_complete))
-                                                            .setConfirmText("OK")
-                                                            .showCancelButton(false)
-                                                            .setConfirmClickListener(null)
-                                                            .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
-                                                }
-                                            });
+        boolean IsNotDownloaded = false;
+        if( !internalStorage.isFileExist(openFilePathGif) || !internalStorage.isFileExist(openFilePathpng) ) {
+            IsNotDownloaded = true;
+        }
+
+        SweetAlertDialog downloadDlg = new SweetAlertDialog(activity, SweetAlertDialog.NORMAL_TYPE)
+                .setTitleText(ledData.getIndex().split("_")[1]);
+
+
+        if( IsNotDownloaded ) {
+            downloadDlg/** Click Download **/
+                    .setCancelText(activity.getString(R.string.led_dialog_cancel))
+                    .setConfirmButton(activity.getString(R.string.led_dialog_download), new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(final SweetAlertDialog sweetAlertDialog) {
+                            DownloadImageTask downloadUserDataLED = new DownloadImageTask(activity, new ValidateCallback() {
+                                @Override
+                                public void onDone(int resultCode) throws JSONException {
+                                    if( resultCode == DownloadImageTask.DONE_LOAD_LED_IMAGES ) {
+                                        /** Update user info **/
+                                        if( !UserManager.getUser().getUserLEDIndicies().contains(ledData.getIndex()) ) {
+                                            UserManager.getUser().addLEDIndex(ledData.getIndex());
                                         }
-                                    }
-                                });
-                                /** Download User's LED **/
-                                // uri + ledIndex
-                                downloadUserDataLED.execute(CommonManager.getUriStringArrOfLED(activity.getString(R.string.server_uri), ledData.getIndex()));
 
-                            }
-                        });
+                                        UserManager.updateUserInfoServerAndXml(activity);
+
+                                        activity.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                sweetAlertDialog
+                                                        .setTitleText(activity.getString(R.string.led_download_complete))
+                                                        /** Click Show 8 **/
+                                                        .setConfirmButton(activity.getString(R.string.led_dialog_showon), new SweetAlertDialog.OnSweetClickListener()
+                                                        {
+                                                            @Override
+                                                            public void onClick(final SweetAlertDialog sweetAlertDialog) {
+                                                                BTManager.setShowOnDevice(activity, ledData.getIndex());
+                                                                sweetAlertDialog.dismissWithAnimation();
+                                                            }})
+                                                        .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                            /** Download User's LED **/
+                            // uri + ledIndex
+                            downloadUserDataLED.execute(CommonManager.getUriStringArrOfLED(activity.getString(R.string.server_uri), ledData.getIndex()));
+
+                        }
+                    });
+        } else {
+            downloadDlg.showCancelButton(false);
+            downloadDlg.setConfirmButton("Already downloaded", null);
+        }
+
+        return downloadDlg;
     }
 
     private SweetAlertDialog makeDetailDlg(final Context context, final LED ledData) {

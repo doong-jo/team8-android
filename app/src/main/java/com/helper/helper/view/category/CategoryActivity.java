@@ -68,9 +68,9 @@ public class CategoryActivity extends AppCompatActivity
 
         String url = getString(R.string.server_uri)
                 .concat("/")
-                .concat("images/LED/")
+                .concat(getString(R.string.led_resource_uri))
                 .concat(m_thisCategory.getCharacter())
-                .concat(".gif");
+                .concat(getString(R.string.gif_format));
 
         /** load image by url **/
 
@@ -83,12 +83,12 @@ public class CategoryActivity extends AppCompatActivity
 
     private void addLEDintoCategoryGrid() {
         //1/ get List of category
-        if( HttpManager.useCollection("led") ) {
+        if( HttpManager.useCollection(getString(R.string.collection_led)) ) {
             try {
                 final JSONObject reqObject = new JSONObject();
                 reqObject.put("category", m_thisCategory.getName());
 
-                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override
                     public void onSuccess(JSONArray jsonArray) throws JSONException {
                         //2. Add LED into GridView
@@ -108,9 +108,9 @@ public class CategoryActivity extends AppCompatActivity
 
                             String url = getString(R.string.server_uri)
                                     .concat("/")
-                                    .concat("images/LED/")
+                                    .concat(getString(R.string.led_resource_uri))
                                     .concat(led.getIndex())
-                                    .concat(".gif");
+                                    .concat(getString(R.string.gif_format));
 
                             cardViewLED.setCardImageView(url);
 

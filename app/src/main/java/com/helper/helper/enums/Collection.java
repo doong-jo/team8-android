@@ -19,5 +19,9 @@ public enum Collection {
         this.value = value;
     }
 
+    public Collection toCollection(String str) {
+        return Collection.valueOf(str);
+    }
+
     public String getValue() { return value; }
 }
