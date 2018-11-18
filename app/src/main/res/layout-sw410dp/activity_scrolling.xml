@@ -9,9 +9,8 @@
     tools:openDrawer="end"
     android:background="@color/white">
 
-    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
@@ -28,6 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_scrollFlags="scroll|enterAlways|snap"
+
                 app:navigationIcon="@drawable/ic_menu"
                 app:navigationContentDescription="user navigation"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
@@ -46,7 +46,6 @@
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll|enterAlways|snap"
                 app:tabBackground="@color/white"
                 app:tabIndicatorColor="@color/tab_indicator_color"
                 app:tabRippleColor="@color/tab_indicator_color"

@@ -21,6 +21,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -100,6 +102,8 @@ public class ScrollingActivity extends AppCompatActivity
     private TabLayout m_tabLayout;
     private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
+
+    private NestedScrollView m_nestedScroll;
 
 
     private SweetAlertDialog m_accDialog;
@@ -227,6 +231,9 @@ public class ScrollingActivity extends AppCompatActivity
             }
         });
 
+        /** Nested Scroll **/
+        m_nestedScroll = findViewById(R.id.app_nestedScroll);
+
 
         /** Dialog **/
         m_accDialog = resetAccDialog();
@@ -271,6 +278,22 @@ public class ScrollingActivity extends AppCompatActivity
         GyroManager.m_sensorAccel = GyroManager.m_sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         GyroManager.m_sensorMag = GyroManager.m_sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         /* Sensor end */
+    }
+
+    protected View findAppBarScrollingChild(AppBarLayout appBarLayout) {
+        for (int i = 0; i < appBarLayout.getChildCount(); i++) {
+            View child = appBarLayout.getChildAt(i);
+            AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) child.getLayoutParams();
+            int flags = params.getScrollFlags();
+            if ((flags & AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL) != 0) {
+                if ((flags & AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED) != 0) {
+                    return child;
+                }
+            } else {
+                break;
+            }
+        }
+        return null;
     }
 
     /** Dialog **/

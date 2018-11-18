@@ -46,7 +46,6 @@
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll|enterAlways|snap"
                 app:tabBackground="@color/white"
                 app:tabIndicatorColor="@color/tab_indicator_color"
                 app:tabRippleColor="@color/tab_indicator_color"
