@@ -177,6 +177,8 @@ public class InfoFragment extends Fragment {
 
         if( val < 10 ) {
             seekValToString = "0" + String.valueOf(val);
+        } else {
+            seekValToString = "10";
         }
 
         return seekValToString;
