@@ -1,8 +1,6 @@
 package com.helper.helper.view.login;
 
 import android.os.Bundle;
-import android.transition.Slide;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -15,17 +13,16 @@ import com.daimajia.slider.library.Indicators.PagerIndicator;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
-import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.helper.helper.R;
-import com.helper.helper.controller.UserManager;
-import com.helper.helper.model.User;
 
-import java.util.HashMap;
 
 public class StartFragment extends Fragment implements BaseSliderView.OnSliderClickListener, ViewPagerEx.OnPageChangeListener{
     private final static String TAG = LoginFragment.class.getSimpleName() + "/DEV";
-    private static final int MAX_INTRO_IMGS = 3;
+
+    private static final int DELAY_START = 7000;
+    private static final int DELAY_SHOING = 5000;
+
     private SliderLayout m_slider;
 
     /******************* Define widgtes in view *******************/
@@ -55,9 +52,9 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
         /******************* Slider *******************/
 
         String[] imgUrlArr = new String[]{
-                getString(R.string.intro_service_url) + "1.png",
-                getString(R.string.intro_service_url) + "2.png",
-                getString(R.string.intro_service_url) + "3.png",
+                getString(R.string.intro_service_url).concat("1").concat(getString(R.string.png_format)),
+                getString(R.string.intro_service_url).concat("2").concat(getString(R.string.png_format)),
+                getString(R.string.intro_service_url).concat("3").concat(getString(R.string.png_format)),
         };
 
         for (int i = 0; i < imgUrlArr.length; i++) {
@@ -78,7 +75,7 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
         m_slider.setCustomIndicator((PagerIndicator) view.findViewById(R.id.custom_indicator));
         m_slider.setCustomAnimation(new DescriptionAnimation());
         m_slider.setCurrentPosition(0);
-        m_slider.startAutoCycle(7000, 7000, false);
+        m_slider.startAutoCycle(DELAY_START, DELAY_SHOING, false);
         m_slider.addOnPageChangeListener(this);
 
         /**********************************************/

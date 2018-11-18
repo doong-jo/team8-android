@@ -102,11 +102,11 @@ public class LEDCardView extends FrameLayout {
         String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
         String openFilePathGif = dir.concat(File.separator)
                 .concat(ledData.getIndex())
-                .concat(".gif");
+                .concat(activity.getString(R.string.gif_format));
 
         String openFilePathpng = dir.concat(File.separator)
                 .concat(ledData.getIndex())
-                .concat(".png");
+                .concat(activity.getString(R.string.png_format));
 
         String confirmText;
 

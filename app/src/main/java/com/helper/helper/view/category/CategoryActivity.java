@@ -37,10 +37,10 @@ public class CategoryActivity extends AppCompatActivity
         setContentView(R.layout.activity_category);
         m_thisActivity = this;
         m_thisCategory = new LEDCategory(
-                getIntent().getStringExtra("name"),
-                getIntent().getStringExtra("bkgColor"),
-                getIntent().getStringExtra("notice"),
-                getIntent().getStringExtra("character")
+                getIntent().getStringExtra(LEDCategory.KEY_NAME),
+                getIntent().getStringExtra(LEDCategory.KEY_BKGCOLOR),
+                getIntent().getStringExtra(LEDCategory.KEY_NOTICE),
+                getIntent().getStringExtra(LEDCategory.KEY_CHARACTER)
         );
 
         /******************* Connect widgtes with layout *******************/
@@ -86,7 +86,7 @@ public class CategoryActivity extends AppCompatActivity
         if( HttpManager.useCollection(getString(R.string.collection_led)) ) {
             try {
                 final JSONObject reqObject = new JSONObject();
-                reqObject.put("category", m_thisCategory.getName());
+                reqObject.put(LED.KEY_CATEGORY, m_thisCategory.getName());
 
                 HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override
@@ -96,11 +96,11 @@ public class CategoryActivity extends AppCompatActivity
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
                             final LED led = new LED(
                                     new LED.Builder()
-                                            .index(jsonObject.getString("index"))
-                                            .name(jsonObject.getString("name"))
-                                            .creator(jsonObject.getString("creator"))
-                                            .downloadCnt(jsonObject.getInt("downloadcnt"))
-                                            .type(jsonObject.getString("type"))
+                                            .index(jsonObject.getString(LED.KEY_INDEX))
+                                            .name(jsonObject.getString(LED.KEY_NAME))
+                                            .creator(jsonObject.getString(LED.KEY_CREATOR))
+                                            .downloadCnt(jsonObject.getInt(LED.KEY_DOWNLOADCNT))
+                                            .type(jsonObject.getString(LED.KEY_TYPE))
                             );
 
                             LEDCardView cardViewLED = new LEDCardView(m_thisActivity);

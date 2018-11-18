@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
+/** Compatible Collection **/
 public class User {
     private static final String SPLIT_COMMA_REGEX = ",\\s*";
 
@@ -35,6 +36,17 @@ public class User {
     private ArrayList<String> m_ledBookmarked;
     private ArrayList<String> m_trackIndicies;
 
+    public static final String KEY_LASTPOSITON = "lastPosition";
+    public static final String KEY_LED_INDICIES = "ledIndicies";
+    public static final String KEY_LED_BOOKMARKED = "ledBookmarked";
+    public static final String KEY_TRACK_INDICIES = "trackIndicies";
+    public static final String KEY_EMERGENCY = "emergency";
+    public static final String KEY_EMAIL = "email";
+    public static final String KEY_PASSWORD = "passwd";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_PHONE = "phone";
+    public static final String KEY_RIDING_TYPE = "riding_type";
+    public static final String KEY_LAST_ACCESS = "lastAccess";
 
     public static class Builder {
 

@@ -154,8 +154,8 @@ public class AddNameFragment extends Fragment {
         if( HttpManager.useCollection(getString(R.string.collection_user)) ) {
 
             JSONObject reqObject = user.getTransformUserToJSON();
-            reqObject.remove("emergency");
-            reqObject.remove("lastAccess");
+            reqObject.remove(User.KEY_EMERGENCY);
+            reqObject.remove(User.KEY_LAST_ACCESS);
 //            reqObject.put("lastAccess", new Date().toString());
 
             HttpManager.requestHttp(reqObject, "",  "GET", "", new HttpCallback() {

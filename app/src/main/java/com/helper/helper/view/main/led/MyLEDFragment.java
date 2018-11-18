@@ -102,11 +102,11 @@ public class MyLEDFragment extends Fragment {
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
                             LED led = new LED(
                                     new LED.Builder()
-                                            .index(jsonObject.getString("index"))
-                                            .name(jsonObject.getString("name"))
-                                            .creator(jsonObject.getString("creator"))
-                                            .downloadCnt(jsonObject.getInt("downloadcnt"))
-                                            .type(jsonObject.getString("type"))
+                                            .index(jsonObject.getString(LED.KEY_INDEX))
+                                            .name(jsonObject.getString(LED.KEY_NAME))
+                                            .creator(jsonObject.getString(LED.KEY_CREATOR))
+                                            .downloadCnt(jsonObject.getInt(LED.KEY_DOWNLOADCNT))
+                                            .type(jsonObject.getString(LED.KEY_TYPE))
                             );
                             m_mapDataLED.put(led.getIndex(), led);
                         }
@@ -219,7 +219,7 @@ public class MyLEDFragment extends Fragment {
         Storage internalStorage = new Storage(getActivity());
         String path = internalStorage.getInternalFilesDirectory();
         String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + ledIndex + ".gif";
+        String openFilePath = dir + File.separator + ledIndex + getString(R.string.gif_format);
 
         return openFilePath;
     }
