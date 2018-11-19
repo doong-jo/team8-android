@@ -47,55 +47,6 @@
                         android:layout_marginLeft="12.54dp"
                         android:layout_marginRight="12.54dp"
                         android:orientation="horizontal">
-                        <com.helper.helper.view.widget.LEDCardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.LEDCardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.LEDCardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.LEDCardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.LEDCardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.LEDCardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.LEDCardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.LEDCardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.LEDCardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.LEDCardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
                     </GridLayout>
                 </FrameLayout>
             </HorizontalScrollView>
