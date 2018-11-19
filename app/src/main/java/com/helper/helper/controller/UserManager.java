@@ -119,7 +119,7 @@ public class UserManager {
         return m_userLEDcurShowOn;
     }
 
-    public static void updateUserInfoServerAndXml(Context context) {
+    public static void updateUserInfoServerAndXml(Context context, JSONObject jsonQuery) throws JSONException {
         User curUser = UserManager.getUser();
         try {
             FileManager.writeXmlUserInfo(context, curUser);
@@ -127,14 +127,7 @@ public class UserManager {
             e.printStackTrace();
         }
 
-        JSONObject jsonQuery = new JSONObject();
-        try {
-            jsonQuery.put("email", curUser.getUserEmail());
-            jsonQuery.put("ledIndicies", curUser.getUserLEDIndicies());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-//        jsonQuery.put("ledIndicies", UserManager.getUser().getled);
+        jsonQuery.put(User.KEY_EMAIL, curUser.getUserEmail());
 
         if ( HttpManager.useCollection(context.getString(R.string.collection_user)) ) {
             try {

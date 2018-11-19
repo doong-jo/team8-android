@@ -12,8 +12,13 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.helper.helper.R;
 import com.helper.helper.controller.DownloadImageTask;
+import com.helper.helper.controller.UserManager;
 import com.helper.helper.model.LED;
+import com.helper.helper.model.User;
 import com.snatik.storage.Storage;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 
@@ -127,10 +132,31 @@ public class DialogLED extends FrameLayout {
             m_bookmarkToggle.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    /** set Bookmark into xml and server **/
                     if( m_bIsBookmarked ) {
                         m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
+                        User user = UserManager.getUser();
+                        user.removeBookmarkLEDIndex(m_ledData.getIndex());
+
+                        JSONObject jsonQuery = new JSONObject();
+                        try {
+                            jsonQuery.put(User.KEY_LED_BOOKMARKED, user.getUserBookmarked());
+                            UserManager.updateUserInfoServerAndXml(m_context, jsonQuery);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     } else {
                         m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
+                        User user = UserManager.getUser();
+                        user.addBookmarkLEDIndex(m_ledData.getIndex());
+
+                        JSONObject jsonQuery = new JSONObject();
+                        try {
+                            jsonQuery.put(User.KEY_LED_BOOKMARKED, user.getUserBookmarked());
+                            UserManager.updateUserInfoServerAndXml(m_context, jsonQuery);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     m_bIsBookmarked = !m_bIsBookmarked;

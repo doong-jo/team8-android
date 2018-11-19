@@ -22,6 +22,7 @@ import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LED;
+import com.helper.helper.model.User;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.snatik.storage.Storage;
 
@@ -124,11 +125,15 @@ public class LEDCardView extends FrameLayout {
                                 public void onDone(int resultCode) throws JSONException {
                                     if( resultCode == DownloadImageTask.DONE_LOAD_LED_IMAGES ) {
                                         /** Update user info **/
-                                        if( !UserManager.getUser().getUserLEDIndicies().contains(ledData.getIndex()) ) {
-                                            UserManager.getUser().addLEDIndex(ledData.getIndex());
-                                        }
+                                        User user = UserManager.getUser();
+                                        if( !user.getUserLEDIndicies().contains(ledData.getIndex()) ) {
+                                            user.addBookmarkLEDIndex(ledData.getIndex());
 
-                                        UserManager.updateUserInfoServerAndXml(activity);
+                                            JSONObject jsonObj = new JSONObject();
+                                            jsonObj.put(User.KEY_LED_INDICIES, user.getUserLEDIndicies());
+
+                                            UserManager.updateUserInfoServerAndXml(activity, jsonObj);
+                                        }
 
                                         JSONObject jsonObj = new JSONObject();
                                         jsonObj.put(LED.KEY_INDEX, ledData.getIndex());

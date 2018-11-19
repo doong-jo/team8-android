@@ -177,9 +177,7 @@ public class User {
         m_ledIndicies.add(ledIndex);
     }
 
-    public void addBookmarkLEDIndex(String ledIndex) {
-        m_ledBookmarked.add(ledIndex);
-    }
+    public void addBookmarkLEDIndex(String ledIndex) { m_ledBookmarked.add(ledIndex); }
 
     /*
     for (Iterator i = data.iterator(); i.hasNext(); ) {
@@ -246,6 +244,10 @@ public class User {
         return m_ledIndicies.toString();
     }
 
+    public String getUserBookmarked() {
+        return m_ledBookmarked.toString();
+    }
+
     public ArrayList<String> getUserLEDArray() {
         return m_ledIndicies;
     }
@@ -267,14 +269,11 @@ public class User {
         return resultArr;
     }
 
-    public String getUserBookmarked() {
-        return m_ledBookmarked.toString();
-    }
-
     public String getUserName() { return m_userName; }
 
     public Location getUserPosition() { return m_lastPosition; }
 
+    /** User LoginActivity **/
     public JSONObject getTransformUserToJSON() {
         JSONObject obj = new JSONObject();
 
