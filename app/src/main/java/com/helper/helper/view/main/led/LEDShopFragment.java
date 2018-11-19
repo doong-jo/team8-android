@@ -1,25 +1,22 @@
 package com.helper.helper.view.main.led;
 
+import android.os.Bundle;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Bundle;
-import android.support.design.widget.TextInputEditText;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
-import android.widget.ImageView;
 
 import com.helper.helper.R;
 import com.helper.helper.controller.DownloadImageTask;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.model.LEDCategory;
 import com.helper.helper.view.category.CategoryActivity;
-import com.helper.helper.view.search.SearchActivity;
 import com.helper.helper.view.widget.LEDCategoryCardView;
 import com.snatik.storage.Storage;
 
@@ -51,28 +48,11 @@ public class LEDShopFragment extends Fragment {
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
         View view = inflater.inflate( R.layout.fragment_shop, container, false );
         /******************* Connect widgtes with layout *******************/
-        TextInputEditText ledShopSearchEditTxt = view.findViewById(R.id.ledShopSearchEditTxt);
-        ImageView ledShopSearchBtn = view.findViewById(R.id.ledShopSearchBtn);
         m_caregoryGrid = view.findViewById(R.id.categoryGrid);
 
         /*******************************************************************/
 
         /******************* Make Listener in View *******************/
-        ledShopSearchEditTxt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(getActivity(),SearchActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        ledShopSearchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(getActivity(),SearchActivity.class);
-                startActivity(intent);
-            }
-        });
 
         /*************************************************************/
 

@@ -21,6 +21,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -107,6 +109,8 @@ public class ScrollingActivity extends AppCompatActivity
     private TabLayout m_tabLayout;
     private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
+
+    private NestedScrollView m_nestedScroll;
 
 
     private SweetAlertDialog m_accDialog;
@@ -238,6 +242,9 @@ public class ScrollingActivity extends AppCompatActivity
 
             }
         });
+
+        /** Nested Scroll **/
+        m_nestedScroll = findViewById(R.id.app_nestedScroll);
 
 
         /** Dialog **/

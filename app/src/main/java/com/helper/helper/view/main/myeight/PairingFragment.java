@@ -29,11 +29,6 @@ public class PairingFragment extends Fragment {
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), LookingActivity.class);
                 startActivity(intent);
-
-//                EightFragment fragment = (EightFragment)getParentFragment();
-//                if( fragment != null ) {
-//                    fragment.moveToFragment(new InfoFragment());
-//                }
             }
         });
 

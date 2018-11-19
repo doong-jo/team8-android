@@ -11,23 +11,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
-            <!--LED Detail-->
-
-            <!--LED List-->
     </LinearLayout>
-
-    <android.support.design.widget.BottomNavigationView
-        android:id="@+id/bottomNavigationView_led_menu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/white"
-        android:elevation="20dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:elevation="20dp"
-        app:itemBackground="@color/white"
-        app:itemIconTint="@color/bottom_bar_item_selector"
-        app:itemTextColor="@color/bottom_bar_item_selector"
-        app:menu="@menu/bottombar_menu"/>
 </RelativeLayout>
