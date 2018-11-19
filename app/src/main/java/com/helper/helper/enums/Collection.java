@@ -10,12 +10,17 @@ public enum Collection {
     USER("user"),
     ACCIDENT("accident"),
     LED("led"),
-    TRACKING("tracking");
+    TRACKING("tracking"),
+    CATEGORY("category");
 
     private String value;
 
     Collection(String value) {
         this.value = value;
+    }
+
+    public Collection toCollection(String str) {
+        return Collection.valueOf(str);
     }
 
     public String getValue() { return value; }

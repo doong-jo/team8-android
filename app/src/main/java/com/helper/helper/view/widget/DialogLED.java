@@ -76,39 +76,65 @@ public class DialogLED extends FrameLayout {
         Storage internalStorage = new Storage(m_context);
         String path = internalStorage.getInternalFilesDirectory();
         String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + m_ledData.getIndex() + ".gif";
-        File f=new File(openFilePath);
+        String openFilePath = dir.concat(File.separator)
+                .concat(m_ledData.getIndex())
+                .concat(".gif");
 
-        Glide.with(m_context)
-                .load(f)
-                .into(m_ImageLED);
+        if( internalStorage.isFileExist(openFilePath) ) {
+            File f=new File(openFilePath);
 
-        m_bIsBookmarked = m_ledData.getBookmarked();
-        if( m_bIsBookmarked ) {
-            m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
+            Glide.with(m_context)
+                    .load(f)
+                    .into(m_ImageLED);
         } else {
-            m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
+            /* Placeholder
+
+            Glide.with(getContext()).load(item[position])
+                .thumbnail(Glide.with(getContext()).load(R.drawable.preloader))
+                .fitCenter()
+                .crossFade()
+                .into(imageView);
+             */
+            Glide.with(m_context)
+                    .load(m_context.getString(R.string.server_uri)
+                            .concat("/images/LED/")
+                            .concat(m_ledData.getIndex())
+                            .concat(".gif"))
+                    .into(m_ImageLED);
         }
 
-        m_downloadCnt.setText(String.valueOf(m_ledData.getDownloadCnt()));
+
+
+        if( m_dlgMode == LEDCardView.DETAIL_DIALOG_TYPE ) {
+            m_bIsBookmarked = m_ledData.getBookmarked();
+            if (m_bIsBookmarked) {
+                m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
+            } else {
+                m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
+            }
+
+            m_downloadCnt.setText(String.valueOf(m_ledData.getDownloadCnt()));
+        } else {
+            m_bookmarkToggle.setVisibility(View.GONE);
+        }
 
         /******************* Make Listener in View *******************/
-        m_bookmarkToggle.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if( m_bIsBookmarked ) {
-                    m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
-                } else {
-                    m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
+        if( m_dlgMode == LEDCardView.DETAIL_DIALOG_TYPE ) {
+            m_bookmarkToggle.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if( m_bIsBookmarked ) {
+                        m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
+                    } else {
+                        m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
+                    }
+
+                    m_bIsBookmarked = !m_bIsBookmarked;
                 }
+            });
+        }
 
-                m_bIsBookmarked = !m_bIsBookmarked;
-            }
-        });
         /*************************************************************/
-
-
-
 
         /** Do something about child widget **/
     }

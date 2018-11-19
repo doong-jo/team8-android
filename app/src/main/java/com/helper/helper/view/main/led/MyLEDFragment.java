@@ -87,7 +87,7 @@ public class MyLEDFragment extends Fragment {
 
         m_mapDataLED = new HashMap<>();
 
-        if( HttpManager.useCollection("led") ) {
+        if( HttpManager.useCollection(getString(R.string.collection_led)) ) {
             try {
                 JSONObject reqObject = new JSONObject();
                 JSONObject inObject = new JSONObject();
@@ -95,18 +95,18 @@ public class MyLEDFragment extends Fragment {
                 inObject.put("$in", ledIndicies);
                 reqObject.put("index", inObject);
 
-                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override
                     public void onSuccess(JSONArray jsonArray) throws JSONException {
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
                             LED led = new LED(
                                     new LED.Builder()
-                                            .index(jsonObject.getString("index"))
-                                            .name(jsonObject.getString("name"))
-                                            .creator(jsonObject.getString("creator"))
-                                            .downloadCnt(jsonObject.getInt("downloadcnt"))
-                                            .type(jsonObject.getString("type"))
+                                            .index(jsonObject.getString(LED.KEY_INDEX))
+                                            .name(jsonObject.getString(LED.KEY_NAME))
+                                            .creator(jsonObject.getString(LED.KEY_CREATOR))
+                                            .downloadCnt(jsonObject.getInt(LED.KEY_DOWNLOADCNT))
+                                            .type(jsonObject.getString(LED.KEY_TYPE))
                             );
                             m_mapDataLED.put(led.getIndex(), led);
                         }
@@ -122,7 +122,7 @@ public class MyLEDFragment extends Fragment {
 
                     @Override
                     public void onError(String err) {
-
+                        startchangingLEDinGrid();
                     }
                 });
             } catch (JSONException e) {
@@ -219,7 +219,7 @@ public class MyLEDFragment extends Fragment {
         Storage internalStorage = new Storage(getActivity());
         String path = internalStorage.getInternalFilesDirectory();
         String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + ledIndex + ".gif";
+        String openFilePath = dir + File.separator + ledIndex + getString(R.string.gif_format);
 
         return openFilePath;
     }

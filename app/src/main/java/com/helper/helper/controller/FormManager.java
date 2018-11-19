@@ -77,35 +77,4 @@ public class FormManager {
         String pattern = "(?=\\S+$).{2,}";
         return !name.matches(pattern);
     }
-
-    public static void nameValidate(String name, final ValidateCallback callback) throws JSONException {
-        if( nameCharValidate(name) ) {
-            /** name wrong **/
-            callback.onDone(RESULT_VALIDATION_NAME_WRONG);
-        } else {
-            if( HttpManager.useCollection("user") ) {
-                JSONObject reqObject = new JSONObject();
-                reqObject.put("name", name);
-                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
-
-                    @Override
-                    public void onSuccess(JSONArray jsonArray) throws JSONException {
-                        int arrLen = jsonArray.length();
-
-                        if( arrLen > 0 ) {
-                            /** name exist **/
-                            callback.onDone(RESULT_VALIDATION_NAME_EXIST);
-                        } else {
-                            callback.onDone(RESULT_VALIDATION_SUCCESS);
-                        }
-                    }
-
-                    @Override
-                    public void onError(String err) throws JSONException {
-                        callback.onDone(RESULT_VALIDATION_NAME_WRONG);
-                    }
-                });
-            }
-        }
-    }
 }

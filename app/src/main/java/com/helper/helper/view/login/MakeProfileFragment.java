@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -22,14 +21,11 @@ import android.widget.Toast;
 import com.helper.helper.R;
 import com.helper.helper.controller.CircleTransform;
 import com.helper.helper.controller.FileManager;
-import com.helper.helper.controller.FormManager;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.PermissionManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.enums.RidingType;
 import com.helper.helper.interfaces.HttpCallback;
-import com.helper.helper.interfaces.ValidateCallback;
-import com.helper.helper.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +38,6 @@ public class MakeProfileFragment extends Fragment {
     private static final int PHOTO_PICK = 772;
     private ImageView m_previewImage;
     private ImageView m_beforeImgView;
-    private boolean m_bIsSetImage;
 
     public MakeProfileFragment() {
 
@@ -135,7 +130,7 @@ public class MakeProfileFragment extends Fragment {
                 JSONObject jsonObject = UserManager.getUser().getTransformUserToJSON();
 
                 try {
-                    HttpManager.requestHttp(jsonObject, "POST", new HttpCallback() {
+                    HttpManager.requestHttp(jsonObject, "", "POST", "", new HttpCallback() {
                         @Override
                         public void onSuccess(JSONArray jsonArray) throws JSONException {
                             JSONObject obj = (JSONObject)jsonArray.get(0);
@@ -214,7 +209,6 @@ public class MakeProfileFragment extends Fragment {
         switch (requestCode) {
             case PHOTO_PICK:
                 if( data == null ) { return; }
-                m_bIsSetImage = true;
                 Bundle dataExtras = data.getExtras();
                 Bitmap photo = dataExtras.getParcelable("data");
 

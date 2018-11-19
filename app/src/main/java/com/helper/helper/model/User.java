@@ -17,8 +17,10 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
+/** Compatible Collection **/
 public class User {
     private static final String SPLIT_COMMA_REGEX = ",\\s*";
 
@@ -34,6 +36,20 @@ public class User {
     private ArrayList<String> m_ledBookmarked;
     private ArrayList<String> m_trackIndicies;
 
+    /** Not Collection field **/
+    private String m_userLEDIndex;
+
+    public static final String KEY_LASTPOSITON = "lastPosition";
+    public static final String KEY_LED_INDICIES = "ledIndicies";
+    public static final String KEY_LED_BOOKMARKED = "ledBookmarked";
+    public static final String KEY_TRACK_INDICIES = "trackIndicies";
+    public static final String KEY_EMERGENCY = "emergency";
+    public static final String KEY_EMAIL = "email";
+    public static final String KEY_PASSWORD = "passwd";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_PHONE = "phone";
+    public static final String KEY_RIDING_TYPE = "riding_type";
+    public static final String KEY_LAST_ACCESS = "lastAccess";
 
     public static class Builder {
 
@@ -97,7 +113,7 @@ public class User {
             if( !ledIndicies.contains(",") ) {
                 m_ledIndicies.add(ledIndicies);
             } else {
-                String[] ledStrArr = ledIndicies.split(",");
+                String[] ledStrArr = ledIndicies.split(", ");
 
                 for (String str :
                         ledStrArr) {
@@ -157,6 +173,43 @@ public class User {
         m_trackIndicies = new ArrayList<String>();
     }
 
+    public void addLEDIndex(String ledIndex) {
+        m_ledIndicies.add(ledIndex);
+    }
+
+    public void addBookmarkLEDIndex(String ledIndex) {
+        m_ledBookmarked.add(ledIndex);
+    }
+
+    /*
+    for (Iterator i = data.iterator(); i.hasNext(); ) {
+    Object element = i.next();
+
+    if ((..your conition..)) {
+       i.remove();
+    }
+}
+     */
+    public void removeLEDIndex(String targetIndex) {
+        for (Iterator i = m_ledIndicies.iterator(); i.hasNext(); ) {
+            String listOfIndex = (String) i.next();
+
+            if ( targetIndex.equals(listOfIndex) ) {
+                i.remove();
+            }
+        }
+    }
+
+    public void removeBookmarkLEDIndex(String targetIndex) {
+        for (Iterator i = m_ledBookmarked.iterator(); i.hasNext(); ) {
+            String listOfIndex = (String) i.next();
+
+            if ( targetIndex.equals(listOfIndex) ) {
+                i.remove();
+            }
+        }
+    }
+
     public void setUserName(String name) {
         m_userName = name;
     }
@@ -169,6 +222,10 @@ public class User {
 
     public void setUserRidingType(String ridingType) {
         m_userRidingType = ridingType;
+    }
+
+    public void setLEDIndex(String ledIndex) {
+        m_userLEDIndex = ledIndex;
     }
 
     public String getUserEmail() {
@@ -187,6 +244,10 @@ public class User {
 
     public String getUserLEDIndicies() {
         return m_ledIndicies.toString();
+    }
+
+    public ArrayList<String> getUserLEDArray() {
+        return m_ledIndicies;
     }
 
     public String[] getUserLEDIndiciesURI(String baseUri) {
@@ -237,5 +298,9 @@ public class User {
             e.printStackTrace();
         }
         return obj;
+    }
+
+    public String getUserLEDIndex() {
+        return m_userLEDIndex;
     }
 }

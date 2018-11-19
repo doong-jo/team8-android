@@ -6,6 +6,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
+    <LinearLayout
+        android:id="@+id/newLedTopBar"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="59.28dp"
+        android:orientation="horizontal">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/ledShopSearchEditTxt"
+            android:layout_width="316.92dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textColorLink="@color/black"
+            android:layout_marginStart="46.74dp"
+            android:layout_marginEnd="9.12dp"
+            android:focusableInTouchMode="true"
+            android:focusable="false"
+            />
+
+        <ImageView
+            android:id="@+id/ledShopSearchBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="19.38dp"
+            android:src="@drawable/ic_search" />
+
+    </LinearLayout>
+
     <android.support.v4.widget.NestedScrollView
         android:layout_marginTop="15.96dp"
         android:layout_width="match_parent"
@@ -36,10 +65,11 @@
                 >
 
                 <FrameLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     >
                     <GridLayout
+                        android:id="@+id/newGrid"
                         android:layout_gravity="center_horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -125,69 +155,23 @@
                 >
 
                 <FrameLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     >
 
                     <GridLayout
+                        android:id="@+id/categoryGrid"
                         android:layout_gravity="center_horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="12.54dp"
                         android:layout_marginRight="12.54dp"
                         android:orientation="horizontal">
-                        <com.helper.helper.view.widget.ImageCardViewAddonLong
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
 
-                        <com.helper.helper.view.widget.ImageCardViewAddonLong
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonLong
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonLong
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonLong
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonLong
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonLong
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonLong
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonLong
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonLong
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
                     </GridLayout>
                 </FrameLayout>
             </HorizontalScrollView>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1.14dp"
@@ -215,11 +199,12 @@
                 >
 
                 <FrameLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     >
 
                     <GridLayout
+                        android:id="@+id/freeGrid"
                         android:layout_gravity="center_horizontal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -307,12 +292,13 @@
                 >
 
                 <FrameLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="30.78dp"
                     >
 
                     <GridLayout
+                        android:id="@+id/paidGrid"
                         android:layout_gravity="center_horizontal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

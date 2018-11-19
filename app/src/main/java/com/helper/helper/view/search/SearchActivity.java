@@ -146,17 +146,17 @@ public class SearchActivity extends AppCompatActivity
     public void trySearch() {
         String name = m_searchInput.getText();
 
-        if (HttpManager.useCollection("led")) {
+        if (HttpManager.useCollection(getString(R.string.collection_led))) {
             JSONObject reqObject = new JSONObject();
             try {
                 name = "^"+name;
-                reqObject.put("name", name);
+                reqObject.put(LED.KEY_NAME, name);
             }
             catch (JSONException e) {
                 e.printStackTrace();
             }
             try {
-                HttpManager.requestHttp(reqObject, "GET", "regex", new HttpCallback() {
+                HttpManager.requestHttp(reqObject, "", "GET", "regex", new HttpCallback() {
 
                     @Override
                     public void onSuccess(JSONArray searchNamejsonArray) throws JSONException {
@@ -168,11 +168,11 @@ public class SearchActivity extends AppCompatActivity
                             for (int i = 0; i < arrLen; ++i) {
                                 JSONObject object = searchNamejsonArray.getJSONObject(i);
                                 LED led = new LED.Builder()
-                                        .index(object.getString("index"))
-                                        .name(object.getString("name"))
-                                        .creator(object.getString("creator"))
-                                        .downloadCnt(object.getInt("downloadcnt"))
-                                        .type(object.getString("type"))
+                                        .index(object.getString(LED.KEY_INDEX))
+                                        .name(object.getString(LED.KEY_NAME))
+                                        .creator(object.getString(LED.KEY_CREATOR))
+                                        .downloadCnt(object.getInt(LED.KEY_DOWNLOADCNT))
+                                        .type(object.getString(LED.KEY_TYPE))
                                         .build();
 
                                 m_searchLEDItems.add(led);

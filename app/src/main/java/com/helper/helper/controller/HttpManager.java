@@ -53,6 +53,10 @@ public class HttpManager {
                 m_collection = Collection.TRACKING;
                 return true;
 
+            case "category" :
+                m_collection = Collection.CATEGORY;
+                return true;
+
             default:
                 return false;
         }
@@ -63,7 +67,7 @@ public class HttpManager {
         m_serverURI = uri;
     }
 
-    private static String getAllKeyValueJSONObject(JSONObject obj) throws JSONException {
+    public static String getAllKeyValueJSONObject(JSONObject obj) throws JSONException {
         StringBuilder resultStr = new StringBuilder();
 
         Iterator<String> keys = obj.keys();
@@ -90,7 +94,7 @@ public class HttpManager {
                                 ValueOfKeyOfValue[i] = "\"" + ValueOfKeyOfValue[i] + "\"";
                             }
 
-                            //http://175.123.140.145/led?index={"$in":["team8_bird","team8_thunder"]}
+                            //http://address/led?index={"$in":["team8_bird","team8_thunder"]}
                             value = "{\"" + keyOfValue + "\":" + Arrays.deepToString(ValueOfKeyOfValue) + "}";
                         }
                     }
@@ -111,7 +115,20 @@ public class HttpManager {
         return resultStr.toString();
     }
 
-    public static void requestHttp(final JSONObject query, final String method, final String subURI, final HttpCallback callback) throws JSONException {
+    public static String getParamOfKeyValueJSONObject(JSONObject obj, String paramStr) throws JSONException {
+        String resultStr = "";
+        String keyStr = obj.getString(paramStr);
+
+        obj.remove(paramStr);
+
+        resultStr = resultStr.concat(keyStr)
+                .concat("?")
+                .concat(getAllKeyValueJSONObject(obj));
+
+        return resultStr;
+    }
+
+    public static void requestHttp(final JSONObject query, String key, final String method, final String subURI, final HttpCallback callback) throws JSONException {
 
         final String[] resBuffer = {""};
         final String charset = "UTF-8";
@@ -121,26 +138,26 @@ public class HttpManager {
                 !(method.equals("PUT") || method.equals("GET") || method.equals("POST") || method.equals("DELETE"))
                 ) {
             callback.onError("requestHttp: Invalid parameters");
+            return;
         }
 
-        final String queryString = getAllKeyValueJSONObject(query);
+        String queryStr = "";
+        final URL serverEndPoint;
+
+        if( method.equals("GET") || method.equals("POST") ) {
+            queryStr = getAllKeyValueJSONObject(query);
+            serverEndPoint = getGETmethodServerEndPoint(queryStr, subURI);
+        } else { /** PUT, DELETE **/
+            queryStr = getParamOfKeyValueJSONObject(query, key);
+            serverEndPoint = getPUTmethodServerEndPoint(queryStr, subURI);
+        }
+
 
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 /** Create URL **/
-                URL serverEndPoint = null;
-                try {
-                    serverEndPoint = new URL(m_serverURI
-                            .concat("/")
-                            .concat(m_collection.getValue())
-                            .concat("/")
-                            .concat(subURI)
-                            .concat("?")
-                            .concat(queryString));
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
+
 
                 /** Set Connection **/
                 HttpURLConnection connection = null;
@@ -213,117 +230,163 @@ public class HttpManager {
                         callback.onError(errMsg);
                         Log.d(TAG, "HttpManagerUtil Error : " + errMsg);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
+                } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
             }
         });
     }
 
-    public static void requestHttp(final JSONObject query, final String method, final HttpCallback callback) throws JSONException {
+    private static URL getGETmethodServerEndPoint(String queryString, String subURI) {
+        URL serverEndPoint = null;
+        String uriStr = null;
 
-        final String[] resBuffer = {""};
-        final String charset = "UTF-8";
+        try {
+            if (!queryString.equals("")) {
+                uriStr = m_serverURI.concat("/")
+                        .concat(m_collection.getValue());
 
+                if( !subURI.equals("") ) {
+                    uriStr = uriStr.concat("/")
+                            .concat(subURI);
+                }
+                uriStr = uriStr.concat("?").concat(queryString);
+            } else {
+                uriStr = m_serverURI
+                        .concat("/")
+                        .concat(m_collection.getValue());
+            }
 
-        if( query == null ||
-            !(method.equals("PUT") || method.equals("GET") || method.equals("POST") || method.equals("DELETE"))
-        ) {
-            callback.onError("requestHttp: Invalid parameters");
+            serverEndPoint = new URL(uriStr);
+        }
+        catch (MalformedURLException e) {
+            e.printStackTrace();
         }
 
-        final String queryString = getAllKeyValueJSONObject(query);
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                /** Create URL **/
-                URL serverEndPoint = null;
-                try {
-                    serverEndPoint = new URL(m_serverURI + "/" + m_collection.getValue() + "?" + queryString);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-
-                /** Set Connection **/
-                HttpURLConnection connection = null;
-                try {
-                    connection = (HttpURLConnection) serverEndPoint.openConnection();
-
-                    // TODO: 2018. 10. 12. Not GET Method
-                    if( !method.equals("GET") && !method.equals("DELETE")) {
-                        connection.setDoOutput(true);
-                    }
-
-                    connection.setRequestMethod(method);
-
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if (connection != null) {
-                    connection.setRequestProperty("Content-Type", "application/json");
-                    connection.setRequestProperty("Accept-Charset", charset);
-//                    connection.setRequestProperty("User-Agent", "my-rest-app-v0.1");
-                }
-
-                /** Request result **/
-                try {
-                    int resultResponseCode = connection.getResponseCode();
-
-                    if (resultResponseCode == HttpURLConnection.HTTP_OK ||
-                            resultResponseCode == HttpURLConnection.HTTP_NOT_MODIFIED
-                            ) {
-
-                        String contentType = connection.getHeaderField("Content-Type");
-                        String charset = null;
-                        InputStream response = connection.getInputStream();
-
-                        for (String param : contentType.replace(" ", "").split(";")) {
-                            if (param.startsWith("charset=")) {
-                                charset = param.split("=", 2)[1];
-                                break;
-                            }
-                        }
-
-                        if (charset != null) {
-                            try (BufferedReader reader = new BufferedReader(new InputStreamReader(response, charset))) {
-
-                                String readResponse = reader.readLine();
-
-                                if( method.equals("GET") ) {
-                                    m_resultJsonArray = new JSONArray(readResponse);
-                                } else {
-                                    m_resultJsonArray = new JSONArray("[{result:"+readResponse+"}]");
-                                }
-
-                                callback.onSuccess(m_resultJsonArray);
-
-                            } catch (JSONException e) {
-                                callback.onError(e.getMessage());
-                                e.printStackTrace();
-                            }
-                        } else {
-                            // It's likely binary content, use InputStream/OutputStream.
-                        }
-
-                        Log.d(TAG, "request rest run: success");
-                    } else {
-                        // Error handling code goes here
-                        String errMsg = connection.getResponseMessage();
-
-                        callback.onError(errMsg);
-                        Log.d(TAG, "HttpManagerUtil Error : " + errMsg);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        return serverEndPoint;
     }
+
+    private static URL getPUTmethodServerEndPoint(String queryString, String subURI) {
+        URL serverEndPoint = null;
+
+        String uriStr = m_serverURI.concat("/")
+                .concat(m_collection.getValue())
+                .concat("/");
+
+        if( subURI.equals("") ) {
+            uriStr = uriStr.concat(subURI);
+        }
+
+        uriStr = uriStr.concat(queryString);
+
+
+        try {
+            serverEndPoint = new URL(uriStr);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return serverEndPoint;
+    }
+//
+//    public static void requestHttp(final JSONObject query, final String method, final HttpCallback callback) throws JSONException {
+//
+//        final String[] resBuffer = {""};
+//        final String charset = "UTF-8";
+//
+//
+//        if( query == null ||
+//            !(method.equals("PUT") || method.equals("GET") || method.equals("POST") || method.equals("DELETE"))
+//        ) {
+//            callback.onError("requestHttp: Invalid parameters");
+//        }
+//
+//        final String queryString = getAllKeyValueJSONObject(query);
+//
+//        AsyncTask.execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                // user?email=sdong001@gmail.com
+//                /** Create URL **/
+//                URL serverEndPoint = getGETmethodServerEndPoint(queryString, "");
+//
+//                /** Set Connection **/
+//                HttpURLConnection connection = null;
+//                try {
+//                    connection = (HttpURLConnection) serverEndPoint.openConnection();
+//
+//                    // TODO: 2018. 10. 12. Not GET Method
+//                    if( !method.equals("GET") && !method.equals("DELETE")) {
+//                        connection.setDoOutput(true);
+//                    }
+//
+//                    connection.setRequestMethod(method);
+//
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                if (connection != null) {
+//                    connection.setRequestProperty("Content-Type", "application/json");
+//                    connection.setRequestProperty("Accept-Charset", charset);
+////                    connection.setRequestProperty("User-Agent", "my-rest-app-v0.1");
+//                }
+//
+//                /** Request result **/
+//                try {
+//                    int resultResponseCode = connection.getResponseCode();
+//
+//                    if (resultResponseCode == HttpURLConnection.HTTP_OK ||
+//                            resultResponseCode == HttpURLConnection.HTTP_NOT_MODIFIED
+//                            ) {
+//
+//                        String contentType = connection.getHeaderField("Content-Type");
+//                        String charset = null;
+//                        InputStream response = connection.getInputStream();
+//
+//                        for (String param : contentType.replace(" ", "").split(";")) {
+//                            if (param.startsWith("charset=")) {
+//                                charset = param.split("=", 2)[1];
+//                                break;
+//                            }
+//                        }
+//
+//                        if (charset != null) {
+//                            try (BufferedReader reader = new BufferedReader(new InputStreamReader(response, charset))) {
+//
+//                                String readResponse = reader.readLine();
+//
+//                                if( method.equals("GET") ) {
+//                                    m_resultJsonArray = new JSONArray(readResponse);
+//                                } else {
+//                                    m_resultJsonArray = new JSONArray("[{result:"+readResponse+"}]");
+//                                }
+//
+//                                callback.onSuccess(m_resultJsonArray);
+//
+//                            } catch (JSONException e) {
+//                                callback.onError(e.getMessage());
+//                                e.printStackTrace();
+//                            }
+//                        } else {
+//                            // It's likely binary content, use InputStream/OutputStream.
+//                        }
+//
+//                        Log.d(TAG, "request rest run: success");
+//                    } else {
+//                        // Error handling code goes here
+//                        String errMsg = connection.getResponseMessage();
+//
+//                        callback.onError(errMsg);
+//                        Log.d(TAG, "HttpManagerUtil Error : " + errMsg);
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
 }

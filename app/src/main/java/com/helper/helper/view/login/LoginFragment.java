@@ -8,13 +8,10 @@
 
 package com.helper.helper.view.login;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Editable;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -24,14 +21,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.ahmadrosid.library.FloatingLabelEditText;
 import com.helper.helper.R;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.FormManager;
@@ -57,8 +49,6 @@ public class LoginFragment extends Fragment {
     private final static int SNACKBAR_DENYING_LOGIN = 1000;
     private final static int DEFAULT_LOGIN = 1000;
     private final static int DELAY_LOGIN = 1001;
-    private static final int MAX_EMAIL_LENGTH = 40;
-    private static final int MAX_PW_LENGTH = 15;
 
     /******************* Define widgtes in view *******************/
     private FloatingEditTextAddonControl m_emailInputTxt;
@@ -66,15 +56,6 @@ public class LoginFragment extends Fragment {
     private LoadingButton m_loginBtn;
 
     private SnackBar m_snackBar;
-
-//    private Button m_emailInputClear;
-//    private Button m_pwInputClear;
-//    private OnClickListener m_emailInputClearClickListener;
-//    private OnClickListener m_pwInputClearClickListener;
-
-
-    // save original pixel(after convert dp) of editText control marginEnd
-    private int m_editTextControlMarginEnd;
     /**************************************************************/
 
     public LoginFragment() {
@@ -182,17 +163,17 @@ public class LoginFragment extends Fragment {
             return;
         }
 
-        if( HttpManager.useCollection("user") ) {
+        if( HttpManager.useCollection(getString(R.string.collection_user)) ) {
             JSONObject reqObject = new JSONObject();
             try {
-                reqObject.put("email", email);
-                reqObject.put("passwd", pw);
+                reqObject.put(User.KEY_EMAIL, email);
+                reqObject.put(User.KEY_PASSWORD, pw);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             try {
-                HttpManager.requestHttp(reqObject, "GET", new HttpCallback() {
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override
                     public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
                         int arrLen = existIdjsonArray.length();
@@ -202,11 +183,11 @@ public class LoginFragment extends Fragment {
                         if( arrLen != 0 ) {
                             JSONObject object = existIdjsonArray.getJSONObject(0);
                             User user = new User.Builder()
-                                    .email(object.getString("email"))
-                                    .name(object.getString("name"))
-                                    .ridingType(object.getString("riding_type"))
-                                    .ledIndicies(object.getJSONArray("ledIndicies"))
-                                    .ledBookmarked(object.getJSONArray("ledBookmarked"))
+                                    .email(object.getString(User.KEY_EMAIL))
+                                    .name(object.getString(User.KEY_NAME))
+                                    .ridingType(object.getString(User.KEY_RIDING_TYPE))
+                                    .ledIndicies(object.getJSONArray(User.KEY_LED_INDICIES))
+                                    .ledBookmarked(object.getJSONArray(User.KEY_LED_BOOKMARKED))
                                     .build();
 
                             UserManager.setUser(existIdjsonArray.getJSONObject(0));
@@ -223,7 +204,6 @@ public class LoginFragment extends Fragment {
                                     new Handler().postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-//                                            ProgressDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.login_loading_title), getString(R.string.login_loading_message), true);
                                             setLoginBtnStatus(DELAY_LOGIN);
                                             m_snackBar.setVisible(false);
 
@@ -242,7 +222,6 @@ public class LoginFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     setSnackBarStatus(SNACKBAR_DENYING_LOGIN);
-                                    //Toast.makeText(getActivity(), "아이디 혹은 비밀번호가 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
                                 }
                             });
 

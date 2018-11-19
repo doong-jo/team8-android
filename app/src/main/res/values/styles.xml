@@ -40,8 +40,8 @@
     <!--Buttons-->
     <style name="PrimaryButton" parent="android:Widget.Button">
         <item name="android:background">@drawable/primary_button</item>
-        <item name="android:layout_width">192dp</item>
-        <item name="android:layout_height">32dp</item>
+        <item name="android:layout_width">308dp</item>
+        <item name="android:layout_height">52dp</item>
         <item name="android:textAppearance">@style/CategoryCardTitleTypo</item>
         <item name="android:textColor">#FFFFFF</item>
     </style>

@@ -1,19 +1,32 @@
 <resources>
-    <!--app base-->
+    <!--App base-->
     <string name="app_name">TEAM EIGHT</string>
     <string name="service_name">TEAM EIGHT</string>
     <string name="google_api">AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k</string>
+
     <!--Bluetooth-->
     <string name="bluetooth_uuid">94f39d29-7d6d-437d-973b-fba39e49d4ee</string>
 
-    <!--page name-->
+    <!--Page name-->
     <string name="menu_guideline">Guideline</string>
     <string name="menu_emergency_contacts">Emergency contacts</string>
     <string name="title_activity_maps">Map</string>
 
-    <!--private key-->
+    <!--Private key-->
     <string name="server_uri">http://175.123.140.145</string>
+    <string name="led_resource_uri">images/LED/</string>
     <string name="youtube_key">n6EydOVvJ00</string>
+
+    <!--Collection-->
+    <string name="collection_user">user</string>
+    <string name="collection_led">led</string>
+    <string name="collection_accident">accident</string>
+    <string name="collection_category">category</string>
+
+
+    <!--File Format-->
+    <string name="gif_format">.gif</string>
+    <string name="png_format">.png</string>
 
     <!--permission-->
     <string name="not_grant_location_permission">위치 서비스가 허용되지 않으면 "트래킹 서비스"와 "사고 대응 시스템"을 정상적으로 이용하실 수 없습니다. [설정-애플리케이션]에서 허용해주세요.</string>
@@ -83,14 +96,13 @@
     <string name="disconnect_state">Disconnected device</string>
     <string name="connect_state">connected device</string>
     <string name="connect_device">Connect</string>
-    <string name="bluetooth_loading_title">"블루투스 연결 준비중입니다."</string>
-    <string name="bluetooth_loading_message">잠시만 기다려주세요...</string>
 
     <!--Dialog-->
-    <string name="led_dialog_download">내려받기</string>
-    <string name="led_dialog_showon">디바이스에 적용</string>
-    <string name="led_dialog_cancel">닫기</string>
-    <string name="loading_dialog_user_data">사용자 데이터를 불러오는 중입니다..</string>
+    <string name="led_dialog_download">Download</string>
+    <string name="led_dialog_showon">Show on 8</string>
+    <string name="led_dialog_cancel">Close</string>
+    <string name="loading_dialog_user_data">Downloading user data..</string>
+    <string name="led_download_complete">Download Completely!</string>
 
     <!--LED Fragment-->
     <string name="cardTitleLEDDetail">Current LED</string>

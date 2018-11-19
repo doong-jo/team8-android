@@ -59,7 +59,10 @@ import com.helper.helper.controller.GoogleMapManager;
 import com.helper.helper.controller.SMSManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.controller.ViewStateManager;
+import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
+import com.helper.helper.model.LEDCategory;
+import com.helper.helper.model.User;
 import com.helper.helper.view.assist.AssistActivity;
 import com.helper.helper.view.main.myeight.EightFragment;
 import com.helper.helper.view.main.myeight.InfoFragment;
@@ -70,10 +73,14 @@ import com.helper.helper.controller.PermissionManager;
 import com.helper.helper.view.widget.WrapContentViewPager;
 import com.snatik.storage.Storage;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -119,6 +126,9 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /** Http Server **/
+        HttpManager.setServerURI(getString(R.string.server_uri));
+
         final Activity activity = this;
 
         Log.d(TAG, "onCreate: ");
@@ -139,9 +149,9 @@ public class ScrollingActivity extends AppCompatActivity
         try {
             m_loadingDialog = makeLoadingDialog();
             m_loadingDialog.show();
-//            m_loadingDialog.findViewById(R.id.confirm_button).setVisibility(View.GONE);
-//            LinearLayout parentOfConfirmBtn = (LinearLayout)m_loadingDialog.findViewById(R.id.confirm_button).getParent();
-//            parentOfConfirmBtn.setVisibility(View.GONE);
+            m_loadingDialog.findViewById(R.id.confirm_button).setVisibility(View.GONE);
+            LinearLayout parentOfConfirmBtn = (LinearLayout)m_loadingDialog.findViewById(R.id.confirm_button).getParent();
+            parentOfConfirmBtn.setVisibility(View.GONE);
 
             UserManager.setUser(FileManager.readXmlUserInfo(this), new ValidateCallback() {
                 @Override
@@ -155,15 +165,17 @@ public class ScrollingActivity extends AppCompatActivity
                                 }
                             }
                         });
+                        /** Download User's LED **/
                         downloadUserDataLED.execute(UserManager.getUser().getUserLEDIndiciesURI(getString(R.string.server_uri)));
                     }
                 }
             });
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        /** Set Shop Data **/
+        startInitializeShopData();
 
         /** ToolBar **/
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -245,9 +257,6 @@ public class ScrollingActivity extends AppCompatActivity
         /*************************************************************/
 
 
-        /** Http Server **/
-        HttpManager.setServerURI(getString(R.string.server_uri));
-
         /** Request permissions **/
         if (!PermissionManager.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION) ||
                 !PermissionManager.checkPermissions(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
@@ -280,24 +289,51 @@ public class ScrollingActivity extends AppCompatActivity
         /* Sensor end */
     }
 
-    protected View findAppBarScrollingChild(AppBarLayout appBarLayout) {
-        for (int i = 0; i < appBarLayout.getChildCount(); i++) {
-            View child = appBarLayout.getChildAt(i);
-            AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) child.getLayoutParams();
-            int flags = params.getScrollFlags();
-            if ((flags & AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL) != 0) {
-                if ((flags & AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED) != 0) {
-                    return child;
-                }
-            } else {
-                break;
+    private void startInitializeShopData() {
+        if( HttpManager.useCollection(getString(R.string.collection_category)) ) {
+
+            JSONObject reqObject = new JSONObject();
+            String str = reqObject.toString();
+            try {
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
+                        int arrLen = existIdjsonArray.length();
+                        // write category xml file
+                        List<LEDCategory> ledCategoryList = new ArrayList<>();
+
+                        for (int i = 0; i < existIdjsonArray.length(); i++) {
+                            JSONObject categoryObj = existIdjsonArray.getJSONObject(i);
+
+                            LEDCategory category = new LEDCategory(
+                                    categoryObj.getString("name"),
+                                    categoryObj.getString("backgroundColor"),
+                                    categoryObj.getString("notice"),
+                                    categoryObj.getString("character")
+                            );
+                            ledCategoryList.add(category);
+                        }
+                        try {
+                            FileManager.writeXmlCategory(getApplicationContext(), ledCategoryList);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(String err) {
+                        Log.d(TAG, "startInitializeShopData onError: " + err);
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
-        return null;
     }
 
     /** Dialog **/
     private SweetAlertDialog resetAccDialog() {
+        final Context thisContext = this;
         return
             new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
                     .setTitleText("Are you Ok?")
@@ -309,7 +345,7 @@ public class ScrollingActivity extends AppCompatActivity
                         public void onClick(final SweetAlertDialog sDialog) {
                             startAlertEmergencyContacts();
                             try {
-                                EmergencyManager.insertAccidentinServer(UserManager.getUser(), EmergencyManager.getAccLocation(), true);
+                                EmergencyManager.insertAccidentinServer(thisContext, UserManager.getUser(), EmergencyManager.getAccLocation(), true);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
