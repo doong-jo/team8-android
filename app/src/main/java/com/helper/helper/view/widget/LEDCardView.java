@@ -8,28 +8,28 @@ import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
 import com.helper.helper.controller.CommonManager;
 import com.helper.helper.controller.DownloadImageTask;
-import com.helper.helper.controller.FileManager;
+import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.UserManager;
+import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LED;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.snatik.storage.Storage;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -45,14 +45,12 @@ public class LEDCardView extends FrameLayout {
     private SweetAlertDialog m_detailDlg;
 
     public LEDCardView(Context context) {
-
         super(context);
         initView();
 
     }
 
     public LEDCardView(Context context, AttributeSet attrs) {
-
         super(context, attrs);
 
         initView();
@@ -76,8 +74,6 @@ public class LEDCardView extends FrameLayout {
         m_cardLayout = v.findViewById(R.id.cardLayout);
         m_cardImage = v.findViewById(R.id.cardViewImage);
         m_cardNameTxt = v.findViewById(R.id.cardNameText);
-
-        /** Do something about child widget **/
     }
 
     private void getAttrs(AttributeSet attrs) {
@@ -108,8 +104,6 @@ public class LEDCardView extends FrameLayout {
                 .concat(ledData.getIndex())
                 .concat(activity.getString(R.string.png_format));
 
-        String confirmText;
-
         boolean IsNotDownloaded = false;
         if( !internalStorage.isFileExist(openFilePathGif) || !internalStorage.isFileExist(openFilePathpng) ) {
             IsNotDownloaded = true;
@@ -135,6 +129,21 @@ public class LEDCardView extends FrameLayout {
                                         }
 
                                         UserManager.updateUserInfoServerAndXml(activity);
+
+                                        JSONObject jsonObj = new JSONObject();
+                                        jsonObj.put(LED.KEY_INDEX, ledData.getIndex());
+                                        jsonObj.put(LED.KEY_DOWNLOADCNT, 1);
+
+                                        HttpManager.useCollection(activity.getString(R.string.collection_led));
+
+                                        /** Increase LED's downloadcount **/
+                                        HttpManager.requestHttp(jsonObj, "index", "PUT", "downloadcount/", new HttpCallback() {
+                                            @Override
+                                            public void onSuccess(JSONArray jsonArray) { }
+
+                                            @Override
+                                            public void onError(String err) { }
+                                        });
 
                                         activity.runOnUiThread(new Runnable() {
                                             @Override
@@ -199,7 +208,6 @@ public class LEDCardView extends FrameLayout {
     /** LED Dialog **/
     public void setOnClickCustomDialogEnable(final int mode, final LED ledModel, final Activity activity) {
         if( mode == NORMAL_DIALOG_TYPE ) { return; }
-//        m_dlgTargetContxt = context;
 
         m_cardLayout.setOnClickListener(new OnClickListener() {
             @SuppressLint("ResourceAsColor")

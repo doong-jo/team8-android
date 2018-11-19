@@ -113,9 +113,13 @@ public class DialogLED extends FrameLayout {
                 m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
             }
 
+            m_createText.setText(m_ledData.getCreator());
             m_downloadCnt.setText(String.valueOf(m_ledData.getDownloadCnt()));
-        } else {
+        } else if ( m_dlgMode == LEDCardView.DOWNLOAD_DIALOG_TYPE ){
             m_bookmarkToggle.setVisibility(View.GONE);
+
+            m_createText.setText(m_ledData.getCreator());
+            m_downloadCnt.setText(String.valueOf(m_ledData.getDownloadCnt()));
         }
 
         /******************* Make Listener in View *******************/
