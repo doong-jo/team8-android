@@ -83,6 +83,12 @@ public class LEDShopFragment extends Fragment {
     private void setNewLEDCards() {
         if( HttpManager.useCollection(getString(R.string.collection_led)) ) {
             JSONObject jsonObject = new JSONObject();
+            try{
+                jsonObject.put("limit", 10);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
 
             try {
                 HttpManager.requestHttp(jsonObject, "", "GET", "", new HttpCallback() {
