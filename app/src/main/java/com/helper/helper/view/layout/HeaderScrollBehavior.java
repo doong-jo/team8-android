@@ -46,7 +46,6 @@ public class HeaderScrollBehavior extends ViewOffsetBehavior<HeaderLayout> {
     }
 
 
-
     @Override
     public boolean onLayoutChild(CoordinatorLayout parent, HeaderLayout child, int layoutDirection) {
         return super.onLayoutChild(parent, child, layoutDirection);
@@ -73,8 +72,7 @@ public class HeaderScrollBehavior extends ViewOffsetBehavior<HeaderLayout> {
 
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, HeaderLayout child, View directTargetChild,
-                                       View target, int nestedScrollAxes) {
-
+                                       View target, int nestedScrollAxes, int type) {
         Log.d("decurd", "HeaderScrollBehavior.onStartNestedScroll");
         if (mViewFlinger != null) {
             mViewFlinger.cancel();
@@ -101,7 +99,7 @@ public class HeaderScrollBehavior extends ViewOffsetBehavior<HeaderLayout> {
 
     @Override
     public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, HeaderLayout child, View target, int dx, int dy,
-                                  int[] consumed) {
+                                  int[] consumed, int type) {
 
 
         Log.d("decurd", "HeaderScrollBehavior.onNestedPreScroll");
@@ -194,6 +192,7 @@ public class HeaderScrollBehavior extends ViewOffsetBehavior<HeaderLayout> {
         @Override
         public void run() {
             Log.d("decurd", "HeaderScrollBehavior.ViewFlinger.run");
+
             if (mScroller.computeScrollOffset()) {
                 int dy = mScroller.getCurrY() - mLastFlingY;
 
