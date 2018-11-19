@@ -40,6 +40,15 @@
                     android:alpha="0.9"
                     style="@style/ToolbarTitleTypo"
                     android:layout_gravity="center" />
+
+                <ImageView
+                    android:id="@+id/toolbar_option_btn"
+                    android:src="@drawable/ic_search"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="10dp"
+                    android:alpha="0.9"
+                    android:layout_gravity="end"/>
             </android.support.v7.widget.Toolbar>
 
             <android.support.design.widget.TabLayout
@@ -51,12 +60,33 @@
                 app:tabRippleColor="@color/tab_indicator_color"
                 app:tabSelectedTextColor="@color/tab_indicator_color"
                 app:tabTextAppearance="@style/TopTabBarTypo"
-                app:tabIndicatorHeight="4.56dp"
+                app:tabIndicatorHeight="4dp"
                 app:tabTextColor="@color/xxxgray" />
 
         </android.support.design.widget.AppBarLayout>
 
         <include layout="@layout/content_scrolling" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:gravity="bottom">
+
+            <android.support.design.widget.BottomNavigationView
+                android:id="@+id/bottomNavigationView_led_menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="@color/white"
+                android:elevation="20dp"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                app:elevation="20dp"
+                app:itemBackground="@color/white"
+                app:itemIconTint="@color/bottom_bar_item_selector"
+                app:itemTextColor="@color/bottom_bar_item_selector"
+                app:menu="@menu/bottombar_menu"/>
+        </RelativeLayout>
 
     </android.support.design.widget.CoordinatorLayout>
 
