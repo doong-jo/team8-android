@@ -91,7 +91,7 @@ public class EmergencyManager {
     }
 
     public static boolean validateLocation(Location curLocation) {
-        double distance = curLocation.distanceTo(m_accLocation);
+//        double distance = curLocation.distanceTo(m_accLocation);
         if( curLocation.distanceTo(m_accLocation) < EMERGENCY_LOCATION_DISTANCE_RANGE ) {
             return true;
         }
@@ -156,4 +156,5 @@ public class EmergencyManager {
             });
         }
     }
+
 }

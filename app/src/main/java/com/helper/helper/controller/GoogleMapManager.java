@@ -12,6 +12,8 @@ import android.app.Activity;
 import android.location.Location;
 import android.os.Looper;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationCallback;
@@ -46,7 +48,11 @@ public class GoogleMapManager {
             if (locationList.size() > 0) {
                 //The last location in the list is the newest
                 Location location = locationList.get(locationList.size() - 1);
+//                if( m_curLocation != null ) {
+//                    Toast.makeText(m_activity, "speed : " + String.valueOf(getSpeed(location, m_curLocation)), Toast.LENGTH_SHORT).show();
+//                }
                 setCurrentLocation(location, "myLocation", "location");
+
 //                Log.i("MapsActivity", "Location: " + location.getLatitude() + " " + location.getLongitude());
 //                mLastLocation = location;
 //                if (mCurrLocationMarker != null) {
@@ -142,6 +148,16 @@ public class GoogleMapManager {
 //        m_googleMap.moveCamera(CameraUpdateFactory.newLatLng(DEFAULT_LOCATION));
     }
 
+    private static double getSpeed(Location curL, Location beforeL) {
+        // meter / millisecond
+        Log.d(TAG + "/speed", "getSpeed curTime: " + curL.getTime());
+        Log.d(TAG + "/speed", "getSpeed befTime: " + beforeL.getTime());
+        Log.d(TAG + "/speed", "distanceTo: " + curL.distanceTo(beforeL));
+        // meter - > km, second -> hour
+        final double speed = (curL.distanceTo(beforeL) / 1000) / ((curL.getTime() - beforeL.getTime()) / 1000 * 60 * 60);
+        return speed;
+    }
+
     @SuppressLint("MissingPermission")
     private static void requsetLocation() {
         if (!PermissionManager.checkPermissions(m_activity, Manifest.permission.ACCESS_FINE_LOCATION) &&
@@ -154,8 +170,7 @@ public class GoogleMapManager {
             public void onSuccess(Location location) {
                 if (location != null) {
                     m_curLocation = location;
-
-                    setCurrentLocation(m_curLocation, "GPS Position", "GPS Position");
+//                    setCurrentLocation(m_curLocation, "GPS Position", "GPS Position");
                 }
             }
         });
