@@ -24,6 +24,7 @@ import com.helper.helper.view.category.CategoryActivity;
 import com.helper.helper.view.widget.DialogLED;
 import com.helper.helper.view.widget.LEDCardView;
 import com.helper.helper.view.widget.LEDCategoryCardView;
+import com.helper.helper.view.widget.LEDRankCardView;
 import com.snatik.storage.Storage;
 
 import org.json.JSONArray;
@@ -45,10 +46,13 @@ import java.util.Locale;
 
 public class LEDShopFragment extends Fragment {
     private final static String TAG = LEDShopFragment.class.getSimpleName() + "/DEV";
+    private final static int RANKMAX = 9;
 
     /******************* Define widgtes in view *******************/
     private GridLayout m_newGrid;
     private GridLayout m_caregoryGrid;
+    private GridLayout m_freeGrid;
+    private GridLayout m_paidGrid;
     /**************************************************************/
 
     public LEDShopFragment() {
@@ -67,6 +71,8 @@ public class LEDShopFragment extends Fragment {
         /******************* Connect widgtes with layout *******************/
         m_caregoryGrid = view.findViewById(R.id.categoryGrid);
         m_newGrid = view.findViewById(R.id.newGrid);
+        m_freeGrid = view.findViewById(R.id.freeGrid);
+        m_paidGrid = view.findViewById(R.id.paidGrid);
         /*******************************************************************/
 
         /******************* Make Listener in View *******************/
@@ -79,6 +85,7 @@ public class LEDShopFragment extends Fragment {
 
         return view;
     }
+
 
     private void setNewLEDCards() {
         if( HttpManager.useCollection(getString(R.string.collection_led)) ) {
@@ -117,7 +124,26 @@ public class LEDShopFragment extends Fragment {
                             );
                         }
 
+                        List<LED> ledFreeList = new ArrayList<>();
+                        List<LED> ledPaidList = new ArrayList<>();
+
+                        for(LED led:ledList){
+                            if(led.getType().equals("free")){
+                                ledFreeList.add(led);
+                            }
+                            else{
+                                ledPaidList.add(led);
+                            }
+                        }
+
+                        LED[] ledFreeArr = ledFreeList.toArray(new LED[ledFreeList.size()]);
+                        LED[] ledPaidArr = ledPaidList.toArray(new LED[ledPaidList.size()]);
+
                         final LED[] finalLEDList = ledList;
+                        final LED[] finalLEDFreeList = ledFreeArr;
+                        final LED[] finalLEDPaidList = ledPaidArr;
+
+
                         // sort by create date ascending
                         Arrays.sort(ledList, new Comparator<LED>() {
                             @Override
@@ -125,12 +151,30 @@ public class LEDShopFragment extends Fragment {
                                 return l1.getCreateDate().compareTo(l2.getCreateDate());
                             }
                         });
+
+                        Arrays.sort(ledFreeArr, new Comparator<LED>() {
+                            @Override
+                            public int compare(LED l1, LED l2) {
+                                return Integer.compare(l2.getDownloadCnt(), l1.getDownloadCnt());
+                            }
+                        });
+
+                        Arrays.sort(ledPaidArr, new Comparator<LED>() {
+                            @Override
+                            public int compare(LED l1, LED l2) {
+                                return Integer.compare(l2.getDownloadCnt(), l1.getDownloadCnt());
+                            }
+                        });
+
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 makeNewCard(m_newGrid, finalLEDList);
+                                makeRankCard(m_freeGrid, finalLEDFreeList);
+                                makeRankCard(m_paidGrid, finalLEDPaidList);
                             }
                         });
+
 
                     }
 
@@ -144,6 +188,7 @@ public class LEDShopFragment extends Fragment {
             }
         }
     }
+
 
     private void makeNewCard(GridLayout grid, LED[] list) {
         for (LED ledData :
@@ -167,6 +212,28 @@ public class LEDShopFragment extends Fragment {
             grid.addView(cardViewLED);
         }
     }
+
+    private void makeRankCard(GridLayout grid, LED[] list) {
+        for (LED ledData : list) {
+            LEDRankCardView rankCardViewLED = new LEDRankCardView(getActivity());
+
+            /** set Bitmap Image (character) **/
+            File f=new File(CommonManager.getOpenLEDFilePath(
+                    getActivity(),
+                    ledData.getIndex(),
+                    getString(R.string.gif_format)));
+            try {
+                Bitmap cardImageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
+                rankCardViewLED.setCardViewImg(cardImageBitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            rankCardViewLED.setCardviewNameTxt(ledData.getName());
+            grid.addView(rankCardViewLED);
+        }
+    }
+
 
     private void setDataToCategoryCards() {
         // 1. Read Xml of category data
