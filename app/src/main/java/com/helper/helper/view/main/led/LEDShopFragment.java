@@ -46,7 +46,7 @@ import java.util.Locale;
 
 public class LEDShopFragment extends Fragment {
     private final static String TAG = LEDShopFragment.class.getSimpleName() + "/DEV";
-    private final static int RANKMAX = 9;
+    private final static int LED_SHOW_MAX = 30;
 
     /******************* Define widgtes in view *******************/
     private GridLayout m_newGrid;
@@ -66,7 +66,7 @@ public class LEDShopFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
         View view = inflater.inflate( R.layout.fragment_shop, container, false );
         /******************* Connect widgtes with layout *******************/
         m_caregoryGrid = view.findViewById(R.id.categoryGrid);
@@ -91,11 +91,69 @@ public class LEDShopFragment extends Fragment {
         if( HttpManager.useCollection(getString(R.string.collection_led)) ) {
             JSONObject jsonObject = new JSONObject();
             try{
-                jsonObject.put("limit", 10);
+                jsonObject.put("limit", LED_SHOW_MAX);
+                jsonObject.put("order",-1);
+                jsonObject.put("sort", LED.KEY_CREATE_TIME);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
+            try {
+                HttpManager.requestHttp(jsonObject, "", "GET", "", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray jsonArray) throws JSONException {
+
+                        LED[] ledList = new LED[jsonArray.length()];
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject object = (JSONObject) jsonArray.get(i);
+                            Date convertDate = null;
+                            try {
+                                convertDate = new SimpleDateFormat("yyyy-mm-dd", Locale.KOREA).parse(object.getString(LED.KEY_CREATE_TIME));
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            ledList[i] = new LED(
+                                    new LED.Builder()
+                                            .index(object.getString(LED.KEY_INDEX))
+                                            .name(object.getString(LED.KEY_NAME))
+                                            .creator(object.getString(LED.KEY_CREATOR))
+                                            .createDate(convertDate)
+                                            .category(object.getString(LED.KEY_CATEGORY))
+                                            .downloadCnt(object.getInt(LED.KEY_DOWNLOADCNT))
+                                            .type(object.getString(LED.KEY_TYPE))
+                            );
+                        }
+
+                        final LED[] finalLEDList = ledList;
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                makeNewCard(m_newGrid, finalLEDList);
+                            }
+                        });
+
+
+                    }
+
+                    @Override
+                    public void onError(String err) throws JSONException {
+
+                    }
+                });
+            } catch (JSONException e ) {
+                e.printStackTrace();
+            }
+
+            jsonObject = new JSONObject();
+            try{
+                jsonObject.put("limit", LED_SHOW_MAX);
+                jsonObject.put("order",-1);
+                jsonObject.put("sort", LED.KEY_DOWNLOADCNT);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
             try {
                 HttpManager.requestHttp(jsonObject, "", "GET", "", new HttpCallback() {
@@ -128,7 +186,7 @@ public class LEDShopFragment extends Fragment {
                         List<LED> ledPaidList = new ArrayList<>();
 
                         for(LED led:ledList){
-                            if(led.getType().equals("free")){
+                            if(led.getType().equals(LED.LED_TYPE_FREE)){
                                 ledFreeList.add(led);
                             }
                             else{
@@ -139,47 +197,20 @@ public class LEDShopFragment extends Fragment {
                         LED[] ledFreeArr = ledFreeList.toArray(new LED[ledFreeList.size()]);
                         LED[] ledPaidArr = ledPaidList.toArray(new LED[ledPaidList.size()]);
 
-                        final LED[] finalLEDList = ledList;
                         final LED[] finalLEDFreeList = ledFreeArr;
                         final LED[] finalLEDPaidList = ledPaidArr;
-
-
-                        // sort by create date ascending
-                        Arrays.sort(ledList, new Comparator<LED>() {
-                            @Override
-                            public int compare(LED l1, LED l2) {
-                                return l1.getCreateDate().compareTo(l2.getCreateDate());
-                            }
-                        });
-
-                        Arrays.sort(ledFreeArr, new Comparator<LED>() {
-                            @Override
-                            public int compare(LED l1, LED l2) {
-                                return Integer.compare(l2.getDownloadCnt(), l1.getDownloadCnt());
-                            }
-                        });
-
-                        Arrays.sort(ledPaidArr, new Comparator<LED>() {
-                            @Override
-                            public int compare(LED l1, LED l2) {
-                                return Integer.compare(l2.getDownloadCnt(), l1.getDownloadCnt());
-                            }
-                        });
 
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                makeNewCard(m_newGrid, finalLEDList);
                                 makeRankCard(m_freeGrid, finalLEDFreeList);
                                 makeRankCard(m_paidGrid, finalLEDPaidList);
                             }
                         });
-
-
                     }
 
                     @Override
-                    public void onError(String err) throws JSONException {
+                    public void onError(String err) {
 
                     }
                 });
@@ -214,6 +245,8 @@ public class LEDShopFragment extends Fragment {
     }
 
     private void makeRankCard(GridLayout grid, LED[] list) {
+        int ledCnt = 1;
+
         for (LED ledData : list) {
             LEDRankCardView rankCardViewLED = new LEDRankCardView(getActivity());
 
@@ -228,12 +261,12 @@ public class LEDShopFragment extends Fragment {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-
+            rankCardViewLED.setCardviewNumTxt(ledCnt++);
             rankCardViewLED.setCardviewNameTxt(ledData.getName());
+            rankCardViewLED.setOnClickCustomDialogEnable(LEDCardView.DOWNLOAD_DIALOG_TYPE, ledData, getActivity());
             grid.addView(rankCardViewLED);
         }
     }
-
 
     private void setDataToCategoryCards() {
         // 1. Read Xml of category data
@@ -281,15 +314,6 @@ public class LEDShopFragment extends Fragment {
             });
             grid.addView(cardViewLED);
         }
-    }
-
-    private String getOpenFilePath(String ledIndex) {
-        Storage internalStorage = new Storage(getActivity());
-        String path = internalStorage.getInternalFilesDirectory();
-        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + ledIndex + getString(R.string.gif_format);
-
-        return openFilePath;
     }
 }
 
