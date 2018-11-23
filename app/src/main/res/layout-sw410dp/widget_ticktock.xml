@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.bcgdv.asia.lib.ticktock.TickTockView
+        android:id="@+id/tickTock"
+        android:layout_width="228dp"
+        android:layout_height="228dp"
+        android:layout_gravity="center"
+        app:tickText="00:00"
+        app:tickAutoFitText="true"
+        app:tickMiddleColor="@color/white"
+        app:tickMoveCounterClockwise="false"
+        app:tickTextColor="@color/accent_orange"
+        app:tickDotRadius="11.4dp"
+        app:tickEmptyRingColor="@color/white"
+        app:tickFillRingColor="@color/accent_orange"
+        app:tickRingThickness="3.42dp" />
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.9"
+        android:textColor="@color/black"
+        style="@style/TopTabBarTypo"/>
+
+</LinearLayout>

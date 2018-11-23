@@ -34,4 +34,9 @@
     <declare-styleable name="DialogLED">
 
     </declare-styleable>
+
+
+    <declare-styleable name="DialogTickTock">
+
+    </declare-styleable>
 </resources>

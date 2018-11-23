@@ -98,6 +98,9 @@
     <string name="connect_device">Connect</string>
 
     <!--Dialog-->
+    <string name="dialog_ok">OK</string>
+
+    <!--LED Dialog-->
     <string name="led_dialog_download">Download</string>
     <string name="led_dialog_showon">Show on 8</string>
     <string name="led_dialog_cancel">Close</string>
@@ -133,6 +136,15 @@
     <!--File Names-->
     <string name="internal_directory">user_data</string>
     <string name="file_name_tracking_data">tracking.xml</string>
+
+    <!--Emergency Dialog-->
+    <string name="emergency_dialog_title">Are you Ok?</string>
+    <string name="emergency_dialog_send">Send</string>
+    <string name="emergency_dialog_cancel">I\'m fine</string>
+    <string name="emergency_dialog_content">Accident was detected!\nI\'ll send accident information to emergency contacts in 60s.</string>
+    <string name="emergency_dialog_nearby">near by</string>
+    <string name="emergency_dialog_send_completely">Send completely</string>
+    <string name="emergency_dialog_coming">Your protector will coming soon!</string>
 
     <!--Emergency Contacts-->
     <string name="contact_title">Emergency contacts</string>

@@ -35,6 +35,7 @@ public class EmergencyManager {
 
     public static final int EMERGENCY_VALIDATE_LOCATION_WAITNG_FINISH = 901;
     public static final int EMERGENCY_WAITING_USER_RESPONSE = 231;
+    public static final int EMERGENCY_WAITING_ALERT_SECONDS = 60;
 
     private static Location m_accLocation;
     private static boolean m_bIsAccidentProcessing;

@@ -70,6 +70,7 @@ import com.helper.helper.view.contact.ContactActivity;
 import com.helper.helper.controller.GyroManager;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.PermissionManager;
+import com.helper.helper.view.widget.DialogTickTock;
 import com.helper.helper.view.widget.WrapContentViewPager;
 import com.snatik.storage.Storage;
 
@@ -111,7 +112,6 @@ public class ScrollingActivity extends AppCompatActivity
     private ViewPager m_viewPager;
 
     private NestedScrollView m_nestedScroll;
-
 
     private SweetAlertDialog m_accDialog;
     private SweetAlertDialog m_loadingDialog;
@@ -155,11 +155,11 @@ public class ScrollingActivity extends AppCompatActivity
 
             UserManager.setUser(FileManager.readXmlUserInfo(this), new ValidateCallback() {
                 @Override
-                public void onDone(int resultCode) throws JSONException {
+                public void onDone(int resultCode) {
                     if( resultCode == UserManager.DONE_SET_USER ) {
                         DownloadImageTask downloadUserDataLED = new DownloadImageTask(activity, new ValidateCallback() {
                             @Override
-                            public void onDone(int resultCode) throws JSONException {
+                            public void onDone(int resultCode) {
                                 if( resultCode == DownloadImageTask.DONE_LOAD_LED_IMAGES ) {
                                     m_loadingDialog.dismissWithAnimation();
                                 }
@@ -243,10 +243,6 @@ public class ScrollingActivity extends AppCompatActivity
             }
         });
 
-        /** Nested Scroll **/
-        m_nestedScroll = findViewById(R.id.app_nestedScroll);
-
-
         /** Dialog **/
         m_accDialog = resetAccDialog();
 
@@ -287,6 +283,12 @@ public class ScrollingActivity extends AppCompatActivity
         GyroManager.m_sensorAccel = GyroManager.m_sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         GyroManager.m_sensorMag = GyroManager.m_sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         /* Sensor end */
+
+//        LinearLayout layout = findViewById(R.layout.widget_ticktock);
+
+        m_accDialog = resetAccDialog();
+        m_accDialog.setCustomView(new DialogTickTock(this, EmergencyManager.EMERGENCY_WAITING_ALERT_SECONDS));
+        m_accDialog.show();
     }
 
     private void startInitializeShopData() {
@@ -336,10 +338,18 @@ public class ScrollingActivity extends AppCompatActivity
         final Context thisContext = this;
         return
             new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
-                    .setTitleText("Are you Ok?")
-                    .setContentText("사고를 인지하였습니다.\n시간(30s) 내에 응답이 없을 시 비상연락처에 사고정보가 전달됩니다.")
-                    .setConfirmText("전달해주세요")
-                    .setCancelText("괜찮아요")
+                    .setTitleText(getString(R.string.emergency_dialog_title))
+                    .setCancelText(getString(R.string.emergency_dialog_cancel))
+                    .setNeutralText(getString(R.string.emergency_dialog_nearby))
+                    .setNeutralClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            sweetAlertDialog.dismissWithAnimation();
+                            Intent intent = new Intent(thisContext, AssistActivity.class);
+                            startActivity(intent);
+                        }
+                    })
+                    .setConfirmText(getString(R.string.emergency_dialog_send))
                     .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                         @Override
                         public void onClick(final SweetAlertDialog sDialog) {
@@ -371,9 +381,9 @@ public class ScrollingActivity extends AppCompatActivity
 
 
         m_accDialog
-                .setTitleText("전달되었습니다!")
-                .setContentText("ㅇㅇㅇ이 곧 도착합니다!")
-                .setConfirmText("OK")
+                .setTitleText(getString(R.string.emergency_dialog_send_completely))
+                .setContentText(getString(R.string.emergency_dialog_coming))
+                .setConfirmText(getString(R.string.dialog_ok))
                 .showCancelButton(false)
                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
@@ -528,7 +538,7 @@ public class ScrollingActivity extends AppCompatActivity
                 /** shock detect **/
                 GyroManager.shockStateDetector(activity, sensorEvent, new ValidateCallback() {
                     @Override
-                    public void onDone(int resultCode) throws JSONException {
+                    public void onDone(int resultCode) {
                         if( resultCode == GyroManager.DETECT_ACCIDENT ) {
 
                             /** permission (location) **/
@@ -552,6 +562,7 @@ public class ScrollingActivity extends AppCompatActivity
                                         EmergencyManager.insertAccidentinServer(activity, UserManager.getUser(), accLocation, false);
 
                                         m_accDialog = resetAccDialog();
+                                        m_accDialog.setCustomView(new DialogTickTock(activity, EmergencyManager.EMERGENCY_WAITING_ALERT_SECONDS));
                                         m_accDialog.show();
 
                                         EmergencyManager.startWaitingUserResponse(new ValidateCallback() {
@@ -589,7 +600,7 @@ public class ScrollingActivity extends AppCompatActivity
     /** Navigation **/
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -646,7 +657,7 @@ public class ScrollingActivity extends AppCompatActivity
                 break;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
