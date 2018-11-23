@@ -24,6 +24,7 @@ import com.helper.helper.view.category.CategoryActivity;
 import com.helper.helper.view.widget.DialogLED;
 import com.helper.helper.view.widget.LEDCardView;
 import com.helper.helper.view.widget.LEDCategoryCardView;
+import com.helper.helper.view.widget.LEDRankCardView;
 import com.snatik.storage.Storage;
 
 import org.json.JSONArray;
@@ -45,10 +46,13 @@ import java.util.Locale;
 
 public class LEDShopFragment extends Fragment {
     private final static String TAG = LEDShopFragment.class.getSimpleName() + "/DEV";
+    private final static int LED_SHOW_MAX = 30;
 
     /******************* Define widgtes in view *******************/
     private GridLayout m_newGrid;
     private GridLayout m_caregoryGrid;
+    private GridLayout m_freeGrid;
+    private GridLayout m_paidGrid;
     /**************************************************************/
 
     public LEDShopFragment() {
@@ -62,11 +66,13 @@ public class LEDShopFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
         View view = inflater.inflate( R.layout.fragment_shop, container, false );
         /******************* Connect widgtes with layout *******************/
         m_caregoryGrid = view.findViewById(R.id.categoryGrid);
         m_newGrid = view.findViewById(R.id.newGrid);
+        m_freeGrid = view.findViewById(R.id.freeGrid);
+        m_paidGrid = view.findViewById(R.id.paidGrid);
         /*******************************************************************/
 
         /******************* Make Listener in View *******************/
@@ -80,15 +86,17 @@ public class LEDShopFragment extends Fragment {
         return view;
     }
 
+
     private void setNewLEDCards() {
         if( HttpManager.useCollection(getString(R.string.collection_led)) ) {
             JSONObject jsonObject = new JSONObject();
             try{
-                jsonObject.put("limit", 10);
+                jsonObject.put("limit", LED_SHOW_MAX);
+                jsonObject.put("order",-1);
+                jsonObject.put("sort", LED.KEY_CREATE_TIME);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
 
             try {
                 HttpManager.requestHttp(jsonObject, "", "GET", "", new HttpCallback() {
@@ -118,19 +126,14 @@ public class LEDShopFragment extends Fragment {
                         }
 
                         final LED[] finalLEDList = ledList;
-                        // sort by create date ascending
-                        Arrays.sort(ledList, new Comparator<LED>() {
-                            @Override
-                            public int compare(LED l1, LED l2) {
-                                return l1.getCreateDate().compareTo(l2.getCreateDate());
-                            }
-                        });
+
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 makeNewCard(m_newGrid, finalLEDList);
                             }
                         });
+
 
                     }
 
@@ -142,8 +145,81 @@ public class LEDShopFragment extends Fragment {
             } catch (JSONException e ) {
                 e.printStackTrace();
             }
+
+            jsonObject = new JSONObject();
+            try{
+                jsonObject.put("limit", LED_SHOW_MAX);
+                jsonObject.put("order",-1);
+                jsonObject.put("sort", LED.KEY_DOWNLOADCNT);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                HttpManager.requestHttp(jsonObject, "", "GET", "", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray jsonArray) throws JSONException {
+
+                        LED[] ledList = new LED[jsonArray.length()];
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject object = (JSONObject) jsonArray.get(i);
+                            Date convertDate = null;
+                            try {
+                                convertDate = new SimpleDateFormat("yyyy-mm-dd", Locale.KOREA).parse(object.getString(LED.KEY_CREATE_TIME));
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            ledList[i] = new LED(
+                                    new LED.Builder()
+                                            .index(object.getString(LED.KEY_INDEX))
+                                            .name(object.getString(LED.KEY_NAME))
+                                            .creator(object.getString(LED.KEY_CREATOR))
+                                            .createDate(convertDate)
+                                            .category(object.getString(LED.KEY_CATEGORY))
+                                            .downloadCnt(object.getInt(LED.KEY_DOWNLOADCNT))
+                                            .type(object.getString(LED.KEY_TYPE))
+                            );
+                        }
+
+                        List<LED> ledFreeList = new ArrayList<>();
+                        List<LED> ledPaidList = new ArrayList<>();
+
+                        for(LED led:ledList){
+                            if(led.getType().equals(LED.LED_TYPE_FREE)){
+                                ledFreeList.add(led);
+                            }
+                            else{
+                                ledPaidList.add(led);
+                            }
+                        }
+
+                        LED[] ledFreeArr = ledFreeList.toArray(new LED[ledFreeList.size()]);
+                        LED[] ledPaidArr = ledPaidList.toArray(new LED[ledPaidList.size()]);
+
+                        final LED[] finalLEDFreeList = ledFreeArr;
+                        final LED[] finalLEDPaidList = ledPaidArr;
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                makeRankCard(m_freeGrid, finalLEDFreeList);
+                                makeRankCard(m_paidGrid, finalLEDPaidList);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String err) {
+
+                    }
+                });
+            } catch (JSONException e ) {
+                e.printStackTrace();
+            }
         }
     }
+
 
     private void makeNewCard(GridLayout grid, LED[] list) {
         for (LED ledData :
@@ -165,6 +241,30 @@ public class LEDShopFragment extends Fragment {
             cardViewLED.setCardNameText(ledData.getName());
             cardViewLED.setOnClickCustomDialogEnable(LEDCardView.DOWNLOAD_DIALOG_TYPE, ledData, getActivity());
             grid.addView(cardViewLED);
+        }
+    }
+
+    private void makeRankCard(GridLayout grid, LED[] list) {
+        int ledCnt = 1;
+
+        for (LED ledData : list) {
+            LEDRankCardView rankCardViewLED = new LEDRankCardView(getActivity());
+
+            /** set Bitmap Image (character) **/
+            File f=new File(CommonManager.getOpenLEDFilePath(
+                    getActivity(),
+                    ledData.getIndex(),
+                    getString(R.string.gif_format)));
+            try {
+                Bitmap cardImageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
+                rankCardViewLED.setCardViewImg(cardImageBitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            rankCardViewLED.setCardviewNumTxt(ledCnt++);
+            rankCardViewLED.setCardviewNameTxt(ledData.getName());
+            rankCardViewLED.setOnClickCustomDialogEnable(LEDCardView.DOWNLOAD_DIALOG_TYPE, ledData, getActivity());
+            grid.addView(rankCardViewLED);
         }
     }
 
@@ -214,15 +314,6 @@ public class LEDShopFragment extends Fragment {
             });
             grid.addView(cardViewLED);
         }
-    }
-
-    private String getOpenFilePath(String ledIndex) {
-        Storage internalStorage = new Storage(getActivity());
-        String path = internalStorage.getInternalFilesDirectory();
-        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + ledIndex + getString(R.string.gif_format);
-
-        return openFilePath;
     }
 }
 

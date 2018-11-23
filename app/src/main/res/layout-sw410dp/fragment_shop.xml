@@ -127,62 +127,14 @@
 
                     <GridLayout
                         android:id="@+id/freeGrid"
-                        android:layout_gravity="center_horizontal"
+                        android:layout_gravity="start"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="12.54dp"
                         android:layout_marginRight="12.54dp"
                         android:rowCount="3"
                         android:orientation="vertical">
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
 
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
                     </GridLayout>
                 </FrameLayout>
             </HorizontalScrollView>
@@ -221,62 +173,14 @@
 
                     <GridLayout
                         android:id="@+id/paidGrid"
-                        android:layout_gravity="center_horizontal"
+                        android:layout_gravity="start"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="12.54dp"
                         android:layout_marginRight="12.54dp"
                         android:rowCount="3"
                         android:orientation="vertical">
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
 
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <com.helper.helper.view.widget.ImageCardViewAddonRank
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
                     </GridLayout>
                 </FrameLayout>
             </HorizontalScrollView>
