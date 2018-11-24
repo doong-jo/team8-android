@@ -8,6 +8,7 @@ package com.helper.helper.view;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -44,6 +45,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bcgdv.asia.lib.ticktock.TickTockView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -243,9 +245,6 @@ public class ScrollingActivity extends AppCompatActivity
             }
         });
 
-        /** Dialog **/
-        m_accDialog = resetAccDialog();
-
         /*******************************************************************/
 
         /******************* Make Listener in View *******************/
@@ -283,12 +282,6 @@ public class ScrollingActivity extends AppCompatActivity
         GyroManager.m_sensorAccel = GyroManager.m_sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         GyroManager.m_sensorMag = GyroManager.m_sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         /* Sensor end */
-
-//        LinearLayout layout = findViewById(R.layout.widget_ticktock);
-
-        m_accDialog = resetAccDialog();
-        m_accDialog.setCustomView(new DialogTickTock(this, EmergencyManager.EMERGENCY_WAITING_ALERT_SECONDS));
-        m_accDialog.show();
     }
 
     private void startInitializeShopData() {
@@ -562,7 +555,25 @@ public class ScrollingActivity extends AppCompatActivity
                                         EmergencyManager.insertAccidentinServer(activity, UserManager.getUser(), accLocation, false);
 
                                         m_accDialog = resetAccDialog();
-                                        m_accDialog.setCustomView(new DialogTickTock(activity, EmergencyManager.EMERGENCY_WAITING_ALERT_SECONDS));
+                                        DialogTickTock tickTockDlg = new DialogTickTock(activity, EmergencyManager.EMERGENCY_WAITING_ALERT_SECONDS);
+                                        tickTockDlg.setOnTickListener(new TickTockView.OnTickListener() {
+                                            @Override
+                                            public String getText(long timeRemainingInMillis) {
+                                                int seconds = (int) (timeRemainingInMillis / 1000) % 60;
+
+                                                if( seconds == 0) {
+                                                    startAlertEmergencyContacts();
+                                                    try {
+                                                        EmergencyManager.insertAccidentinServer(activity, UserManager.getUser(), EmergencyManager.getAccLocation(), true);
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                                return String.valueOf(seconds).concat("s");
+                                            }
+                                        });
+                                        m_accDialog.setCustomView(tickTockDlg);
+
                                         m_accDialog.show();
 
                                         EmergencyManager.startWaitingUserResponse(new ValidateCallback() {

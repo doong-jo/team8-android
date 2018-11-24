@@ -69,14 +69,14 @@ public class DialogTickTock extends FrameLayout {
 
 
         /******************* Make Listener in View *******************/
-        m_ticktock.setOnTickListener(new TickTockView.OnTickListener() {
-            @Override
-            public String getText(long timeRemainingInMillis) {
-                int seconds = (int) (timeRemainingInMillis / 1000) % 60;
-
-                return String.valueOf(seconds).concat("s");
-            }
-        });
+//        m_ticktock.setOnTickListener(new TickTockView.OnTickListener() {
+//            @Override
+//            public String getText(long timeRemainingInMillis) {
+//                int seconds = (int) (timeRemainingInMillis / 1000) % 60;
+//
+//                return String.valueOf(seconds).concat("s");
+//            }
+//        });
         /*************************************************************/
 
         m_content.setText(m_context.getString(R.string.emergency_dialog_content));
@@ -103,5 +103,9 @@ public class DialogTickTock extends FrameLayout {
 
     private void setTypeArray(TypedArray typedArray) {
         typedArray.recycle();
+    }
+
+    public void setOnTickListener(TickTockView.OnTickListener onTickListener) {
+        m_ticktock.setOnTickListener(onTickListener);
     }
 }
