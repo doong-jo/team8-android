@@ -13,10 +13,10 @@
             android:icon="@drawable/ic_user"
             android:title="Emergency Contacts" />
 
-        <item
-            android:id="@+id/nav_assistPlaces"
-            android:icon="@drawable/ic_heartbeat_solid"
-            android:title="Assist Places" />
+        <!--<item-->
+            <!--android:id="@+id/nav_assistPlaces"-->
+            <!--android:icon="@drawable/ic_heartbeat_solid"-->
+            <!--android:title="Assist Places" />-->
     </group>
 
 </menu>

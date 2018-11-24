@@ -333,15 +333,15 @@ public class ScrollingActivity extends AppCompatActivity
             new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
                     .setTitleText(getString(R.string.emergency_dialog_title))
                     .setCancelText(getString(R.string.emergency_dialog_cancel))
-                    .setNeutralText(getString(R.string.emergency_dialog_nearby))
-                    .setNeutralClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-                            sweetAlertDialog.dismissWithAnimation();
-                            Intent intent = new Intent(thisContext, AssistActivity.class);
-                            startActivity(intent);
-                        }
-                    })
+//                    .setNeutralText(getString(R.string.emergency_dialog_nearby))
+//                    .setNeutralClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//                        @Override
+//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+//                            sweetAlertDialog.dismissWithAnimation();
+//                            Intent intent = new Intent(thisContext, AssistActivity.class);
+//                            startActivity(intent);
+//                        }
+//                    })
                     .setConfirmText(getString(R.string.emergency_dialog_send))
                     .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                         @Override
@@ -662,10 +662,10 @@ public class ScrollingActivity extends AppCompatActivity
 
                 break;
 
-            case R.id.nav_assistPlaces:
-                intent = new Intent(this, AssistActivity.class);
-                startActivity(intent);
-                break;
+//            case R.id.nav_assistPlaces:
+//                intent = new Intent(this, AssistActivity.class);
+//                startActivity(intent);
+//                break;
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
