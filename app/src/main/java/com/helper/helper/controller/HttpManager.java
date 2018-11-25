@@ -87,6 +87,8 @@ public class HttpManager {
             } catch (ClassCastException e) {
                 if( obj.get(key).getClass().getName().equals("java.lang.Boolean") ) {
                     value = String.valueOf(obj.get(key));
+                } else if( obj.get(key).getClass().getName().equals("java.lang.Double") ) {
+                    value = String.valueOf(obj.get(key));
                 }
                 /** mongoDB ($in ...) syntax case **/
                 else if ( obj.get(key).getClass().getName().equals("org.json.JSONObject")) {
@@ -96,12 +98,18 @@ public class HttpManager {
                     if(keysInValue.hasNext()) {
                         while( keysInValue.hasNext() ) {
                             String keyOfValue = keysInValue.next();
-                            String[] ValueOfKeyOfValue = (String[])jsonObject.get(keyOfValue);
-                            for (int i = 0; i < ValueOfKeyOfValue.length; i++) {
-                                ValueOfKeyOfValue[i] = "\"" + ValueOfKeyOfValue[i] + "\"";
+                            String[] ValueOfKeyOfValue = new String[]{};
+                            if( jsonObject.get(keyOfValue).getClass().getName().equals("java.lang.Double") ) {
+                                value = String.valueOf(obj.get(key));
+                            } else {
+                                ValueOfKeyOfValue = (String[]) jsonObject.get(keyOfValue);
+                                for (int i = 0; i < ValueOfKeyOfValue.length; i++) {
+                                    ValueOfKeyOfValue[i] = "\"" + ValueOfKeyOfValue[i] + "\"";
+                                }
+
+                                value = "{\"" + keyOfValue + "\":" + Arrays.deepToString(ValueOfKeyOfValue) + "}";
                             }
 
-                            value = "{\"" + keyOfValue + "\":" + Arrays.deepToString(ValueOfKeyOfValue) + "}";
                         }
                     }
                      else {

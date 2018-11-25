@@ -28,6 +28,9 @@ public class SMSManager {
 
 
     public static void sendEmergencyMessages(Context context, List<ContactItem> list, Location location, String address) {
+        if( list == null ) { return; }
+        if( list.size() == 0 ) { return; }
+
         String strMessage = context.getString(R.string.sms_content) + "\n\n" + address;
         String strGoogleMap = "https://google.com/maps?q=" + location.getLatitude() + "," + location.getLongitude();
 

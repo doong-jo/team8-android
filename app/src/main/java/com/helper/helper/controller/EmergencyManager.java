@@ -29,17 +29,18 @@ import java.util.Locale;
 
 public class EmergencyManager {
     private final static String TAG = EmergencyManager.class.getSimpleName() + "/DEV";
-    private static final int EMERGENCY_LOCATION_WATING_TIME = 10000; // 4min 240000
+    private static final int EMERGENCY_LOCATION_WATING_TIME = 5000; // 4min 240000
     private static final int EMERGENCY_LOCATION_DISTANCE_RANGE = 50; // 50m
     private static final int EMERGENCY_WATING_RESPONSE_TIME = 30000; // 30S
 
-    public static final int EMERGENCY_VALIDATE_LOCATION_WAITNG_FINISH = 901;
     public static final int EMERGENCY_WAITING_USER_RESPONSE = 231;
     public static final int EMERGENCY_WAITING_ALERT_SECONDS = 60;
 
     private static Location m_accLocation;
     private static boolean m_bIsAccidentProcessing;
+    private static boolean m_bIsDoneEmergencyAlert;
     private static List<ContactItem> m_emergencyContacts;
+
 
 
     public static void setEmergencycontacts(List<ContactItem> list) {
@@ -58,6 +59,16 @@ public class EmergencyManager {
         return m_accLocation;
     }
 
+    public static boolean getAccidentProcessing() { return m_bIsAccidentProcessing; }
+
+    public static void setEmergencyAlertState(boolean IsAlerted) {
+        m_bIsDoneEmergencyAlert = IsAlerted;
+    }
+
+    public static boolean getEmergencyAlertState() {
+        return m_bIsDoneEmergencyAlert;
+    }
+
     public static void startValidationAccident(final ValidateCallback callback) {
         if( m_bIsAccidentProcessing ) { return; }
 
@@ -65,35 +76,23 @@ public class EmergencyManager {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                try {
-                    callback.onDone(EMERGENCY_VALIDATE_LOCATION_WAITNG_FINISH);
-                    m_bIsAccidentProcessing = false;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                validateLocation(m_accLocation, callback);
+
             }
         }, EMERGENCY_LOCATION_WATING_TIME);
 
         m_bIsAccidentProcessing = true;
     }
 
-    public static void startWaitingUserResponse(final ValidateCallback callback) {
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    callback.onDone(EMERGENCY_WAITING_USER_RESPONSE);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, EMERGENCY_WATING_RESPONSE_TIME);
-    }
-
-    public static boolean validateLocation(Location curLocation) {
+    public static boolean validateLocation(final Location loc, final ValidateCallback callback) {
 //        double distance = curLocation.distanceTo(m_accLocation);
-        if( curLocation.distanceTo(m_accLocation) < EMERGENCY_LOCATION_DISTANCE_RANGE ) {
+        if( loc.distanceTo(m_accLocation) < EMERGENCY_LOCATION_DISTANCE_RANGE ) {
+            try {
+                m_bIsAccidentProcessing = false;
+                callback.onDone(EMERGENCY_WAITING_USER_RESPONSE);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             return true;
         }
 

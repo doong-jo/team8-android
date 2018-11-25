@@ -26,6 +26,8 @@
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <!--SMS-->
     <uses-permission android:name="android.permission.SEND_SMS" />
@@ -33,6 +35,7 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
 
     <application
         android:allowBackup="true"
@@ -59,19 +62,18 @@
             android:screenOrientation="portrait"
             android:noHistory="false"
             android:theme="@style/AppTheme">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <activity
             android:name=".view.ScrollingActivity"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait">
-
 
         </activity>
 
@@ -104,7 +106,12 @@
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait">
         </activity>
-        <!--BLE service class 추가-->
+
+        <activity android:name=".view.popup.PopupActivity"
+            android:theme="@style/Theme.Transparent">
+        </activity>
+
+        <!--BLE service class -->
         <!--<service android:name=".controller.ble.BluetoothLeService" android:enabled="true"/>-->
 
         <service

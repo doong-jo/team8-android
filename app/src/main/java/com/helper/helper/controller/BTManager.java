@@ -97,7 +97,13 @@ public class BTManager {
                     public void onResult(String result) {
                         bluetoothSignalHandler(result);
                     }
+
+                    @Override
+                    public void onError(String result) {
+                        return;
+                    }
                 });
+
                 SystemClock.sleep(BT_READ_CLOCK_SLEEP);
             }
         }
@@ -112,12 +118,12 @@ public class BTManager {
     private static BroadcastReceiver m_discoveryReceiver = makeBroadcastReceiver();
     private static BluetoothReadThread m_bluetoothReadthread;
     private static ValidateCallback m_connectionResultCb;
-    private static BluetoothReadCallback m_readResultCb;
+    private static BluetoothReadCallback m_infoReadCb;
+    private static BluetoothReadCallback m_activityReadCb;
     private static BluetoothReadCallback m_downloadLEDResultCb;
     private static String m_lastSignalStr = "";
 
     /** Send bytearray of Bitmap (LED) **/
-    private static ByteArrayOutputStream m_outBitmapByteArrLED;
     private static byte[] m_outBitmapByteArr;
     private static int m_cntSendByteArr;
     private static int m_copyCursor;
@@ -135,7 +141,17 @@ public class BTManager {
 
     public static String getLastSignalStr() { return m_lastSignalStr; }
 
-    public static void setReadResultCb(BluetoothReadCallback callback) { m_readResultCb = callback; }
+    public static void setInfoReadCb(BluetoothReadCallback callback) {
+        m_infoReadCb = callback;
+
+        /** create bluetooth read thread **/
+        m_bluetoothReadthread = new BluetoothReadThread();
+        m_bluetoothReadthread.start();
+    }
+
+    public static void setActivityReadCb(BluetoothReadCallback callback) {
+        m_activityReadCb = callback;
+    }
 
     public static void initBluetooth(final Activity activity) {
         if( getConnected() ) {
@@ -179,23 +195,14 @@ public class BTManager {
     private static void bluetoothSignalHandler(String signalMsg) {
         m_lastSignalStr = signalMsg;
         if ( signalMsg.equals("EMERGENCY") ) {
-            try {
-                EmergencyManager.startEmergencyProcess(m_activity);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            m_activityReadCb.onResult(signalMsg);
         } else if( signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[0].equals(BT_SIGNAL_RESPONSE_LED) ||
                 signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[0].equals(BT_SIGNAL_DOWNLOAD_LED) ){
-            if( m_downloadLEDResultCb != null ) {
-                m_downloadLEDResultCb.onResult(signalMsg);
-            }
-        } else {
-            if (m_readResultCb != null) {
-                m_readResultCb.onResult(signalMsg);
-            }
+            m_downloadLEDResultCb.onResult(signalMsg);
+        } else if ( signalMsg.split("info").length != 0 ){
+            m_infoReadCb.onResult(signalMsg);
         }
     }
-
 
     /** Find Bluetooth Device **/
     private static void prepareDevice()  {
@@ -235,10 +242,6 @@ public class BTManager {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            /** create bluetooth read thread **/
-            m_bluetoothReadthread = new BluetoothReadThread();
-            m_bluetoothReadthread.start();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -317,6 +320,7 @@ public class BTManager {
         } catch (IOException e) {
             Log.e(TAG, "readFromBluetoothDevice: StopBluetoothReadThread");
             stopReadThread();
+            callback.onError(e.getMessage());
             e.printStackTrace();
         }
     }
@@ -325,21 +329,24 @@ public class BTManager {
         try {
             if( m_bluetoothSocket != null && m_bluetoothSocket.isConnected() ) {
                 m_bluetoothSocket.close();
-                stopReadThread();
+
             }
         } catch (IOException e) {
             e.printStackTrace();
-            stopReadThread();
         }
+        stopReadThread();
     }
 
     private static void stopReadThread() {
         if( m_bluetoothReadthread != null ) {
-            m_bluetoothReadthread.interrupt();
+            try {
+                m_bluetoothReadthread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             m_bluetoothReadthread = null;
             m_bluetoothInput = null;
             m_bluetoothOutput = null;
-
         }
     }
 
@@ -476,6 +483,11 @@ public class BTManager {
                     default:
                         break;
                 }
+            }
+
+            @Override
+            public void onError(String result) {
+
             }
         };
 

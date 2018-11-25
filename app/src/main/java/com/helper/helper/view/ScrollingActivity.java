@@ -8,7 +8,6 @@ package com.helper.helper.view;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -19,11 +18,8 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -33,19 +29,15 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bcgdv.asia.lib.ticktock.TickTockView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -61,19 +53,18 @@ import com.helper.helper.controller.GoogleMapManager;
 import com.helper.helper.controller.SMSManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.controller.ViewStateManager;
+import com.helper.helper.interfaces.BluetoothReadCallback;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LEDCategory;
-import com.helper.helper.model.User;
-import com.helper.helper.view.assist.AssistActivity;
 import com.helper.helper.view.main.myeight.EightFragment;
 import com.helper.helper.view.main.myeight.InfoFragment;
 import com.helper.helper.view.contact.ContactActivity;
 import com.helper.helper.controller.GyroManager;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.PermissionManager;
-import com.helper.helper.view.widget.DialogTickTock;
-import com.helper.helper.view.widget.WrapContentViewPager;
+import com.helper.helper.view.popup.PopupActivity;
+import com.helper.helper.view.widget.DialogAccident;
 import com.snatik.storage.Storage;
 
 import org.json.JSONArray;
@@ -119,7 +110,9 @@ public class ScrollingActivity extends AppCompatActivity
     private SweetAlertDialog m_loadingDialog;
     /**************************************************************/
 
-
+    private BluetoothReadCallback m_emergencyCallback;
+    private boolean m_bIsDestroyed;
+    private boolean m_bIsAccident;
 
     public ViewPager getViewPager() {
         return m_viewPager;
@@ -275,7 +268,49 @@ public class ScrollingActivity extends AppCompatActivity
         GoogleMapManager.initGoogleMap(this);
 
         /** Bluetooth  **/
-//        BTManager.initBluetooth(this);
+        m_emergencyCallback = new BluetoothReadCallback() {
+            @Override
+            public void onResult(String result) {
+                if( EmergencyManager.getAccidentProcessing() ||
+                        EmergencyManager.getEmergencyAlertState() ||
+                        !result.contains("EMERGENCY")  ||
+                        !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ||
+                        !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    return;
+                }
+
+                EmergencyManager.setEmergencyAlertState(true);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final Location accLocation = GoogleMapManager.getCurLocation();
+                        AddressManager.startAddressIntentService(activity, accLocation);
+
+                        EmergencyManager.startValidationAccident(new ValidateCallback() {
+                            @Override
+                            public void onDone(int resultCode) {
+                                if( m_bIsDestroyed ) {
+                                    Intent intent = new Intent(activity, PopupActivity.class);
+                                    startActivity(intent);
+                                } else {
+                                    DialogAccident dialogAccident = new DialogAccident(activity, false);
+                                    dialogAccident.showDialog();
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String result) {
+
+            }
+        };
+
+        BTManager.setActivityReadCb(m_emergencyCallback);
+
 
         /** Gyro **/
         GyroManager.m_sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -333,15 +368,6 @@ public class ScrollingActivity extends AppCompatActivity
             new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
                     .setTitleText(getString(R.string.emergency_dialog_title))
                     .setCancelText(getString(R.string.emergency_dialog_cancel))
-//                    .setNeutralText(getString(R.string.emergency_dialog_nearby))
-//                    .setNeutralClickListener(new SweetAlertDialog.OnSweetClickListener() {
-//                        @Override
-//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-//                            sweetAlertDialog.dismissWithAnimation();
-//                            Intent intent = new Intent(thisContext, AssistActivity.class);
-//                            startActivity(intent);
-//                        }
-//                    })
                     .setConfirmText(getString(R.string.emergency_dialog_send))
                     .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                         @Override
@@ -385,14 +411,6 @@ public class ScrollingActivity extends AppCompatActivity
                     }
                 })
                 .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
-
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                m_accDialog.dismissWithAnimation();
-            }
-        }, 3000);
     }
 
     /** Result handler **/
@@ -481,6 +499,7 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        m_bIsDestroyed = false;
         Log.d(TAG, "onResume: ");
 
         TabLayout.Tab tab = m_tabLayout.getTabAt(ViewStateManager.getSavedTabPosition());
@@ -510,10 +529,10 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        m_bIsDestroyed = true;
+        Log.d(TAG, "onDestroy: ");
 
-//        Log.d(TAG, "onDestroy: ");
-
-        BTManager.closeBluetoothSocket();
+//        BTManager.closeBluetoothSocket();
     }
 
 //    /** GyroSensor **/
@@ -522,6 +541,7 @@ public class ScrollingActivity extends AppCompatActivity
 //    public void onSensorChanged(SensorEvent sensorEvent) {
 //
 //    }
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
 
@@ -534,66 +554,7 @@ public class ScrollingActivity extends AppCompatActivity
                     public void onDone(int resultCode) {
                         if( resultCode == GyroManager.DETECT_ACCIDENT ) {
 
-                            /** permission (location) **/
-                            if ( !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ||
-                                    !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_FINE_LOCATION) ) {
-                                Toast.makeText(activity, "사고를 인지했지만 위치 정보 권한이 허용되지 않아 제대로 동작하지 않습니다.", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
 
-                            final Location accLocation = GoogleMapManager.getCurLocation();
-                            AddressManager.startAddressIntentService(activity, accLocation);
-                            EmergencyManager.setAccLocation(accLocation);
-
-                            EmergencyManager.startValidationAccident(new ValidateCallback() {
-                                @Override
-                                public void onDone(int resultCode) throws JSONException {
-                                    /** Consider accident **/
-                                    if (resultCode == EmergencyManager.EMERGENCY_VALIDATE_LOCATION_WAITNG_FINISH &&
-                                            EmergencyManager.validateLocation(GoogleMapManager.getCurLocation())) {
-
-                                        EmergencyManager.insertAccidentinServer(activity, UserManager.getUser(), accLocation, false);
-
-                                        m_accDialog = resetAccDialog();
-                                        DialogTickTock tickTockDlg = new DialogTickTock(activity, EmergencyManager.EMERGENCY_WAITING_ALERT_SECONDS);
-                                        tickTockDlg.setOnTickListener(new TickTockView.OnTickListener() {
-                                            @Override
-                                            public String getText(long timeRemainingInMillis) {
-                                                int seconds = (int) (timeRemainingInMillis / 1000) % 60;
-
-                                                if( seconds == 0) {
-                                                    startAlertEmergencyContacts();
-                                                    try {
-                                                        EmergencyManager.insertAccidentinServer(activity, UserManager.getUser(), EmergencyManager.getAccLocation(), true);
-                                                    } catch (JSONException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }
-                                                return String.valueOf(seconds).concat("s");
-                                            }
-                                        });
-                                        m_accDialog.setCustomView(tickTockDlg);
-
-                                        m_accDialog.show();
-
-                                        EmergencyManager.startWaitingUserResponse(new ValidateCallback() {
-                                            @Override
-                                            public void onDone(int resultCode) {
-                                                if( resultCode == EmergencyManager.EMERGENCY_WAITING_USER_RESPONSE ) {
-                                                    if( m_accDialog.isShowing() ) {
-                                                        startAlertEmergencyContacts();
-                                                        try {
-                                                            EmergencyManager.insertAccidentinServer(activity, UserManager.getUser(), accLocation, true);
-                                                        } catch (JSONException e) {
-                                                            e.printStackTrace();
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        });
-                                    }
-                                }
-                            });
                         }
                     }
                 });
