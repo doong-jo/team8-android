@@ -59,6 +59,7 @@ import com.helper.helper.controller.EmergencyManager;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.GoogleMapManager;
 import com.helper.helper.controller.SMSManager;
+import com.helper.helper.controller.SharedPreferencer;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.controller.ViewStateManager;
 import com.helper.helper.interfaces.HttpCallback;
@@ -175,6 +176,9 @@ public class ScrollingActivity extends AppCompatActivity
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        /** Set SharedPreferencer **/
+        SharedPreferencer.getSharedPreferencer(this, UserManager.getUserEmail(), MODE_PRIVATE);
 
         /** Set Shop Data **/
         startInitializeShopData();

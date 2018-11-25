@@ -43,7 +43,6 @@
             android:id="@+id/searchInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:search_hint_text="@string/search_hint"
             app:search_clear_control="true" />
 
 
