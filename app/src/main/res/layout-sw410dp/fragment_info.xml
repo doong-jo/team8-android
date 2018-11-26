@@ -105,41 +105,27 @@
             style="@style/CategoryCardTypo"/>
 
         <HorizontalScrollView
-            android:scrollbars="none"
             android:layout_marginTop="2.28dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <LinearLayout
-                android:id="@+id/myledsLayout"
+            android:layout_height="wrap_content"
+            android:fillViewport="true"
+            android:scrollbars="none"
+            >
+
+            <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="9.12dp"/>
-
-                <com.helper.helper.view.widget.LEDCardView
-                    android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+                <GridLayout
+                    android:id="@+id/myled"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    />
-
-                <com.helper.helper.view.widget.LEDCardView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-
-                <com.helper.helper.view.widget.LEDCardView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-
-                <com.helper.helper.view.widget.LEDCardView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-
-            </LinearLayout>
-
+                    android:layout_marginLeft="12.54dp"
+                    android:layout_marginRight="12.54dp"
+                    android:orientation="horizontal">
+                </GridLayout>
+            </FrameLayout>
         </HorizontalScrollView>
 
         <TextView

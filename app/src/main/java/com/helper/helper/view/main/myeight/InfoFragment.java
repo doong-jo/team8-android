@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -20,15 +21,25 @@ import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
 import com.helper.helper.controller.CommonManager;
 import com.helper.helper.controller.DownloadImageTask;
+import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.BluetoothReadCallback;
+import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
+import com.helper.helper.model.LED;
+import com.helper.helper.view.widget.LEDCardView;
 import com.snatik.storage.Storage;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 public class InfoFragment extends Fragment {
     private final static String TAG = InfoFragment.class.getSimpleName() + "/DEV";
@@ -36,14 +47,15 @@ public class InfoFragment extends Fragment {
     private BluetoothReadCallback m_bluetoothReadCallback;
 
     /******************* Define widgtes in view *******************/
-    private LinearLayout m_myledsLayout;
     private SeekBar m_brightnessSeek;
     private SeekBar m_speedSeek;
 
-    private TextView m_userName;
     private ImageView m_thumbImg;
+
+    private GridLayout m_newGrid;
     /**************************************************************/
 
+    private Map<String, LED> m_mapDataLED;
     private static boolean m_bIsSetDeviceInfo;
 
     public InfoFragment() {
@@ -55,20 +67,19 @@ public class InfoFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_info, container, false);
 
         /******************* Connect widgtes with layout *******************/
-        m_myledsLayout = view.findViewById(R.id.myledsLayout);
         m_brightnessSeek = view.findViewById(R.id.brightnessSeek);
         m_speedSeek = view.findViewById(R.id.speedSeek);
-        m_userName = view.findViewById(R.id.myeightUsername);
+        TextView userName = view.findViewById(R.id.myeightUsername);
         m_thumbImg = view.findViewById(R.id.curledImageThumb);
+        m_newGrid = view.findViewById(R.id.myled);
         /*******************************************************************/
 
         UserManager.setUserLEDDeviceShowOnThumb(m_thumbImg);
 
         String tempName = "조성동";
-        m_myledsLayout.bringToFront();
 
         // TODO: 01/11/2018 get UserManager getUser Name
-        m_userName.setText(tempName + "'s EIGHT");
+        userName.setText(tempName + "'s EIGHT");
 
         /** Read Bluetooth Signal -> Callback **/
         m_bluetoothReadCallback = new BluetoothReadCallback() {
@@ -103,7 +114,89 @@ public class InfoFragment extends Fragment {
             }
         }
 
+        final String[] ledIndicies = CommonManager.splitNoWhiteSpace(UserManager.getUser()
+                .getUserLEDIndicies()
+                .split("\\[")[1]
+                .split("]")[0]);
+
+        for (int i = 0; i < ledIndicies.length; i++) {
+            ledIndicies[i] = ledIndicies[i].replaceAll("\"", "");
+        }
+
+        m_mapDataLED = new HashMap<>();
+
+        if( HttpManager.useCollection(getString(R.string.collection_led)) ) {
+            try {
+                JSONObject reqObject = new JSONObject();
+                JSONObject inObject = new JSONObject();
+
+                inObject.put("$in", ledIndicies);
+                reqObject.put("index", inObject);
+
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray jsonArray) throws JSONException {
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            LED led = new LED(
+                                    new LED.Builder()
+                                            .index(jsonObject.getString(LED.KEY_INDEX))
+                                            .name(jsonObject.getString(LED.KEY_NAME))
+                                            .creator(jsonObject.getString(LED.KEY_CREATOR))
+                                            .downloadCnt(jsonObject.getInt(LED.KEY_DOWNLOADCNT))
+                                            .type(jsonObject.getString(LED.KEY_TYPE))
+                            );
+                            m_mapDataLED.put(led.getIndex(), led);
+                        }
+
+                        /** Add GridView (Bookmared or Downloaded) **/
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                startChangingLEDinGrid(m_newGrid, ledIndicies);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String err) {
+                        startChangingLEDinGrid(m_newGrid, ledIndicies);
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
         return view;
+    }
+
+    private void startChangingLEDinGrid(GridLayout grid, String[] userIndicies) {
+        m_newGrid.removeAllViews();
+
+        for (int i = 0; i < userIndicies.length; i++) {
+            String ledIndex = userIndicies[i].replaceAll("\"", "");
+            LED led = m_mapDataLED.get(ledIndex);
+            addLEDinGrid(led, grid);
+        }
+    }
+
+    private void addLEDinGrid(LED ledInfo, GridLayout grid) {
+        LEDCardView cardViewLED = new LEDCardView(getActivity());
+        cardViewLED.setCardNameText(ledInfo.getIndex().split("_")[1]);
+
+        try {
+            File f=new File(CommonManager.getOpenLEDFilePath(getActivity(), ledInfo.getIndex(), getActivity().getString(R.string.gif_format)));
+            Bitmap cardImageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
+            cardViewLED.setCardImageView(cardImageBitmap);
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+        cardViewLED.setOnClickCustomDialogEnable(LEDCardView.DETAIL_DIALOG_TYPE, ledInfo, getActivity());
+        grid.addView(cardViewLED);
     }
 
     private void setDeviceInfo(String signalStr) {
