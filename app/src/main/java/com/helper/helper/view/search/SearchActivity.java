@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
 import com.helper.helper.controller.CommonManager;
@@ -19,6 +20,7 @@ import com.helper.helper.controller.DownloadImageTask;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.SharedPreferencer;
 import com.helper.helper.controller.UserManager;
+import com.helper.helper.enums.Collection;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LED;
@@ -32,9 +34,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -45,6 +52,7 @@ public class SearchActivity extends AppCompatActivity
     public static final int NORMAL_DIALOG_TYPE = 0;
     public static final int DETAIL_DIALOG_TYPE = 1;
     public static final int DOWNLOAD_DIALOG_TYPE = 2;
+    public static final int MAX_RECORDS = 5;
 
     private static final String PREFERENCER_SEARCH_RECORD = "SEARCH_RECORD";
 
@@ -58,7 +66,8 @@ public class SearchActivity extends AppCompatActivity
 
     private SearchItemListAdapter m_adapter;
     private JSONArray m_searchItemArr;
-
+    private List<LED> m_searchLEDRecord;
+    private SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,40 +81,19 @@ public class SearchActivity extends AppCompatActivity
         m_backLEDShopFragment = (ImageView) findViewById(R.id.backLEDShopFragment);
         /*******************************************************************/
 
+        m_searchLEDItems = new ArrayList<>();
+        m_searchLEDRecord = new ArrayList<>();
         // TODO: 2018-11-25 get preferencer data (key : search_record)
         m_searchItemArr = new JSONArray();
-        final SharedPreferences pref = SharedPreferencer.getSharedPreferencer(this, UserManager.getUserEmail(), MODE_PRIVATE);
+        pref = SharedPreferencer.getSharedPreferencer(this, UserManager.getUserEmail(), MODE_PRIVATE);
         final String strItemRecord = pref.getString(PREFERENCER_SEARCH_RECORD, "");
-        if( !strItemRecord.equals("") ) {
-            // TODO: 2018-11-25 INSERT
 
-
-            // TODO: 2018-11-25 get JSONObject in JSONArray (String -> JSONArray)
-            JSONArray jsonArr;
-            try {
-                jsonArr = new JSONArray(strItemRecord);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-//            JSONObject object =
-
-//            LED ledInfo = new LED.Builder()
-//                    .index(object.getString(LED.KEY_INDEX))
-//                    .name(object.getString(LED.KEY_NAME))
-//                    .category(object.getString(LED.KEY_CATEGORY))
-//                    .build();
-
-            m_searchItemArr.put(strItemRecord);
-        }
-
-        // TODO: 2018-11-25 add items in m_searchItemArr
-        m_searchLEDItems = new ArrayList<LED>();
-
-
-
-        //settingList();
+        getLastestSearch(strItemRecord);
 
         m_adapter = new SearchItemListAdapter(this, m_searchLEDItems);
+        m_searchLEDItems.addAll(m_searchLEDRecord);
+
+
         m_listView.setAdapter(m_adapter);
 
         /******************* Make Listener in View *******************/
@@ -123,6 +111,11 @@ public class SearchActivity extends AppCompatActivity
                     trySearch();
                 } else {
                     m_searchLEDItems.clear();
+                    if( m_searchItemArr != null ) {
+                        m_searchLEDRecord.clear();
+                        getLastestSearch(m_searchItemArr.toString());
+                        m_searchLEDItems.addAll(m_searchLEDRecord);
+                    }
                     m_adapter.notifyDataSetChanged();
                 }
             }
@@ -144,6 +137,15 @@ public class SearchActivity extends AppCompatActivity
 
                 saveJSONSearchRecordItem(ledInfo);
 
+                if ( m_searchInput.getText().equals("") ) {
+                    m_searchLEDItems.clear();
+                    if( m_searchItemArr != null ) {
+                        m_searchLEDRecord.clear();
+                        getLastestSearch(m_searchItemArr.toString());
+                        m_searchLEDItems.addAll(m_searchLEDRecord);
+                    }
+                    m_adapter.notifyDataSetChanged();
+                }
                 m_detailDlg.setCustomView(new DialogLED(thisActvity, DOWNLOAD_DIALOG_TYPE, ledInfo));
                 m_detailDlg.show();
             }
@@ -243,6 +245,53 @@ public class SearchActivity extends AppCompatActivity
         return downloadDlg;
     }
 
+    private void getLastestSearch(String strItemRecord){
+        // TODO: 2018-11-25 INSERT
+        List<JSONObject> jsonList = new ArrayList<>();
+
+        try {
+            m_searchItemArr = new JSONArray(strItemRecord);
+            for (int i = m_searchItemArr.length()-1; i >=0 ; --i) {
+                jsonList.add(new JSONObject(m_searchItemArr.get(i).toString()));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+//        Collections.sort(jsonList, new Comparator<JSONObject>() {
+//            @Override
+//            public int compare(JSONObject o1, JSONObject o2) {
+//                SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", new Locale("us"));
+//                Date o2_date = new Date();
+//                Date o1_date = new Date();
+//                try {
+//                    o1_date = sdf.parse(o1.get("date").toString());
+//                    o2_date = sdf.parse(o2.get("date").toString());
+//                }
+//                catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//                return o1_date.compareTo(o2_date);
+//            }
+//        });
+
+
+        for(JSONObject object:jsonList){
+            try {
+                LED ledInfo = new LED.Builder()
+                        .index(object.getString(LED.KEY_INDEX))
+                        .name(object.getString(LED.KEY_NAME))
+                        .category(object.getString(LED.KEY_CATEGORY))
+                        .build();
+
+                m_searchLEDRecord.add(ledInfo);
+            }
+            catch (JSONException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void trySearch() {
         String name = m_searchInput.getText();
 
@@ -271,8 +320,8 @@ public class SearchActivity extends AppCompatActivity
                         }
                         m_searchLEDItems.clear();
 
-
                         if (arrLen != 0) {
+
                             for (int i = 0; i < arrLen; ++i) {
                                 JSONObject object = searchNamejsonArray.getJSONObject(i);
                                 LED led = new LED.Builder()
@@ -283,6 +332,7 @@ public class SearchActivity extends AppCompatActivity
 
                                 m_searchLEDItems.add(led);
                             }
+                        }
 
                             //nodify
                             runOnUiThread(new Runnable() {
@@ -292,7 +342,7 @@ public class SearchActivity extends AppCompatActivity
                                 }
                             });
 
-                        }
+
                     }
 
                     @Override
@@ -306,12 +356,13 @@ public class SearchActivity extends AppCompatActivity
     }
 
     private void saveJSONSearchRecordItem(LED ledInfo) {
+
         JSONObject json = new JSONObject();
         try {
             json.put("name", ledInfo.getName());
             json.put("category", ledInfo.getCategory());
             json.put("index", ledInfo.getIndex());
-            json.put("date", new Date().toString());
+            json.put("date", new Date());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -321,7 +372,27 @@ public class SearchActivity extends AppCompatActivity
 
     private void addJSONSearchRecordItem(JSONObject json) {
         // TODO: 2018-11-25 limit : 5
+        int length = m_searchItemArr.length();
 
+        if(m_searchItemArr !=null) {
+            for (int i=0; i<length; ++i) {
+                try {
+                    if (m_searchItemArr.getJSONObject(i).getString("name").equals(json.getString("name"))){
+                        m_searchItemArr.remove(i);
+                    }
+                }
+                catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            if(length >= MAX_RECORDS){
+                m_searchItemArr.remove(0);
+                for(int i=4;i<length;++i){
+                    m_searchItemArr.remove(i);
+                }
+            }
+        }
         m_searchItemArr.put(json);
     }
 }
