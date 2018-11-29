@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 
+import com.google.android.gms.common.internal.service.Common;
 import com.helper.helper.R;
 import com.helper.helper.controller.CommonManager;
 import com.helper.helper.controller.DownloadImageTask;
@@ -57,13 +58,22 @@ public class MyLEDFragment extends Fragment {
 
         /******************* Make Listener in View *******************/
 
+        final String[] ledIndicies = CommonManager.splitNoWhiteSpace(UserManager.getUser()
+                .getUserLEDIndicies()
+                .split("\\[")[1]
+                .split("]")[0]);
+
+        for (int i = 0; i < ledIndicies.length; i++) {
+            ledIndicies[i] = ledIndicies[i].replaceAll("\"", "");
+        }
+
         m_ledGridToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if ( !m_bIsBookmarkView ) {
                     m_ledGridToggle.setImageResource(R.drawable.ic_cloud_download_black_selected);
                     m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
-                    startchangingLEDinGrid();
+                    startChangingLEDinGrid(m_ledGridLayout, ledIndicies);
                 }
             }
         });
@@ -74,14 +84,10 @@ public class MyLEDFragment extends Fragment {
                 if ( m_bIsBookmarkView ) {
                     m_ledGridToggle.setImageResource(R.drawable.ic_cloud_download_black);
                     m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
-                    startchangingLEDinGrid();
+                    startChangingLEDinGrid(m_ledGridLayout, ledIndicies);
                 }
             }
         });
-        String[] ledIndicies = CommonManager.splitNoWhiteSpace(UserManager.getUser()
-                .getUserLEDIndicies()
-                .split("\\[")[1]
-                .split("]")[0]);
 
         /** get LED Information from server **/
 
@@ -115,14 +121,15 @@ public class MyLEDFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                startchangingLEDinGrid();
+                                startChangingLEDinGrid(m_ledGridLayout, ledIndicies);
                             }
                         });
                     }
 
                     @Override
                     public void onError(String err) {
-                        startchangingLEDinGrid();
+                        // TODO: 26/11/2018 OFFLINE LED Info
+                        startChangingLEDinGrid(m_ledGridLayout, ledIndicies);
                     }
                 });
             } catch (JSONException e) {
@@ -135,58 +142,39 @@ public class MyLEDFragment extends Fragment {
         return view;
     }
 
-    private void startchangingLEDinGrid() {
+    private void startChangingLEDinGrid(GridLayout grid, String[] userIndicies) {
         m_ledGridLayout.removeAllViews();
-
-        String[] ledIndicies = CommonManager.splitNoWhiteSpace(UserManager.getUser()
-                .getUserLEDIndicies()
-                .split("\\[")[1]
-                .split("]")[0]);
 
         String[] bookmakred = CommonManager.splitNoWhiteSpace(UserManager.getUser()
                 .getUserBookmarked()
                 .split("\\[")[1]
                 .split("]")[0]);
 
-        for (int i = 0; i < ledIndicies.length; i++) {
-            String ledIndex = ledIndicies[i];
+        for (int i = 0; i < userIndicies.length; i++) {
+            String ledIndex = userIndicies[i].replaceAll("\"", "");
 
             LED led = m_mapDataLED.get(ledIndex);
             if( m_bIsBookmarkView ) {
-                showBookmarkedLED(bookmakred, led);
+                showBookmarkedLED(grid, bookmakred, led);
             } else {
-                showDownloadedLED(bookmakred, led);
+                showDownloadedLED(grid, bookmakred, led);
             }
         }
         m_bIsBookmarkView = !m_bIsBookmarkView;
     }
 
-    private void showBookmarkedLED(String[] bookmarkedArr, LED ledInfo) {
+    private void showBookmarkedLED(GridLayout grid, String[] bookmarkedArr, LED ledInfo) {
         for (String bookmarkedStr:
                 bookmarkedArr) {
             if( ledInfo.getIndex().equals(bookmarkedStr)) {
                 ledInfo.setBookmarked(true);
 
-                LEDCardView cardViewLED = new LEDCardView(getActivity());
-                cardViewLED.setCardNameText(ledInfo.getIndex().split("_")[1]);
-
-                try {
-                    File f=new File(getOpenFilePath(ledInfo.getIndex()));
-                    Bitmap cardImageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
-                    cardViewLED.setCardImageView(cardImageBitmap);
-                }
-                catch (FileNotFoundException e)
-                {
-                    e.printStackTrace();
-                }
-
-                cardViewLED.setOnClickCustomDialogEnable(LEDCardView.DETAIL_DIALOG_TYPE, ledInfo, getActivity());
-                m_ledGridLayout.addView(cardViewLED);
+                addLEDinGrid(ledInfo, grid);
             }
         }
     }
 
-    private void showDownloadedLED(String[] bookmarkedArr, LED ledInfo) {
+    private void showDownloadedLED(GridLayout grid, String[] bookmarkedArr, LED ledInfo) {
         boolean IsBookmakred = false;
 
         for (String bookmarkedStr:
@@ -198,11 +186,15 @@ public class MyLEDFragment extends Fragment {
 
         ledInfo.setBookmarked(IsBookmakred);
 
+        addLEDinGrid(ledInfo, grid);
+    }
+
+    private void addLEDinGrid(LED ledInfo, GridLayout grid) {
         LEDCardView cardViewLED = new LEDCardView(getActivity());
         cardViewLED.setCardNameText(ledInfo.getIndex().split("_")[1]);
 
         try {
-            File f=new File(getOpenFilePath(ledInfo.getIndex()));
+            File f=new File(CommonManager.getOpenLEDFilePath(getActivity(), ledInfo.getIndex(), getActivity().getString(R.string.gif_format)));
             Bitmap cardImageBitmap = BitmapFactory.decodeStream(new FileInputStream(f));
             cardViewLED.setCardImageView(cardImageBitmap);
         }
@@ -212,15 +204,6 @@ public class MyLEDFragment extends Fragment {
         }
 
         cardViewLED.setOnClickCustomDialogEnable(LEDCardView.DETAIL_DIALOG_TYPE, ledInfo, getActivity());
-        m_ledGridLayout.addView(cardViewLED);
-    }
-
-    private String getOpenFilePath(String ledIndex) {
-        Storage internalStorage = new Storage(getActivity());
-        String path = internalStorage.getInternalFilesDirectory();
-        String dir = path + File.separator + DownloadImageTask.DOWNLOAD_PATH;
-        String openFilePath = dir + File.separator + ledIndex + getString(R.string.gif_format);
-
-        return openFilePath;
+        grid.addView(cardViewLED);
     }
 }

@@ -8,4 +8,5 @@ package com.helper.helper.interfaces;
 
 public interface BluetoothReadCallback {
     void onResult(String result);
+    void onError(String result);
 }
