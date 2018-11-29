@@ -45,6 +45,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -115,6 +116,7 @@ public class BTManager {
     }
 
     private static Activity m_activity;
+    private static String m_connectedDeviceName;
     private static BluetoothAdapter m_bluetoothAdapter;
     private static BluetoothDevice m_pairedDevice;
     private static BluetoothSocket m_bluetoothSocket;
@@ -206,14 +208,16 @@ public class BTManager {
         } else if( signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[0].equals(BT_SIGNAL_RESPONSE_LED) ||
                 signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[0].equals(BT_SIGNAL_DOWNLOAD_LED) ){
             m_downloadLEDResultCb.onResult(signalMsg);
-        } else if ( signalMsg.split("info").length != 0 ){
+        } else if ( signalMsg.contains("info") ){
             m_infoReadCb.onResult(signalMsg);
-        } else if ( signalMsg.split(BT_SIGNAL_FILTER).length != 0 ) {
+        } else if ( signalMsg.startsWith(BT_SIGNAL_FILTER + BLUETOOTH_SIGNAL_SEPARATE) ) {
             double complementary = Double.valueOf(signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[1]);
             double rollover = Double.valueOf(signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[2]);
 
             Log.d(TAG, "bluetoothSignalHandler: " + complementary);
             Log.d(TAG, "bluetoothSignalHandler: " + rollover);
+
+//            EmergencyManager.insertAccidentTestDatainServer(m_activity, m_connectedDeviceName, complementary, rollover, new Date());
         }
 
         writeToBluetoothDevice(BT_SIGNAL_RES_FILTER.getBytes());
@@ -252,6 +256,7 @@ public class BTManager {
             m_bluetoothInput = m_bluetoothSocket.getInputStream();
             m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
 
+            m_connectedDeviceName = device.getName();
 
             writeToBluetoothDevice(BT_SIGNAL_CONNECTED.getBytes());
             try {
@@ -335,6 +340,7 @@ public class BTManager {
             String readMessage = new String(buffer, 0, bytes);
             callback.onResult(readMessage);
         } catch (IOException e) {
+            // TODO: 28/11/2018 Bluetooth connection is disconnected state
             Log.e(TAG, "readFromBluetoothDevice: StopBluetoothReadThread");
             stopReadThread();
             callback.onError(e.getMessage());

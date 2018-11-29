@@ -157,4 +157,35 @@ public class EmergencyManager {
         }
     }
 
+    public static void insertAccidentTestDatainServer(Context context, String deviceName, double complimentary, double rollover, Date occuredDate) {
+        if (HttpManager.useCollection(context.getString(R.string.collection_devicetest))) {
+
+            JSONObject reqObject = new JSONObject();
+            try {
+                reqObject.put("device_name", deviceName);
+                reqObject.put("complimentary", complimentary);
+                reqObject.put("roll", rollover);
+
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.KOREA);
+                String dateStr = sdf.format(occuredDate);
+
+                reqObject.put("occured_date", dateStr);
+
+                HttpManager.requestHttp(reqObject, "", "POST", "", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray jsonArray) throws JSONException {
+                        Log.d(TAG, "insertAccidentTestDatainServer: onSuccess!");
+                    }
+
+                    @Override
+                    public void onError(String err) throws JSONException {
+
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

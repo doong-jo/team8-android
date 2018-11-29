@@ -11,7 +11,8 @@ public enum Collection {
     ACCIDENT("accident"),
     LED("led"),
     TRACKING("tracking"),
-    CATEGORY("category");
+    CATEGORY("category"),
+    DEVICETEST("devicetest");
 
     private String value;
 
