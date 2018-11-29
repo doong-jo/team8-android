@@ -5,9 +5,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -34,14 +36,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -77,9 +74,12 @@ public class SearchActivity extends AppCompatActivity
 
         /******************* Connect widgtes with layout *******************/
         m_listView = (ListView) findViewById(R.id.searchList);
-        m_searchInput = (SearchEditTextAddonControl) findViewById(R.id.searchInput);
+        m_searchInput = findViewById(R.id.searchInput);
         m_backLEDShopFragment = (ImageView) findViewById(R.id.backLEDShopFragment);
         /*******************************************************************/
+
+        m_searchInput.setInputType(InputType.TYPE_CLASS_TEXT);
+        m_searchInput.setImeOption(EditorInfo.IME_ACTION_DONE);
 
         m_searchLEDItems = new ArrayList<>();
         m_searchLEDRecord = new ArrayList<>();
@@ -111,7 +111,7 @@ public class SearchActivity extends AppCompatActivity
                     trySearch();
                 } else {
                     m_searchLEDItems.clear();
-                    if( m_searchItemArr != null ) {
+                    if( m_searchItemArr.length() != 0 ) {
                         m_searchLEDRecord.clear();
                         getLastestSearch(m_searchItemArr.toString());
                         m_searchLEDItems.addAll(m_searchLEDRecord);
@@ -137,15 +137,6 @@ public class SearchActivity extends AppCompatActivity
 
                 saveJSONSearchRecordItem(ledInfo);
 
-                if ( m_searchInput.getText().equals("") ) {
-                    m_searchLEDItems.clear();
-                    if( m_searchItemArr != null ) {
-                        m_searchLEDRecord.clear();
-                        getLastestSearch(m_searchItemArr.toString());
-                        m_searchLEDItems.addAll(m_searchLEDRecord);
-                    }
-                    m_adapter.notifyDataSetChanged();
-                }
                 m_detailDlg.setCustomView(new DialogLED(thisActvity, DOWNLOAD_DIALOG_TYPE, ledInfo));
                 m_detailDlg.show();
             }
@@ -167,16 +158,11 @@ public class SearchActivity extends AppCompatActivity
                 .concat(ledData.getIndex())
                 .concat(activity.getString(R.string.png_format));
 
-        boolean IsNotDownloaded = false;
-        if( !internalStorage.isFileExist(openFilePathGif) || !internalStorage.isFileExist(openFilePathpng) ) {
-            IsNotDownloaded = true;
-        }
-
         SweetAlertDialog downloadDlg = new SweetAlertDialog(activity, SweetAlertDialog.NORMAL_TYPE)
                 .setTitleText(ledData.getIndex().split("_")[1]);
 
 
-        if( IsNotDownloaded ) {
+        if( !internalStorage.isFileExist(openFilePathGif) || !internalStorage.isFileExist(openFilePathpng) ) {
             downloadDlg/** Click Download **/
                     .setCancelText(activity.getString(R.string.led_dialog_cancel))
                     .setConfirmButton(activity.getString(R.string.led_dialog_download), new SweetAlertDialog.OnSweetClickListener() {
@@ -246,7 +232,6 @@ public class SearchActivity extends AppCompatActivity
     }
 
     private void getLastestSearch(String strItemRecord){
-        // TODO: 2018-11-25 INSERT
         List<JSONObject> jsonList = new ArrayList<>();
 
         try {
@@ -257,24 +242,6 @@ public class SearchActivity extends AppCompatActivity
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-//        Collections.sort(jsonList, new Comparator<JSONObject>() {
-//            @Override
-//            public int compare(JSONObject o1, JSONObject o2) {
-//                SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", new Locale("us"));
-//                Date o2_date = new Date();
-//                Date o1_date = new Date();
-//                try {
-//                    o1_date = sdf.parse(o1.get("date").toString());
-//                    o2_date = sdf.parse(o2.get("date").toString());
-//                }
-//                catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                return o1_date.compareTo(o2_date);
-//            }
-//        });
-
 
         for(JSONObject object:jsonList){
             try {
@@ -309,20 +276,18 @@ public class SearchActivity extends AppCompatActivity
 
                     @Override
                     public void onSuccess(JSONArray searchNamejsonArray) throws JSONException {
-                        int arrLen = searchNamejsonArray.length();
-                        // clear
-//                        if(m_searchLEDItems.size() == 0){
-//                            return;
-//                        }
+                        final int arrLen = searchNamejsonArray.length();
 
-                        if(m_searchInput.getText().equals("") || m_searchInput.getText()==null){
+
+                        if(m_searchInput.getText().equals("")){
                             return;
                         }
+
                         m_searchLEDItems.clear();
 
                         if (arrLen != 0) {
 
-                            for (int i = 0; i < arrLen; ++i) {
+                            for (int i = 0; i < arrLen; i++) {
                                 JSONObject object = searchNamejsonArray.getJSONObject(i);
                                 LED led = new LED.Builder()
                                         .index(object.getString(LED.KEY_INDEX))
@@ -334,20 +299,18 @@ public class SearchActivity extends AppCompatActivity
                             }
                         }
 
-                            //nodify
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    m_adapter.notifyDataSetChanged();
-                                }
-                            });
-
-
+                         //nodify
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                m_adapter.notifyDataSetChanged();
+                            }});
                     }
 
                     @Override
-                    public void onError(String err) throws JSONException {
-                        Log.d(TAG, "SearchActivity onError: " + err); }});
+                    public void onError(String err) {
+                        Log.d(TAG, "SearchActivity onError: " + err);
+                    }});
             }
             catch (JSONException e) {
                 e.printStackTrace();
@@ -375,9 +338,9 @@ public class SearchActivity extends AppCompatActivity
         int length = m_searchItemArr.length();
 
         if(m_searchItemArr !=null) {
-            for (int i=0; i<length; ++i) {
+            for (int i=0; i<length; i++) {
                 try {
-                    if (m_searchItemArr.getJSONObject(i).getString("name").equals(json.getString("name"))){
+                    if (m_searchItemArr.getJSONObject(i).getString("index").equals(json.getString("index"))){
                         m_searchItemArr.remove(i);
                     }
                 }
@@ -388,9 +351,6 @@ public class SearchActivity extends AppCompatActivity
 
             if(length >= MAX_RECORDS){
                 m_searchItemArr.remove(0);
-                for(int i=4;i<length;++i){
-                    m_searchItemArr.remove(i);
-                }
             }
         }
         m_searchItemArr.put(json);
