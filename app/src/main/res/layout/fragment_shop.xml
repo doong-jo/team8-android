@@ -36,17 +36,17 @@
                 >
 
                 <FrameLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     >
                     <GridLayout
-                        android:layout_gravity="start"
+                        android:id="@+id/newGrid"
+                        android:layout_gravity="center_horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="11dp"
                         android:layout_marginRight="11dp"
                         android:orientation="horizontal">
-
                     </GridLayout>
                 </FrameLayout>
             </HorizontalScrollView>
@@ -77,11 +77,12 @@
                 >
 
                 <FrameLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     >
 
                     <GridLayout
+                        android:id="@+id/categoryGrid"
                         android:layout_gravity="center_horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -119,11 +120,11 @@
                 >
 
                 <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    >
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
                     <GridLayout
+                        android:id="@+id/freeGrid"
                         android:layout_gravity="start"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -131,6 +132,7 @@
                         android:layout_marginRight="11dp"
                         android:rowCount="3"
                         android:orientation="vertical">
+
                     </GridLayout>
                 </FrameLayout>
             </HorizontalScrollView>
@@ -153,31 +155,32 @@
                 android:textColor="@color/half_black"
                 />
 
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fillViewport="true"
-                android:scrollbars="none"
-                >
-
-                <FrameLayout
+                <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="27dp"
+                    android:fillViewport="true"
+                    android:scrollbars="none"
                     >
 
-                    <GridLayout
-                        android:layout_gravity="center_horizontal"
+                    <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="11dp"
-                        android:layout_marginRight="11dp"
-                        android:rowCount="3"
-                        android:orientation="vertical">
+                        android:layout_marginBottom="27dp"
+                        >
 
-                    </GridLayout>
-                </FrameLayout>
-            </HorizontalScrollView>
+                        <GridLayout
+                            android:id="@+id/paidGrid"
+                            android:layout_gravity="start"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="11dp"
+                            android:layout_marginRight="11dp"
+                            android:rowCount="3"
+                            android:orientation="vertical">
+
+                        </GridLayout>
+                    </FrameLayout>
+                </HorizontalScrollView>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </RelativeLayout>

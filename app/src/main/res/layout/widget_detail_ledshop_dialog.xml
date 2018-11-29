@@ -29,8 +29,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_width="170dp"
             android:layout_height="170dp"
-
-            android:scaleType="centerInside"
+            android:scaleType="centerCrop"
             android:src="@drawable/bird" />
     </android.support.constraint.ConstraintLayout>
 
