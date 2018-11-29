@@ -160,5 +160,10 @@
         <item name="android:layout_width">183.54dp</item>
         <item name="android:layout_height">194.94dp</item>
     </style>
-
+    <style name="ledCardSearch" parent="CardView">
+        <item name="android:layout_width">45.6dp</item>
+        <item name="android:layout_height">45.6dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">18dp</item>
+    </style>
 </resources>
