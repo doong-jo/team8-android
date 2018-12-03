@@ -2,6 +2,7 @@ package com.helper.helper.view.widget;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
@@ -40,13 +41,7 @@ public class DialogAccident {
         } else {
             m_vibrate.vibrate(new long[]{VIBRATE_TIME, VIBRATE_TERM_TIME}, 0);
         }
-
-        try {
-            EmergencyManager.insertAccidentinServer(m_activity, UserManager.getUser(), EmergencyManager.getAccLocation(), false);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-//        m_player.start();
+        m_player.start();
     }
 
     public boolean getShowing() {
@@ -65,6 +60,7 @@ public class DialogAccident {
 
         AudioManager mAudioManager = (AudioManager) m_activity.getSystemService(Context.AUDIO_SERVICE);
         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 9, 0);
+
 
         m_dialog =new SweetAlertDialog(m_activity, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText(m_activity.getString(R.string.emergency_dialog_title))
@@ -89,11 +85,9 @@ public class DialogAccident {
                         startAlertEmergencyContacts();
                         m_vibrate.cancel();
                         mediaStop();
-                        try {
-                            EmergencyManager.insertAccidentinServer(m_activity, UserManager.getUser(), EmergencyManager.getAccLocation(), true);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        EmergencyManager.insertAccidentinServer(m_activity, UserManager.getUser(),
+                                EmergencyManager.getAccidentRolllover(), EmergencyManager.getAccidentAccel(),
+                                EmergencyManager.getAccLocation(),true);
                     }
                 });
 
@@ -105,18 +99,27 @@ public class DialogAccident {
                 if( seconds == 0 ) {
                     startAlertEmergencyContacts();
                     tickTockDlg.setOnTickListener(null);
-                    try {
-                        EmergencyManager.insertAccidentinServer(m_activity, UserManager.getUser(), EmergencyManager.getAccLocation(), true);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    EmergencyManager.insertAccidentinServer(m_activity, UserManager.getUser(),
+                            EmergencyManager.getAccidentRolllover(), EmergencyManager.getAccidentAccel(),
+                            EmergencyManager.getAccLocation(), true);
                 }
                 return String.valueOf(seconds).concat("s");
             }
         });
-        m_dialog.setCustomView(tickTockDlg);
-    }
 
+        m_dialog.setCustomView(tickTockDlg);
+
+        m_dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                if( m_dialog.getAlerType() != SweetAlertDialog.SUCCESS_TYPE ) {
+                    EmergencyManager.insertAccidentinServer(m_activity, UserManager.getUser(),
+                            EmergencyManager.getAccidentRolllover(), EmergencyManager.getAccidentAccel(),
+                            EmergencyManager.getAccLocation(), false);
+                }
+            }
+        });
+    }
 
     private void startAlertEmergencyContacts() {
         SMSManager.sendEmergencyMessages(

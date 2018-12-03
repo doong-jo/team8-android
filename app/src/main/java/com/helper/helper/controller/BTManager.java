@@ -24,6 +24,8 @@ import android.util.Log;
 import com.google.android.gms.common.internal.service.Common;
 import com.helper.helper.R;
 import com.helper.helper.interfaces.BluetoothReadCallback;
+import com.helper.helper.interfaces.DistanceCallback;
+import com.helper.helper.interfaces.EmergencyCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.snatik.storage.Storage;
 
@@ -74,6 +76,8 @@ public class BTManager {
     private static final String BT_SIGNAL_FILTER = "F";
     private static final String BT_SIGNAL_RES_FILTER = "RES";
     private static final String BT_SIGNAL_CONNECTED = "CONNECTED";
+
+    public static final String BT_SIGNAL_EMERGENCY = "EMERGENCY";
 
     private static final int BT_READ_CLOCK_SLEEP = 100;
 
@@ -201,25 +205,42 @@ public class BTManager {
 
     private static void bluetoothSignalHandler(String signalMsg) {
         m_lastSignalStr = signalMsg;
-        Log.d(TAG, "bluetoothSignalHandler: " + m_lastSignalStr);
+//        Log.d(TAG, "bluetoothSignalHandler: " + m_lastSignalStr);
 
-        if ( signalMsg.equals("EMERGENCY") ) {
-            m_activityReadCb.onResult(signalMsg);
-        } else if( signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[0].equals(BT_SIGNAL_RESPONSE_LED) ||
-                signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[0].equals(BT_SIGNAL_DOWNLOAD_LED) ){
+       if( signalMsg.startsWith(BT_SIGNAL_RESPONSE_LED + BLUETOOTH_SIGNAL_SEPARATE) ||
+               signalMsg.startsWith(BT_SIGNAL_DOWNLOAD_LED + BLUETOOTH_SIGNAL_SEPARATE) ){
             m_downloadLEDResultCb.onResult(signalMsg);
-        } else if ( signalMsg.contains("info") ){
+       } else if ( signalMsg.contains("info") ){
             m_infoReadCb.onResult(signalMsg);
-        } else if ( signalMsg.startsWith(BT_SIGNAL_FILTER + BLUETOOTH_SIGNAL_SEPARATE) ) {
-            double complementary = Double.valueOf(signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[1]);
-            double rollover = Double.valueOf(signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[2]);
+       } else if ( signalMsg.startsWith(BT_SIGNAL_FILTER + BLUETOOTH_SIGNAL_SEPARATE) ) {
+            final double rollover = Double.valueOf(signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[1]);
+            final double accel = Double.valueOf(signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[2]);
 
-            Log.d(TAG, "bluetoothSignalHandler: " + complementary);
-            Log.d(TAG, "bluetoothSignalHandler: " + rollover);
+            // TODO: 03/12/2018 For "device test log" code
+            EmergencyManager.insertAccidentTestDatainServer(m_activity, m_connectedDeviceName, rollover, accel, new Date());
 
-//            EmergencyManager.insertAccidentTestDatainServer(m_activity, m_connectedDeviceName, complementary, rollover, new Date());
+            final double sensorFuzzy = EmergencyManager.getCalcSensorFuzzyLogicResult(rollover, accel);
+            Log.d(TAG, "bluetoothSignalHandler: " + sensorFuzzy);
+
+            if( sensorFuzzy >= EmergencyManager.FUZZY_LOGIC_MEDIUM ) {
+                EmergencyManager.setAccLocation(GoogleMapManager.getCurLocation());
+                m_activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        /** handler **/
+                        EmergencyManager.getDistanceToAccident(new DistanceCallback() {
+                            @Override
+                            public void onDone(float dis) {
+                                if( EmergencyManager.getCalcGPSFuzzyLogicResult(dis) >= EmergencyManager.FUZZY_LOGIC_MEDIUM ) {
+                                    EmergencyManager.setAccidentSensorData(accel, rollover);
+                                    m_activityReadCb.onResult(BT_SIGNAL_EMERGENCY);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
         }
-
         writeToBluetoothDevice(BT_SIGNAL_RES_FILTER.getBytes());
     }
 

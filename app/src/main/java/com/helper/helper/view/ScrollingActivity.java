@@ -54,6 +54,7 @@ import com.helper.helper.controller.SMSManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.controller.ViewStateManager;
 import com.helper.helper.interfaces.BluetoothReadCallback;
+import com.helper.helper.interfaces.EmergencyCallback;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LEDCategory;
@@ -271,9 +272,7 @@ public class ScrollingActivity extends AppCompatActivity
         m_emergencyCallback = new BluetoothReadCallback() {
             @Override
             public void onResult(String result) {
-                if( EmergencyManager.getAccidentProcessing() ||
-                        EmergencyManager.getEmergencyAlertState() ||
-                        !result.contains("EMERGENCY")  ||
+                if( EmergencyManager.getEmergencyAlertState() ||
                         !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ||
                         !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
                     return;
@@ -287,18 +286,13 @@ public class ScrollingActivity extends AppCompatActivity
                         final Location accLocation = GoogleMapManager.getCurLocation();
                         AddressManager.startAddressIntentService(activity, accLocation);
 
-                        EmergencyManager.startValidationAccident(new ValidateCallback() {
-                            @Override
-                            public void onDone(int resultCode) {
-                                if( m_bIsDestroyed ) {
-                                    Intent intent = new Intent(activity, PopupActivity.class);
-                                    startActivity(intent);
-                                } else {
-                                    DialogAccident dialogAccident = new DialogAccident(activity, false);
-                                    dialogAccident.showDialog();
-                                }
-                            }
-                        });
+                        if( m_bIsDestroyed ) {
+                            Intent intent = new Intent(activity, PopupActivity.class);
+                            startActivity(intent);
+                        } else {
+                            DialogAccident dialogAccident = new DialogAccident(activity, false);
+                            dialogAccident.showDialog();
+                        }
                     }
                 });
             }
@@ -362,55 +356,12 @@ public class ScrollingActivity extends AppCompatActivity
     }
 
     /** Dialog **/
-    private SweetAlertDialog resetAccDialog() {
-        final Context thisContext = this;
-        return
-            new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
-                    .setTitleText(getString(R.string.emergency_dialog_title))
-                    .setCancelText(getString(R.string.emergency_dialog_cancel))
-                    .setConfirmText(getString(R.string.emergency_dialog_send))
-                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(final SweetAlertDialog sDialog) {
-                            startAlertEmergencyContacts();
-                            try {
-                                EmergencyManager.insertAccidentinServer(thisContext, UserManager.getUser(), EmergencyManager.getAccLocation(), true);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-    }
-
     private SweetAlertDialog makeLoadingDialog() {
         SweetAlertDialog dlg = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
         dlg.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
         dlg.setTitleText(getString(R.string.loading_dialog_user_data));
         dlg.setCancelable(false);
         return dlg;
-    }
-
-    private void startAlertEmergencyContacts() {
-        SMSManager.sendEmergencyMessages(
-                this,
-                EmergencyManager.getEmergencyContacts(),
-                EmergencyManager.getAccLocation(),
-                AddressManager.getConvertLocationToAddress());
-
-
-
-        m_accDialog
-                .setTitleText(getString(R.string.emergency_dialog_send_completely))
-                .setContentText(getString(R.string.emergency_dialog_coming))
-                .setConfirmText(getString(R.string.dialog_ok))
-                .showCancelButton(false)
-                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                        m_accDialog.dismissWithAnimation();
-                    }
-                })
-                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
     }
 
     /** Result handler **/
@@ -648,43 +599,5 @@ public class ScrollingActivity extends AppCompatActivity
     public void messageFromChildFragment(Uri uri) {
         Log.i("TAG", "received communication from child fragment");
     }
-
-    /*
-    public void changeLeftOrRightLEDOfRoll(float roll) {
-        String writeStr = "";
-
-        if (m_curInterrupt == EMERGENCY) {
-            return;
-        }
-
-        if (roll >= ROLL_PIVOT) {
-            Log.d(TAG, "onSensorChanged: right");
-            writeStr = "0-07-1";
-            sendToBluetoothDevice(writeStr.getBytes());
-
-            m_curInterrupt = ORIENTATION_RIGHT;
-        } else if (roll <= -ROLL_PIVOT) {
-            Log.d(TAG, "onSensorChanged: left");
-            writeStr = "0-06-1";
-            sendToBluetoothDevice(writeStr.getBytes());
-
-            m_curInterrupt = ORIENTATION_LEFT;
-        }
-
-        if (Math.abs(GyroManager.getPivotRoll()) >= 20 &&
-                Math.abs(roll) < 20) {
-            writeStr = m_curLED;
-
-            if (writeStr == null) {
-                return;
-            }
-
-
-            sendToBluetoothDevice(writeStr.getBytes());
-
-            m_curInterrupt = ORIENTATION_NONE;
-        }
-    }
-    */
 }
 
