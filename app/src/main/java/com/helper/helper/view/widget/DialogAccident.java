@@ -44,10 +44,6 @@ public class DialogAccident {
         m_player.start();
     }
 
-    public boolean getShowing() {
-        return m_dialog.isShowing();
-    }
-
     public DialogAccident(Activity activity, boolean bIsBackground) {
 
         m_activity = activity;

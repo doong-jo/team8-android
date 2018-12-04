@@ -8,13 +8,8 @@ package com.helper.helper.view;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,7 +20,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -50,18 +44,15 @@ import com.helper.helper.controller.DownloadImageTask;
 import com.helper.helper.controller.EmergencyManager;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.GoogleMapManager;
-import com.helper.helper.controller.SMSManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.controller.ViewStateManager;
 import com.helper.helper.interfaces.BluetoothReadCallback;
-import com.helper.helper.interfaces.EmergencyCallback;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LEDCategory;
 import com.helper.helper.view.main.myeight.EightFragment;
 import com.helper.helper.view.main.myeight.InfoFragment;
 import com.helper.helper.view.contact.ContactActivity;
-import com.helper.helper.controller.GyroManager;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.PermissionManager;
 import com.helper.helper.view.popup.PopupActivity;
@@ -82,19 +73,15 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 import static android.support.design.widget.TabLayout.*;
 
 public class ScrollingActivity extends AppCompatActivity
-        implements SensorEventListener,
-        OnMapReadyCallback,
+        implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,
         NavigationView.OnNavigationItemSelectedListener,
         EightFragment.OnFragmentInteractionListener,
         InfoFragment.OnFragmentInteractionListener {
-    private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
 
-//    private static final int TAB_STATUS = 0;
-//    private static final int TAB_LED = 1;
-//    private static final int TAB_TRACKING = 2;
+    private final static String TAG = ScrollingActivity.class.getSimpleName() + "/DEV";
 
     private static final int PERMISSION_REQUEST = 267;
 
@@ -105,15 +92,11 @@ public class ScrollingActivity extends AppCompatActivity
     private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
 
-    private NestedScrollView m_nestedScroll;
-
-    private SweetAlertDialog m_accDialog;
     private SweetAlertDialog m_loadingDialog;
     /**************************************************************/
 
     private BluetoothReadCallback m_emergencyCallback;
     private boolean m_bIsDestroyed;
-    private boolean m_bIsAccident;
 
     public ViewPager getViewPager() {
         return m_viewPager;
@@ -304,13 +287,6 @@ public class ScrollingActivity extends AppCompatActivity
         };
 
         BTManager.setActivityReadCb(m_emergencyCallback);
-
-
-        /** Gyro **/
-        GyroManager.m_sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        GyroManager.m_sensorAccel = GyroManager.m_sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        GyroManager.m_sensorMag = GyroManager.m_sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        /* Sensor end */
     }
 
     private void startInitializeShopData() {
@@ -414,8 +390,7 @@ public class ScrollingActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
-        GoogleMapManager.setCurrentLocation(location, "내 위치", "GPS Position");
-        Toast.makeText(this, "LocationChaged : " + location.getSpeed(), Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -435,12 +410,10 @@ public class ScrollingActivity extends AppCompatActivity
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(this, "GoogleMap connection failed!", Toast.LENGTH_SHORT).show();
+
     }
 
     /** Life cycle **/
-
-
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -458,23 +431,17 @@ public class ScrollingActivity extends AppCompatActivity
             tab.select();
         }
 
-//        GyroManager.m_sensorManager.registerListener(this, GyroManager.m_sensorAccel, SensorManager.SENSOR_DELAY_UI);
-//        GyroManager.m_sensorManager.registerListener(this, GyroManager.m_sensorMag, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         ViewStateManager.saveTabPosition(m_tabLayout.getSelectedTabPosition());
-//        ViewStateManager.stop ++;
-//        Log.d(TAG, "onStop: ");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        Log.d(TAG, "onPause: ");
-//        GyroManager.m_sensorManager.unregisterListener(this);
     }
 
     @Override
@@ -482,42 +449,6 @@ public class ScrollingActivity extends AppCompatActivity
         super.onDestroy();
         m_bIsDestroyed = true;
         Log.d(TAG, "onDestroy: ");
-
-//        BTManager.closeBluetoothSocket();
-    }
-
-//    /** GyroSensor **/
-
-//    @Override
-//    public void onSensorChanged(SensorEvent sensorEvent) {
-//
-//    }
-
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-
-        if( sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
-            final Activity activity = this;
-            try {
-                /** shock detect **/
-                GyroManager.shockStateDetector(activity, sensorEvent, new ValidateCallback() {
-                    @Override
-                    public void onDone(int resultCode) {
-                        if( resultCode == GyroManager.DETECT_ACCIDENT ) {
-
-
-                        }
-                    }
-                });
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
     }
 
     /** Navigation **/
@@ -573,11 +504,6 @@ public class ScrollingActivity extends AppCompatActivity
                 startActivity(intent);
 
                 break;
-
-//            case R.id.nav_assistPlaces:
-//                intent = new Intent(this, AssistActivity.class);
-//                startActivity(intent);
-//                break;
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
