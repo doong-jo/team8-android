@@ -24,10 +24,13 @@ import android.util.Log;
 import com.google.android.gms.common.internal.service.Common;
 import com.helper.helper.R;
 import com.helper.helper.interfaces.BluetoothReadCallback;
+import com.helper.helper.interfaces.DistanceCallback;
+import com.helper.helper.interfaces.EmergencyCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.snatik.storage.Storage;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,6 +47,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -59,27 +63,32 @@ public class BTManager {
     /** Bluetooth Signal Rules **/
     public static final String BLUETOOTH_SIGNAL_SEPARATE = "!S!";
 
-    public static final String BT_SIGNAL_ASK_LED = "AL";
-    public static final String BT_SIGNAL_RESPONSE_LED = "RL";
-    public static final String BT_SIGNAL_RES_DOWNLOAD_LED = "RDL";
-    public static final String BT_SIGNAL_RES_EXIST_LED = "REL";
-    public static final String BT_SIGNAL_DOWNLOAD_LED = "DL";
-    public static final String BT_SIGNAL_DOWNLOAD_DONE_LED = "DDL";
+    private static final String BT_SIGNAL_ASK_LED = "AL";
+    private static final String BT_SIGNAL_RESPONSE_LED = "RL";
+    private static final String BT_SIGNAL_RES_DOWNLOAD_LED = "RDL";
+    private static final String BT_SIGNAL_RES_EXIST_LED = "REL";
+    private static final String BT_SIGNAL_DOWNLOAD_LED = "DL";
+    private static final String BT_SIGNAL_DOWNLOAD_DONE_LED = "DDL";
 
     public static final String BT_SIGNAL_BRIGHTNESS = "B";
     public static final String BT_SIGNAL_SPEED = "S";
 
+    private static final String BT_SIGNAL_FILTER = "F";
+    private static final String BT_SIGNAL_RES_FILTER = "RES";
+    private static final String BT_SIGNAL_CONNECTED = "CONNECTED";
+
+    public static final String BT_SIGNAL_EMERGENCY = "EMERGENCY";
+
     private static final int BT_READ_CLOCK_SLEEP = 100;
 
-    public static final String BLUETOOTH_UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee";
+    private static final String BLUETOOTH_UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee";
     /** Android RFCOMM = 990byte(PAYLOAD) + 34byte(LC2CAP) **/
-    public static final int BLUETOOTH_RFCOMM_PAYLOAD = 900;
-    public static final String DEVICE_ALIAS = "EIGHT_";
+    private static final int BLUETOOTH_RFCOMM_PAYLOAD = 900;
+    private static final String DEVICE_ALIAS = "EIGHT_";
 
     public static final int SUCCESS_BLUETOOTH_CONNECT = 1001;
     public static final int FAIL_BLUETOOTH_CONNECT = 1002;
     public static final int REQUEST_ENABLE_BT = 2001;
-
 
 
     /************************************************************/
@@ -110,6 +119,7 @@ public class BTManager {
     }
 
     private static Activity m_activity;
+    private static String m_connectedDeviceName;
     private static BluetoothAdapter m_bluetoothAdapter;
     private static BluetoothDevice m_pairedDevice;
     private static BluetoothSocket m_bluetoothSocket;
@@ -121,7 +131,6 @@ public class BTManager {
     private static BluetoothReadCallback m_infoReadCb;
     private static BluetoothReadCallback m_activityReadCb;
     private static BluetoothReadCallback m_downloadLEDResultCb;
-    private static String m_lastSignalStr = "";
 
     /** Send bytearray of Bitmap (LED) **/
     private static byte[] m_outBitmapByteArr;
@@ -132,14 +141,12 @@ public class BTManager {
         if( m_bluetoothSocket == null ) {
             return false;
         }
-        return m_bluetoothSocket.isConnected();
+        return m_bluetoothSocket.isConnected();//Attrubute Error
     }
 
     public static void setConnectionResultCb(ValidateCallback callback) {
         m_connectionResultCb = callback;
     }
-
-    public static String getLastSignalStr() { return m_lastSignalStr; }
 
     public static void setInfoReadCb(BluetoothReadCallback callback) {
         m_infoReadCb = callback;
@@ -193,21 +200,47 @@ public class BTManager {
     }
 
     private static void bluetoothSignalHandler(String signalMsg) {
-        m_lastSignalStr = signalMsg;
-        if ( signalMsg.equals("EMERGENCY") ) {
-            m_activityReadCb.onResult(signalMsg);
-        } else if( signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[0].equals(BT_SIGNAL_RESPONSE_LED) ||
-                signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[0].equals(BT_SIGNAL_DOWNLOAD_LED) ){
+       if( signalMsg.startsWith(BT_SIGNAL_RESPONSE_LED + BLUETOOTH_SIGNAL_SEPARATE) ||
+               signalMsg.startsWith(BT_SIGNAL_DOWNLOAD_LED + BLUETOOTH_SIGNAL_SEPARATE) ){
             m_downloadLEDResultCb.onResult(signalMsg);
-        } else if ( signalMsg.split("info").length != 0 ){
+       } else if ( signalMsg.contains("info") ){
             m_infoReadCb.onResult(signalMsg);
+       } else if ( signalMsg.startsWith(BT_SIGNAL_FILTER + BLUETOOTH_SIGNAL_SEPARATE) ) {
+            final double rollover = Double.valueOf(signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[1]);
+            final double accel = Double.valueOf(signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[2]);
+
+            // TODO: 03/12/2018 For "device test log" code
+            EmergencyManager.insertAccidentTestDatainServer(m_activity, m_connectedDeviceName, rollover, accel, new Date());
+
+            final double sensorFuzzy = EmergencyManager.getCalcSensorFuzzyLogicResult(rollover, accel);
+            Log.d(TAG, "bluetoothSignalHandler: " + sensorFuzzy);
+
+            if( sensorFuzzy >= EmergencyManager.FUZZY_LOGIC_WARNING ) {
+                EmergencyManager.setAccLocation(GoogleMapManager.getCurLocation());
+                m_activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        /** handler **/
+                        EmergencyManager.getDistanceToAccident(new DistanceCallback() {
+                            @Override
+                            public void onDone(float dis) {
+                                if( EmergencyManager.getCalcGPSFuzzyLogicResult(dis) ) {
+                                    EmergencyManager.setAccidentSensorData(accel, rollover);
+                                    m_activityReadCb.onResult(BT_SIGNAL_EMERGENCY);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
         }
+        writeToBluetoothDevice(BT_SIGNAL_RES_FILTER.getBytes());
     }
 
     /** Find Bluetooth Device **/
     private static void prepareDevice()  {
 
-        /** 만약 페어링 기기들 리스트에 있다면 바로 연결 **/
+        /** Find exist bluetooth device and connect **/
         List<BluetoothDevice> devices = new ArrayList<>(m_bluetoothAdapter.getBondedDevices());
 
         String[] deviceLabels = new String[devices.size()];
@@ -218,7 +251,7 @@ public class BTManager {
             }
         }
 
-        /** 페어링 기기 리스트에 없다면 새로 찾아서 연결 **/
+        /** Find device non connection **/
         if (m_bluetoothAdapter.startDiscovery()) {
             IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
             filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
@@ -237,6 +270,9 @@ public class BTManager {
             m_bluetoothInput = m_bluetoothSocket.getInputStream();
             m_bluetoothOutput = m_bluetoothSocket.getOutputStream();
 
+            m_connectedDeviceName = device.getName();
+
+            writeToBluetoothDevice(BT_SIGNAL_CONNECTED.getBytes());
             try {
                 m_connectionResultCb.onDone(SUCCESS_BLUETOOTH_CONNECT);
             } catch (JSONException e) {
@@ -300,7 +336,6 @@ public class BTManager {
             e.printStackTrace();
             stopReadThread();
             return false;
-//            Toast.makeText(m_activity, "블루투스 신호 전송에 실패했습니다.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -318,23 +353,12 @@ public class BTManager {
             String readMessage = new String(buffer, 0, bytes);
             callback.onResult(readMessage);
         } catch (IOException e) {
+            // TODO: 28/11/2018 Bluetooth connection is disconnected state
             Log.e(TAG, "readFromBluetoothDevice: StopBluetoothReadThread");
             stopReadThread();
             callback.onError(e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    public static void closeBluetoothSocket() {
-        try {
-            if( m_bluetoothSocket != null && m_bluetoothSocket.isConnected() ) {
-                m_bluetoothSocket.close();
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        stopReadThread();
     }
 
     private static void stopReadThread() {
@@ -366,21 +390,8 @@ public class BTManager {
         }
     }
 
-//    public static byte[] extractBytes (String ImageName) throws IOException {
-//        // open image
-//        File imgPath = new File(ImageName);
-//        BufferedImage bufferedImage = ImageIO.read(imgPath);
-//
-//        // get DataBufferBytes from Raster
-//        WritableRaster raster = bufferedImage .getRaster();
-//        DataBufferByte data   = (DataBufferByte) raster.getDataBuffer();
-//
-//        return ( data.getData() );
-//    }
-
-    private static void sendBitmapByteArray(int cntByteArray) throws IOException {
+    private static void sendBitmapByteArray(int cntByteArray) {
         byte[] signalByteArray = (BT_SIGNAL_DOWNLOAD_LED+BLUETOOTH_SIGNAL_SEPARATE).getBytes();
-//        byte[] bitmapByteArray = m_outBitmapByteArrLED.toByteArray();
 
         /** Divide 990byte(PAYLOAD) **/
         byte[] resultByteArray;
@@ -412,7 +423,6 @@ public class BTManager {
             resultByteArray = new byte[signalByteArray.length + copySize];
             subBitmapByteArray = new byte[copySize];
 
-            // src, srcPos, dest, destPos, length
             System.arraycopy(m_outBitmapByteArr, m_copyCursor, subBitmapByteArray, 0, copySize);
 
             System.arraycopy(signalByteArray, 0, resultByteArray, 0, signalByteArray.length);
@@ -438,13 +448,11 @@ public class BTManager {
         }
     }
 
-    private static void doneOutputBitmap() throws IOException {
+    private static void doneOutputBitmap(){
         m_cntSendByteArr = 0;
         m_copyCursor = 0;
         m_downloadLEDResultCb = null;
         m_outBitmapByteArr = null;
-//        m_outBitmapByteArrLED.close();
-//        m_outBitmapByteArrLED = null;
     }
 
     public static void setShowOnDevice(final Context context, final String ledIndex) {
@@ -454,7 +462,7 @@ public class BTManager {
             public void onResult(String result) {
                 String[] splitData = result.split(BLUETOOTH_SIGNAL_SEPARATE);
 
-                String valueData = "";
+                String valueData;
 
                 switch(splitData[0]) {
                     case BT_SIGNAL_RESPONSE_LED:
@@ -473,11 +481,7 @@ public class BTManager {
                         break;
 
                     case BT_SIGNAL_DOWNLOAD_LED:
-                        try {
-                            sendBitmapByteArray(m_cntSendByteArr++);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        sendBitmapByteArray(m_cntSendByteArr++);
                         break;
 
                     default:
@@ -491,12 +495,23 @@ public class BTManager {
             }
         };
 
-        /** 0. Ask Device about exists **/
         if( writeToBluetoothDevice(BT_SIGNAL_ASK_LED
                 .concat(BLUETOOTH_SIGNAL_SEPARATE)
                 .concat(ledIndex)
                 .getBytes()) ) {
             UserManager.setUserLEDcurShowOn(context, ledIndex);
         }
+    }
+
+    public static void closeBluetoothSocket() {
+        try {
+            if( m_bluetoothSocket != null && m_bluetoothSocket.isConnected() ) {
+                m_bluetoothSocket.close();
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        stopReadThread();
     }
 }

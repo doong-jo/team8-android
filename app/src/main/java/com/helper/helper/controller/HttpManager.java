@@ -57,6 +57,10 @@ public class HttpManager {
                 m_collection = Collection.CATEGORY;
                 return true;
 
+            case "devicetest":
+                m_collection = Collection.DEVICETEST;
+                return true;
+
             default:
                 return false;
         }

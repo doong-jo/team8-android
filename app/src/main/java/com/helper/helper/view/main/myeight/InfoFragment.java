@@ -85,14 +85,12 @@ public class InfoFragment extends Fragment {
         m_bluetoothReadCallback = new BluetoothReadCallback() {
             @Override
             public void onResult(final String signalStr) {
-                if( signalStr.split("info").length != 0 ) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setDeviceInfo(signalStr);
-                        }
-                    });
-                }
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setDeviceInfo(signalStr);
+                    }
+                });
             }
 
             @Override
@@ -105,14 +103,14 @@ public class InfoFragment extends Fragment {
 
         /** Initialize Device info from bluetooth signal After pairing complete**/
 
-        if( !m_bIsSetDeviceInfo ) {
-            m_bIsSetDeviceInfo = true;
-            String lastSignalStr = BTManager.getLastSignalStr();
-
-            if( lastSignalStr.split("/").length != 0 ) {
-                setDeviceInfo(BTManager.getLastSignalStr());
-            }
-        }
+//        if( !m_bIsSetDeviceInfo ) {
+//            m_bIsSetDeviceInfo = true;
+//            String lastSignalStr = BTManager.getLastSignalStr();
+//
+//            if( lastSignalStr.split("/").length != 0 ) {
+//                setDeviceInfo(BTManager.getLastSignalStr());
+//            }
+//        }
 
         final String[] ledIndicies = CommonManager.splitNoWhiteSpace(UserManager.getUser()
                 .getUserLEDIndicies()
