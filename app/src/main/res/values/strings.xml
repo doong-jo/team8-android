@@ -22,6 +22,7 @@
     <string name="collection_led">led</string>
     <string name="collection_accident">accident</string>
     <string name="collection_category">category</string>
+    <string name="collection_devicetest">devicetest</string>
 
 
     <!--File Format-->
