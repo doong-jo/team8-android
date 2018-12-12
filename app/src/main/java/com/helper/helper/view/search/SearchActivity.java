@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
 import com.helper.helper.controller.CommonManager;
@@ -22,7 +21,6 @@ import com.helper.helper.controller.DownloadImageTask;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.SharedPreferencer;
 import com.helper.helper.controller.UserManager;
-import com.helper.helper.enums.Collection;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LED;
@@ -46,8 +44,6 @@ public class SearchActivity extends AppCompatActivity
 {
 
     private final static String TAG = SearchActivity.class.getSimpleName()+"/DEV";
-    public static final int NORMAL_DIALOG_TYPE = 0;
-    public static final int DETAIL_DIALOG_TYPE = 1;
     public static final int DOWNLOAD_DIALOG_TYPE = 2;
     public static final int MAX_RECORDS = 5;
 
@@ -73,9 +69,9 @@ public class SearchActivity extends AppCompatActivity
         final Activity thisActvity = this;
 
         /******************* Connect widgtes with layout *******************/
-        m_listView = (ListView) findViewById(R.id.searchList);
+        m_listView =  findViewById(R.id.searchList);
         m_searchInput = findViewById(R.id.searchInput);
-        m_backLEDShopFragment = (ImageView) findViewById(R.id.backLEDShopFragment);
+        m_backLEDShopFragment = findViewById(R.id.backLEDShopFragment);
         /*******************************************************************/
 
         m_searchInput.setInputType(InputType.TYPE_CLASS_TEXT);

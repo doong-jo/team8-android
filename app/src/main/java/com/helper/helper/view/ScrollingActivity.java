@@ -153,16 +153,30 @@ public class ScrollingActivity extends AppCompatActivity
                 @Override
                 public void onDone(int resultCode) {
                     if( resultCode == UserManager.DONE_SET_USER ) {
-                        DownloadImageTask downloadUserDataLED = new DownloadImageTask(activity, new ValidateCallback() {
-                            @Override
-                            public void onDone(int resultCode) {
-                                if( resultCode == DownloadImageTask.DONE_LOAD_LED_IMAGES ) {
-                                    m_loadingDialog.dismissWithAnimation();
+                        if( UserManager.getUser().getUserLEDIndiciesSize() != 0 ) {
+                            DownloadImageTask downloadUserDataLED = new DownloadImageTask(activity, new ValidateCallback() {
+                                @Override
+                                public void onDone(int resultCode) {
+                                    if( resultCode == DownloadImageTask.DONE_LOAD_LED_IMAGES ) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                m_loadingDialog.dismissWithAnimation();
+                                            }
+                                        });
+                                    }
                                 }
-                            }
-                        });
-                        /** Download User's LED **/
-                        downloadUserDataLED.execute(UserManager.getUser().getUserLEDIndiciesURI(getString(R.string.server_uri)));
+                            });
+                            /** Download User's LED **/
+                            downloadUserDataLED.execute(UserManager.getUser().getUserLEDIndiciesURI(getString(R.string.server_uri)));
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    m_loadingDialog.dismiss();
+                                }
+                            });
+                        }
                     }
                 }
             });

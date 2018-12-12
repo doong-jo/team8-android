@@ -61,7 +61,8 @@
         <activity android:name=".view.login.LoginActivity"
             android:screenOrientation="portrait"
             android:noHistory="false"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -118,6 +119,7 @@
             android:name=".controller.FetchAddressIntentService"
             android:exported="false"/>
 
+        <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
     </application>
 
 </manifest>

@@ -18,6 +18,9 @@ import com.helper.helper.model.TrackingData;
 import com.helper.helper.model.User;
 import com.snatik.storage.Storage;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -73,7 +76,8 @@ public class FileManager {
     private static final String USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED = "ledBookmarked";
     private static final String USER_INFO_XML_ELEM_ATTR_TRACK_INDICIES = "track_indicies";
 
-    private static final String PROFILE_IMG_NAME = "user_profile.jpg";
+    private static final String PROFILE_IMG_NAME = "_profile.jpg";
+    private static final String PROFILE_IMG_DIR_NAME = "profile_image";
 
     private static final String TRACKING_XML_NAME = "tracking.xml";
 
@@ -325,13 +329,20 @@ public class FileManager {
 
     /** User **/
     // TODO: 29/10/2018 Insert Profile Bitmap Image in Server
-    public static void writeUserProfile(Context context, Bitmap bitmap) {
+    public static void writeUserProfile(Context context, Bitmap bitmap, String userName) {
         Storage internalStorage = new Storage(context);
 
         String path = internalStorage.getInternalFilesDirectory();
-        String dir = path + File.separator + DIR_NAME + File.separator + PROFILE_IMG_NAME;
+        String dir = path + File.separator + DIR_NAME + File.separator + PROFILE_IMG_DIR_NAME;
+        String imgdir = dir + File.separator +  userName + PROFILE_IMG_NAME;
 
-        File fileCacheItem = new File(dir);
+        File file = new File(dir);
+        if(!file.exists()) {
+            file.mkdirs();
+        }
+
+
+        File fileCacheItem = new File(imgdir);
         OutputStream out = null;
 
         try
@@ -457,18 +468,24 @@ public class FileManager {
         String riding_type = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_RIDING_TYPE).getNodeValue();
         String led_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_INDICIES).getNodeValue();
         String led_bookmarked = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED).getNodeValue();
-//              String track_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_TRACK_INDICIES).getNodeValue();
 
-        led_indicies = led_indicies.split("\\[")[1].split("]")[0];
-        led_bookmarked = led_bookmarked.split("\\[")[1].split("]")[0];
+        JSONArray led_indices_jarr = null;
+        JSONArray led_bookmarked_jarr = null;
+        try {
+            led_indices_jarr = new JSONArray(led_indicies);
+            led_bookmarked_jarr = new JSONArray(led_bookmarked);
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
 
         User user = new User.Builder()
                 .email(email)
                 .name(name)
                 .phone(phone)
                 .ridingType(riding_type)
-                .ledIndicies(led_indicies)
-                .ledBookmarked(led_bookmarked)
+                .ledIndicies(led_indices_jarr)
+                .ledBookmarked(led_bookmarked_jarr)
                 .build();
 
 

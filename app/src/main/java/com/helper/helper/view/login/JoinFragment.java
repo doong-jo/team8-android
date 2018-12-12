@@ -8,10 +8,13 @@
 package com.helper.helper.view.login;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.text.InputType;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,10 +26,12 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.helper.helper.R;
 import com.helper.helper.controller.FormManager;
+import com.helper.helper.controller.SharedPreferencer;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.Command;
 import com.helper.helper.interfaces.ValidateCallback;
@@ -66,8 +71,10 @@ public class JoinFragment extends Fragment {
     private static final int SNACKBAR_INFO_PW = 228;
     private static final int SNACKBARK_NOT_CHECKED_TERM = 231;
 
+
     private AppCompatCheckBox m_termChkBox;
     private SnackBar m_snackBar;
+    private RelativeLayout m_joinLayout;
 
     private FloatingEditTextAddonControl m_emailInputTxt;
     private FloatingEditTextAddonControl m_pwInputTxt;
@@ -78,18 +85,25 @@ public class JoinFragment extends Fragment {
 
     }
 
+    @Override
+    public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
+
+    }
+
     @SuppressLint({"ResourceAsColor", "RestrictedApi"})
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_join, container, false);
 
-
         // Solve : bug first touch not working
         getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
         /******************* Connect widgtes with layout *******************/
+        m_joinLayout = view.findViewById(R.id.joinLayout);
+
         m_emailInputTxt = view.findViewById(R.id.emailInputTxt);
         m_pwInputTxt = view.findViewById(R.id.pwInputTxt);
 
@@ -101,11 +115,19 @@ public class JoinFragment extends Fragment {
 
         LinearLayout parentLayout = view.findViewById(R.id.parentLayout);
 
+        SharedPreferences pref = SharedPreferencer.getSharedPreferencer(getActivity(), SharedPreferencer.JOINPREFNAME, Activity.MODE_PRIVATE);
+        if(!pref.getString("email","").equals("") || !pref.getString("password","").equals("")){
+            m_emailInputTxt.setText(pref.getString("email",""));
+            m_pwInputTxt.setText(pref.getString("password",""));
+        }
+
         m_emailInputTxt.setEnterFocusCmd(new Command() {
             @Override
             public void execute() {
-                if( m_emailInputTxt.getText().equals("") || FormManager.emailCharValidate(m_emailInputTxt.getText()) == FormManager.RESULT_VALIDATION_SUCCESS ) {
+                if( FormManager.emailCharValidate(m_emailInputTxt.getText()) == FormManager.RESULT_VALIDATION_SUCCESS ) {
                     m_snackBar.setVisible(false);
+                } else {
+                    setSnackBarStatus(SNACKBAR_INVALID_EMAIL);
                 }
             }
         });
@@ -191,7 +213,7 @@ public class JoinFragment extends Fragment {
                 if (focusView != null) { imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0); }
 
                 LoginActivity activity = (LoginActivity)getActivity();
-                activity.moveToFragment(new StartFragment(), true);
+                activity.moveToFragment(new StartFragment(), m_joinLayout, true);
             }
         });
 
@@ -221,7 +243,7 @@ public class JoinFragment extends Fragment {
                 if (focusView != null) { imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0); }
 
                 LoginActivity activity = (LoginActivity)getActivity();
-                activity.moveToFragment(new TermFragment(), false);
+                activity.moveToFragment(new TermFragment(), m_joinLayout, false);
             }
         });
 
@@ -235,18 +257,21 @@ public class JoinFragment extends Fragment {
         });
         /*************************************************************/
 
+        LoginActivity loginActivity = (LoginActivity)getActivity();
+        loginActivity.setFragmentBackPressed(new StartFragment(), m_joinLayout, false);
+
         return view;
     }
 
     private void tryNext() {
-        View focusView = getActivity().getCurrentFocus();
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-        if (focusView != null) { imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0); }
+        final View focusView = getActivity().getCurrentFocus();
 
         final User user = new User.Builder()
                 .email(m_emailInputTxt.getText())
                 .pw(m_pwInputTxt.getText())
                 .build();
+        UserManager.setUser(user);
+
         try {
             validateCharacterForm(user, new ValidateCallback() {
                 @Override
@@ -262,13 +287,18 @@ public class JoinFragment extends Fragment {
                                         if( resultCode == 1 ) {
                                             setSnackBarStatus(SNACKBAR_EXIST_EAMIL);
                                         }
-                                        else if( validateCode == FormManager.RESULT_VALIDATION_SUCCESS && m_termChkBox.isChecked() ){
+                                        else if( validateCode == FormManager.RESULT_VALIDATION_SUCCESS && m_termChkBox.isChecked() ) {
+                                            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                                            if (focusView != null) { imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0); }
                                             // not exist
                                             UserManager.setUserEmail(user.getUserEmail());
                                             UserManager.setUserPassword(user.getUserPw());
 
                                             LoginActivity activity = (LoginActivity)getActivity();
-                                            activity.moveToFragment(new AddNameFragment(), false);
+                                            SharedPreferencer.putString("email", user.getUserEmail());
+                                            SharedPreferencer.putString("password", user.getUserPw());
+                                            SharedPreferencer.remove("name");
+                                            activity.moveToFragment(new AddNameFragment(), m_joinLayout, false);
                                         } else {
                                             if( validateCode == FormManager.RESULT_VALIDATION_PW_WRONG ) {
                                                 setSnackBarStatus(SNACKBAR_INVALID_PW);
@@ -331,11 +361,13 @@ public class JoinFragment extends Fragment {
     private void getResultExistEmail(User user, final ValidateCallback callback) throws  JSONException {
         if( HttpManager.useCollection(getString(R.string.collection_user)) ) {
 
-            JSONObject reqObject = user.getTransformUserToJSON();
+            JSONObject
+                    reqObject = user.getTransformUserToJSON();
             reqObject.remove(User.KEY_EMERGENCY);
             reqObject.remove(User.KEY_LAST_ACCESS);
+            reqObject.remove(User.KEY_PASSWORD);
 
-
+            Log.d(TAG, "getResultExistEmail: " + reqObject.toString());
             HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                 @Override
                 public void onSuccess(JSONArray jsonArray) throws JSONException {
@@ -353,5 +385,4 @@ public class JoinFragment extends Fragment {
             });
         }
     }
-
 }
