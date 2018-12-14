@@ -8,7 +8,9 @@
 
 package com.helper.helper.view.login;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
@@ -22,11 +24,13 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.helper.helper.R;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.FormManager;
+import com.helper.helper.controller.SharedPreferencer;
 import com.helper.helper.interfaces.Command;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.User;
@@ -54,6 +58,7 @@ public class LoginFragment extends Fragment {
     private FloatingEditTextAddonControl m_emailInputTxt;
     private FloatingEditTextAddonControl m_pwInputTxt;
     private LoadingButton m_loginBtn;
+    private RelativeLayout m_loginLayout;
 
     private SnackBar m_snackBar;
     /**************************************************************/
@@ -71,6 +76,8 @@ public class LoginFragment extends Fragment {
         View view = inflater.inflate( R.layout.fragment_login, container, false );
 
         /******************* Connect widgtes with layout *******************/
+        m_loginLayout = view.findViewById(R.id.loginLayout);
+
         m_emailInputTxt = view.findViewById(R.id.loginEmailInput);
         m_pwInputTxt = view.findViewById(R.id.loginPwInput);
         m_loginBtn = view.findViewById(R.id.loginLoadingBtn);
@@ -114,6 +121,14 @@ public class LoginFragment extends Fragment {
                 return false;
             }
         });
+
+        m_pwInputTxt.setEnterFocusCmd(new Command() {
+            @Override
+            public void execute() {
+                m_snackBar.setVisible(false);
+            }
+        });
+
         m_pwInputTxt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -133,11 +148,13 @@ public class LoginFragment extends Fragment {
             public void onClick(View view) {
                 LoginActivity activity = (LoginActivity)getActivity();
                 if( activity != null ) {
-                    activity.moveToFragment(new StartFragment(), true);
+                    activity.moveToFragment(new StartFragment(), m_loginLayout,true);
                 }
             }
         });
         /*************************************************************/
+        LoginActivity loginActivity = (LoginActivity)getActivity();
+        loginActivity.setFragmentBackPressed(new StartFragment(), m_loginLayout, false);
 
         return view;
     }
@@ -155,11 +172,13 @@ public class LoginFragment extends Fragment {
 
         if(FormManager.emailCharValidate(email) == FormManager.RESULT_VALIDATION_EMAIL_WRONG) {
             setSnackBarStatus(SNACKBAR_DENYING_LOGIN);
+            clearAllInputFocus();
             return;
         }
 
         if(FormManager.passwordCharValidate(pw) == FormManager.RESULT_VALIDATION_PW_WRONG) {
-             setSnackBarStatus(SNACKBAR_DENYING_LOGIN);
+            setSnackBarStatus(SNACKBAR_DENYING_LOGIN);
+            clearAllInputFocus();
             return;
         }
 
@@ -222,6 +241,7 @@ public class LoginFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     setSnackBarStatus(SNACKBAR_DENYING_LOGIN);
+                                    clearAllInputFocus();
                                 }
                             });
 
@@ -237,6 +257,11 @@ public class LoginFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void clearAllInputFocus() {
+        m_pwInputTxt.clearFocus();
+        m_emailInputTxt.clearFocus();
     }
 
     private void setSnackBarStatus(int visibleCode) {

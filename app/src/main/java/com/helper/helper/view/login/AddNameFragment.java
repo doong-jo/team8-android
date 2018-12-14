@@ -1,8 +1,12 @@
 package com.helper.helper.view.login;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +16,15 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.helper.helper.R;
 import com.helper.helper.controller.FormManager;
 import com.helper.helper.controller.HttpManager;
+import com.helper.helper.controller.SharedPreferencer;
 import com.helper.helper.controller.UserManager;
+import com.helper.helper.controller.ViewStateManager;
 import com.helper.helper.interfaces.Command;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
@@ -38,7 +45,7 @@ public class AddNameFragment extends Fragment {
 
     private FloatingEditTextAddonControl m_nameInput;
     private SnackBar m_snackBar;
-    private Button m_nextBtn;
+    private RelativeLayout m_addNameLayout;
 
     public AddNameFragment() {
 
@@ -54,8 +61,9 @@ public class AddNameFragment extends Fragment {
 
         /******************* Connect widgtes with layout *******************/
         m_nameInput = view.findViewById(R.id.nameInput);
-        m_nextBtn = view.findViewById(R.id.nextBtn);
         m_snackBar = view.findViewById(R.id.addNameSnackBar);
+        m_addNameLayout = view.findViewById(R.id.addNameLayout);
+        Button m_nextBtn = view.findViewById(R.id.nextBtn);
         ImageView backBtn = view.findViewById(R.id.backMakeProfileFragment);
 
         m_nameInput.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -78,6 +86,11 @@ public class AddNameFragment extends Fragment {
                 setSnackBarStatus(SNACKBAR_INFO_NAME);
             }
         });
+
+        SharedPreferences pref = SharedPreferencer.getSharedPreferencer(getActivity(), SharedPreferencer.JOINPREFNAME, Activity.MODE_PRIVATE);
+        if(!pref.getString("name","").equals("")){
+            m_nameInput.setText(pref.getString("name",""));
+        }
         /*******************************************************************/
 
         /******************* Make Listener in View *******************/
@@ -99,16 +112,19 @@ public class AddNameFragment extends Fragment {
                 }
 
                 LoginActivity activity = (LoginActivity)getActivity();
-                activity.moveToFragment(new JoinFragment(), false);
+                activity.moveToFragment(new JoinFragment(), m_addNameLayout, false);
             }
         });
 
 
         /*************************************************************/
+        LoginActivity loginActivity = (LoginActivity)getActivity();
+        loginActivity.setFragmentBackPressed(new JoinFragment(), m_addNameLayout, false);
+
         return view;
     }
 
-    private void tryNext() {
+    private void tryNext()  {
         User user = new User.Builder()
                 .name(m_nameInput.getText())
                 .build();
@@ -118,6 +134,7 @@ public class AddNameFragment extends Fragment {
                 setSnackBarStatus(SNACKBAR_INVALID_NAME);
                 return;
             }
+
             getResultExistName(user, new ValidateCallback() {
                 @Override
                 public void onDone(final int resultCode) throws JSONException {
@@ -137,8 +154,9 @@ public class AddNameFragment extends Fragment {
                                     imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
                                 }
 
+                                SharedPreferencer.putString("name", UserManager.getUserName());
                                 LoginActivity activity = (LoginActivity)getActivity();
-                                activity.moveToFragment(new MakeProfileFragment(), false);
+                                activity.moveToFragment(new MakeProfileFragment(), m_addNameLayout,false);
                             }
                         }
                     });
@@ -175,6 +193,7 @@ public class AddNameFragment extends Fragment {
             });
         }
     }
+
     private void setSnackBarStatus(int visibleCode) {
         m_snackBar.setVisible(true);
 
@@ -195,4 +214,6 @@ public class AddNameFragment extends Fragment {
                 break;
         }
     }
+
+
 }

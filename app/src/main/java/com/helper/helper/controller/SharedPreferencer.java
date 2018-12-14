@@ -2,15 +2,20 @@ package com.helper.helper.controller;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.ArraySet;
 import android.util.Log;
 
+
+import com.helper.helper.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Set;
+
 public class SharedPreferencer {
     private final static String TAG = SharedPreferencer.class.getSimpleName()+"/DEV";
-    private final static int MAX_SEARCH = 5;
+    public final static String JOINPREFNAME= "JOIN_FORM";
     private static SharedPreferences pref;
 
     public static SharedPreferences getSharedPreferencer(Context context, String name, int mode){
@@ -25,7 +30,26 @@ public class SharedPreferencer {
         editor.putString(key, jsonArr.toString());
 
         editor.apply();
-        Log.d(TAG, "jsonArr toString: " + jsonArr.toString());
-        Log.d(TAG, "pref getAll: " + pref.getAll());
     }
+
+    public static void putString(final String key, final String str){
+        SharedPreferences.Editor editor= pref.edit();
+        editor.putString(key, str);
+        editor.apply();
+    }
+
+    public static void clear(){
+        if( pref == null ) { return; }
+        SharedPreferences.Editor editor= pref.edit();
+        editor.clear();
+        editor.apply();
+    }
+
+    public static void remove(String key){
+        if( pref == null ) { return; }
+        SharedPreferences.Editor editor = pref.edit();
+        editor.remove(key);
+        editor.apply();
+    }
+
 }

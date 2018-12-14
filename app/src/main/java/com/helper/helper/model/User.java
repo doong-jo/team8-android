@@ -244,6 +244,10 @@ public class User {
         return m_ledIndicies.toString();
     }
 
+    public int getUserLEDIndiciesSize() {
+        return m_ledIndicies.size();
+    }
+
     public String getUserBookmarked() {
         return m_ledBookmarked.toString();
     }

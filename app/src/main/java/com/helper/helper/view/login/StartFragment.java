@@ -1,5 +1,7 @@
 package com.helper.helper.view.login;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.support.v4.app.Fragment;
@@ -15,6 +17,7 @@ import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.helper.helper.R;
+import com.helper.helper.controller.SharedPreferencer;
 
 
 public class StartFragment extends Fragment implements BaseSliderView.OnSliderClickListener, ViewPagerEx.OnPageChangeListener{
@@ -29,6 +32,7 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
 
     private TextView m_loginText;
     private LinearLayout m_signupWithEmailLayout;
+    private LinearLayout m_startLayout;
     /**************************************************************/
 
     public StartFragment() {
@@ -39,14 +43,20 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
         View view = inflater.inflate( R.layout.fragment_start, container, false );
 
+        SharedPreferences pref = SharedPreferencer.getSharedPreferencer(getActivity(), SharedPreferencer.JOINPREFNAME, Activity.MODE_PRIVATE);
+        if(pref.getAll() != null) {
+            SharedPreferencer.clear();
+        }
+
         // Solve : bug first touch not working
         getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
         /******************* Connect widgtes with layout *******************/
-        m_slider = (SliderLayout)view.findViewById(R.id.slider);
-        m_loginText = (TextView)view.findViewById(R.id.loginText);
-        m_signupWithEmailLayout = (LinearLayout)view.findViewById(R.id.signupWithEmail);
+        m_startLayout = view.findViewById(R.id.startLayout);
+        m_slider = view.findViewById(R.id.slider);
+        m_loginText = view.findViewById(R.id.loginText);
+        m_signupWithEmailLayout = view.findViewById(R.id.signupWithEmail);
         /*******************************************************************/
 
         /******************* Slider *******************/
@@ -85,7 +95,7 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
             @Override
             public void onClick(View view) {
                 LoginActivity activity = (LoginActivity)getActivity();
-                activity.moveToFragment(new LoginFragment(), false);
+                activity.moveToFragment(new LoginFragment(), m_startLayout,false);
             }
         });
 
@@ -93,11 +103,13 @@ public class StartFragment extends Fragment implements BaseSliderView.OnSliderCl
             @Override
             public void onClick(View view) {
                 LoginActivity activity = (LoginActivity)getActivity();
-                activity.moveToFragment(new JoinFragment(), false);
+                activity.moveToFragment(new JoinFragment(), m_startLayout,false);
             }
         });
         /*************************************************************/
-
+        /*************************************************************/
+        LoginActivity loginActivity = (LoginActivity)getActivity();
+        loginActivity.setFragmentBackPressed(new AddNameFragment(), null, false);
         return view;
     }
 

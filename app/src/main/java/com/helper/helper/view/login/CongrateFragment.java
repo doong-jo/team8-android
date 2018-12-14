@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.helper.helper.R;
@@ -30,6 +31,7 @@ public class CongrateFragment extends Fragment {
         Button startBtn = view.findViewById(R.id.startBtn);
         ImageView userImgView = view.findViewById(R.id.previewImage);
         TextView userName = view.findViewById(R.id.userName);
+        ScrollView congrateLayout = view.findViewById(R.id.congrateLayout);
 
         if ( UserManager.getUserProfileBitmap() != null ) {
             userImgView.setImageBitmap(
@@ -48,10 +50,12 @@ public class CongrateFragment extends Fragment {
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), ScrollingActivity.class);
                 startActivity(intent);
+                getActivity().finish();
             }
         });
         /*************************************************************/
-
+        LoginActivity loginActivity = (LoginActivity)getActivity();
+        loginActivity.setFragmentBackPressed(new StartFragment(), congrateLayout, false);
         return view;
     }
 }

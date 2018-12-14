@@ -158,6 +158,8 @@ public class FloatingEditTextAddonControl extends FrameLayout {
         return m_floatingLblEditTxt.getmEditText().getText().toString();
     }
 
+    public void setText(String str) {m_floatingLblEditTxt.getmEditText().setText(str);}
+
     public void setInputType(int type) {
         m_floatingLblEditTxt.getmEditText().setInputType(type);
     }
