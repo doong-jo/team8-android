@@ -198,6 +198,11 @@
     <string name="accident_threshold_set">Please set accident threshold.</string>
     <string name="accident_threshold_description">* The higher the critical point, the higher the frequency of notifications based on the accident coverage rate.</string>
 
+    <!--Main Drawer-->
+    <string name="nav_tracking_record">Tracking Records</string>
+    <string name="nav_emergency_contacts">Emergency Contacts</string>
+    <string name="nav_accident_threshold">Accident Threshold</string>
+
     <string name="confirm_privacy_term">상기 내용을 확인하였습니다.</string>
     <string name="privacy_term">
         <b>제1조. 목적</b>\n\n
