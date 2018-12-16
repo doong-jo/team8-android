@@ -91,7 +91,12 @@ dependencies {
 //    implementation 'io.reactivex:rxandroid:1.1.0'
 //    implementation 'com.sangcomz:FishBun:0.8.6'
 //    implementation 'com.squareup.picasso:picasso:2.5.2'
+
+    // Profile Image Crop
     implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
+
+    //  Accident Threshold seekbar
+    implementation 'com.xw.repo:bubbleseekbar:3.19'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

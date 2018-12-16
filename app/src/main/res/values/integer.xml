@@ -15,4 +15,9 @@
     <integer name="shadow_x">0</integer>
     <integer name="shadow_y">4</integer>
     <integer name="shadow_b">5</integer>
+
+    <integer name="threshold_seekbar_min">0</integer>
+    <integer name="threshold_seekbar_max">10</integer>
+    <integer name="threshold_seekbar_progress_def">0</integer>
+    <integer name="threshold_seekbar_section_count">10</integer>
 </resources>

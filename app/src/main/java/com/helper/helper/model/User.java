@@ -38,6 +38,7 @@ public class User {
 
     /** Not Collection field **/
     private String m_userLEDIndex;
+    private int m_accidentThreshold;
 
     public static final String KEY_LASTPOSITON = "lastPosition";
     public static final String KEY_LED_INDICIES = "ledIndicies";
@@ -226,6 +227,10 @@ public class User {
         m_userLEDIndex = ledIndex;
     }
 
+    public void setAccidentThreshold(int accidentThreshold){
+        m_accidentThreshold = accidentThreshold;
+    }
+
     public String getUserEmail() {
         return m_userEmail;
     }
@@ -306,4 +311,6 @@ public class User {
     public String getUserLEDIndex() {
         return m_userLEDIndex;
     }
+
+    public int getUserAccidentThreshold(){ return m_accidentThreshold; }
 }

@@ -7,11 +7,15 @@
         <item
             android:id="@+id/nav_trackingRecords"
             android:icon="@drawable/ic_bicycle"
-            android:title="Tracking Records" />
+            android:title="@string/nav_tracking_record" />
         <item
             android:id="@+id/nav_emergencyContacts"
             android:icon="@drawable/ic_user"
-            android:title="Emergency Contacts" />
+            android:title="@string/nav_emergency_contacts" />
+        <item
+            android:id="@+id/nav_accidentThreshold"
+            android:icon="@drawable/ic_accident"
+            android:title="@string/nav_accident_threshold" />
 
         <!--<item-->
             <!--android:id="@+id/nav_assistPlaces"-->
