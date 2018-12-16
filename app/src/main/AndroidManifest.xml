@@ -63,7 +63,6 @@
             android:noHistory="false"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
@@ -75,6 +74,7 @@
             android:name=".view.ScrollingActivity"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait">
+
 
         </activity>
 
@@ -110,6 +110,11 @@
 
         <activity android:name=".view.popup.PopupActivity"
             android:theme="@style/Theme.Transparent">
+        </activity>
+
+        <activity android:name=".view.accident.ThresholdActivity"
+            android:theme="@style/AppTheme">
+
         </activity>
 
         <!--BLE service class -->

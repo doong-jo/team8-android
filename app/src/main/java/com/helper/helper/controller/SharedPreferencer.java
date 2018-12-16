@@ -38,6 +38,12 @@ public class SharedPreferencer {
         editor.apply();
     }
 
+    public static void putInt(final String key, final int num){
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(key, num);
+        editor.apply();
+    }
+
     public static void clear(){
         if( pref == null ) { return; }
         SharedPreferences.Editor editor= pref.edit();

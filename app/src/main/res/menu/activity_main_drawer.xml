@@ -12,6 +12,10 @@
             android:id="@+id/nav_emergencyContacts"
             android:icon="@drawable/ic_user"
             android:title="Emergency Contacts" />
+        <item
+            android:id="@+id/nav_accidentThreshold"
+            android:icon="@drawable/ic_accident"
+            android:title="Accident Threshold" />
 
         <!--<item-->
             <!--android:id="@+id/nav_assistPlaces"-->

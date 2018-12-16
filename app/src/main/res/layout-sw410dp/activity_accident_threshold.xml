@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="11.4dp"
+        android:paddingBottom="11.4dp"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/backBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="17.1dp"
+            android:layout_marginEnd="17.1dp"
+            android:layout_marginBottom="17.1dp"
+            android:src="@drawable/ic_back" />
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="228dp"
+            android:layout_height="228dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_accident" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22.8dp"
+            android:text="@string/accident_threshold_set"
+            android:textAlignment="center"
+            android:textColor="@color/xxxxgray"
+            android:theme="@style/TitleTypo" />
+
+        <com.xw.repo.BubbleSeekBar
+            android:id="@+id/thresholdSeekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="22.8dp"
+            android:layout_marginStart="22.8dp"
+            android:layout_marginTop="57dp"
+            app:bsb_bubble_color="@color/accent_orange"
+            app:bsb_bubble_text_color="@color/white"
+            app:bsb_max="0"
+            app:bsb_min="10"
+            app:bsb_progress="0"
+            app:bsb_second_track_color="@color/accent_orange"
+            app:bsb_section_count="10"
+            app:bsb_section_text_position="below_section_mark"
+            app:bsb_seek_step_section="true"
+            app:bsb_show_section_mark="true"
+            app:bsb_touch_to_seek="true"
+            app:bsb_show_thumb_text="true"
+            app:bsb_track_color="@color/accent_orange" />
+
+        <TextView
+            android:layout_width="342dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22.8dp"
+            android:text="@string/accident_threshold_description"
+            android:textColor="@color/xxxgray"
+            android:layout_gravity="center_horizontal"
+            android:theme="@style/BodyTypo" />
+
+    </LinearLayout>
+</RelativeLayout>
