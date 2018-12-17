@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -43,6 +44,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -101,7 +104,7 @@ public class BTManager {
 
         public void run() {
             while (true) {
-                BTManager.readFromBluetoothDevice(new BluetoothReadCallback() {
+                readFromBluetoothDevice(new BluetoothReadCallback() {
                     @Override
                     public void onResult(String result) {
                         bluetoothSignalHandler(result);
@@ -233,7 +236,29 @@ public class BTManager {
                     }
                 });
             }
-        }
+        } else if ( signalMsg.startsWith(BT_SIGNAL_EMERGENCY + BLUETOOTH_SIGNAL_SEPARATE) ) {
+           final double acc = Double.valueOf(signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[1]);
+           final double similarity = Double.valueOf(signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[2]);
+           final double rollover = Double.valueOf(signalMsg.split(BLUETOOTH_SIGNAL_SEPARATE)[3]);
+
+           EmergencyManager.setAccLocation(GoogleMapManager.getCurLocation());
+           m_activity.runOnUiThread(new Runnable() {
+               @Override
+               public void run() {
+                   /** handler **/
+                   EmergencyManager.getDistanceToAccident(new DistanceCallback() {
+                       @Override
+                       public void onDone(float dis) {
+                           if( EmergencyManager.getCalcGPSFuzzyLogicResult(dis) ) {
+                               EmergencyManager.setAccidentSensorData(acc, rollover);
+                               m_activityReadCb.onResult(BT_SIGNAL_EMERGENCY);
+                           }
+                       }
+                   });
+               }
+           });
+
+       }
         writeToBluetoothDevice(BT_SIGNAL_RES_FILTER.getBytes());
     }
 
@@ -247,7 +272,27 @@ public class BTManager {
         for (int i = 0; i < deviceLabels.length; ++i) {
             if (devices.get(i).getName().contains(DEVICE_ALIAS)) {
                 connectDevice(devices.get(i));
-                return;
+
+                if( getConnected() ) {
+                    return;
+                }
+                /** Remove bond device **/
+//                if( !getConnected() ) {
+//                    Method m = null;
+//                    try {
+//                        m = devices.get(i).getClass()
+//                                .getMethod("removeBond", (Class[]) null);
+//                    } catch (NoSuchMethodException e) {
+//                        e.printStackTrace();
+//                    }
+//                    try {
+//                        m.invoke(devices.get(i), (Object[]) null);
+//                    } catch (IllegalAccessException | InvocationTargetException e) {
+//                        e.printStackTrace();
+//                    }
+//                } else {
+//                    return;
+//                }
             }
         }
 
@@ -278,6 +323,12 @@ public class BTManager {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            try {
+                m_activity.unregisterReceiver(m_discoveryReceiver);
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            }
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -306,7 +357,7 @@ public class BTManager {
                         connectDevice(searchedDevice);
                     }
 
-                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()) ) {
+                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()) && !getConnected()) {
                     try {
                         m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
                     } catch (JSONException e) {
@@ -317,7 +368,7 @@ public class BTManager {
         };
     }
 
-    public static void requestEnableBluetooth() {
+    private static void requestEnableBluetooth() {
         if (!m_bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             m_activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
@@ -339,8 +390,8 @@ public class BTManager {
         }
     }
 
-    public static void readFromBluetoothDevice(BluetoothReadCallback callback) {
-        if (m_bluetoothInput == null ) {
+    private static void readFromBluetoothDevice(BluetoothReadCallback callback) {
+        if ( !getConnected() ) {
             stopReadThread();
             return;
         }
@@ -354,10 +405,13 @@ public class BTManager {
             callback.onResult(readMessage);
         } catch (IOException e) {
             // TODO: 28/11/2018 Bluetooth connection is disconnected state
-            Log.e(TAG, "readFromBluetoothDevice: StopBluetoothReadThread");
+            try {
+                m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
+            } catch (JSONException e1) {
+                e1.printStackTrace();
+            }
+            closeBluetoothSocket();
             stopReadThread();
-            callback.onError(e.getMessage());
-            e.printStackTrace();
         }
     }
 

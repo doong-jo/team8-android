@@ -259,29 +259,31 @@ public class ScrollingActivity extends AppCompatActivity
         m_emergencyCallback = new BluetoothReadCallback() {
             @Override
             public void onResult(String result) {
-                if( EmergencyManager.getEmergencyAlertState() ||
-                        !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ||
-                        !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    return;
-                }
-
-                EmergencyManager.setEmergencyAlertState(true);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final Location accLocation = GoogleMapManager.getCurLocation();
-                        AddressManager.startAddressIntentService(activity, accLocation);
-
-                        if( m_bIsDestroyed ) {
-                            Intent intent = new Intent(activity, PopupActivity.class);
-                            startActivity(intent);
-                        } else {
-                            DialogAccident dialogAccident = new DialogAccident(activity, false);
-                            dialogAccident.showDialog();
-                        }
+                if( result.equals(BTManager.BT_SIGNAL_EMERGENCY) ) {
+                    if( EmergencyManager.getEmergencyAlertState() ||
+                            !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ||
+                            !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        return;
                     }
-                });
+
+                    EmergencyManager.setEmergencyAlertState(true);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final Location accLocation = GoogleMapManager.getCurLocation();
+                            AddressManager.startAddressIntentService(activity, accLocation);
+
+                            if( m_bIsDestroyed ) {
+                                Intent intent = new Intent(activity, PopupActivity.class);
+                                startActivity(intent);
+                            } else {
+                                DialogAccident dialogAccident = new DialogAccident(activity, false);
+                                dialogAccident.showDialog();
+                            }
+                        }
+                    });
+                }
             }
 
             @Override

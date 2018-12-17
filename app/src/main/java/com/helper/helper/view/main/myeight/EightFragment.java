@@ -15,10 +15,14 @@ import android.widget.RelativeLayout;
 
 import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
+import com.helper.helper.interfaces.ValidateCallback;
+
+import org.json.JSONException;
 
 public class EightFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    private ValidateCallback m_bluetoothConnectionCallback;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,6 +39,20 @@ public class EightFragment extends Fragment {
 //
 //        toolbar.requestLayout();
         // Inflate the layout for this fragment
+
+        m_bluetoothConnectionCallback = new ValidateCallback() {
+            @Override
+            public void onDone(int resultCode) {
+                if (resultCode == BTManager.SUCCESS_BLUETOOTH_CONNECT) {
+                    moveToFragment(new InfoFragment());
+                } else if (resultCode == BTManager.FAIL_BLUETOOTH_CONNECT) {
+                    moveToFragment(new PairingFragment());
+                }
+            }
+        };
+
+        BTManager.setConnectionResultCb(m_bluetoothConnectionCallback);
+
         return inflater.inflate(R.layout.fragment_eight, container, false);
     }
 
@@ -79,6 +97,8 @@ public class EightFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        BTManager.setConnectionResultCb(m_bluetoothConnectionCallback);
+
         if ( BTManager.getConnected() ) {
             moveToFragment(new InfoFragment());
         } else {
