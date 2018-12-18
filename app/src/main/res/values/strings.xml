@@ -204,6 +204,26 @@
     <string name="nav_accident_threshold">Accident Threshold</string>
 
     <string name="confirm_privacy_term">상기 내용을 확인하였습니다.</string>
+
+
+    <string name="input_text">Looking for…</string>
+    <string name="button_send">Go!</string>
+    <string name="police_stations">Police Stations in Victoria</string>
+    <string name="medicare">Medicare Offices</string>
+    <string name="attrib_format">Data from &lt;a href = "%s">data.gov.au&lt;/a>, modified under &lt;a href = \"http://creativecommons.org/licenses/by/3.0/au/\">CC BY 3.0 AU&lt;/a></string>
+    <string name="police_stations_url">http://data.gov.au/dataset/police-station-locations/resource/76110b24-0f0a-4c29-9583-3f99eaba486c</string>
+    <string name="medicare_url">http://data.gov.au/dataset/location-of-medicare-offices/resource/5d38e1be-4011-49c4-8b8b-75405eeb1088</string>
+    <string name="kml_url">http://googlemaps.github.io/kml-samples/morekml/Polygons/Polygons.Google_Campus.kml</string>
+    <string name="geojson_url">https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson</string>
+    <string-array name="heatmaps_datasets_array">
+        <item>@string/police_stations</item>
+        <item>@string/medicare</item>
+    </string-array>
+    <string name="button_radius">Radius</string>
+    <string name="button_gradient">Gradient</string>
+    <string name="button_opacity">Opacity</string>
+
+
     <string name="privacy_term">
         <b>제1조. 목적</b>\n\n
         \u0020\u0020\u0020\u00201. 이 약관은 (주)Team 8(이하 “회사”)이 운영하는 HELPER 서비스(이하 “서비스”)를 이용함에 있어 회사와 회원간의 권리ㆍ의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.\n\n

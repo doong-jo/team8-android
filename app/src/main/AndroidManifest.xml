@@ -54,11 +54,6 @@
 
         <activity android:name=".view.intro.YoutubeActivity"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <!--android:windowSoftInputMode="adjustResize"-->
@@ -112,6 +107,16 @@
 
         <activity android:name=".view.accident.ThresholdActivity"
             android:theme="@style/AppTheme">
+
+        </activity>
+
+        <activity android:name=".view.main.tracking.HeatmapsDemoActivity"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
 
         </activity>
 
