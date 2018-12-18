@@ -31,6 +31,7 @@ public class LookingActivity extends Activity {
     private ImageView m_pairingCircle2;
     private ImageView m_device;
     private TextView m_title;
+    private TextView m_description;
 
     private TextView m_resultTitle;
     private ImageView m_resultSymbol;
@@ -56,6 +57,7 @@ public class LookingActivity extends Activity {
         m_pairingCircle2 = findViewById(R.id.pairing_circle2);
         m_device = findViewById(R.id.pairing_device);
         m_title = findViewById(R.id.lookingTitle);
+        m_description = findViewById(R.id.lookingDescription);
 
         m_resultTitle = findViewById(R.id.resultTitle);
         m_resultSymbol = findViewById(R.id.pairing_result_symbol);
@@ -157,6 +159,7 @@ public class LookingActivity extends Activity {
         m_backMainImg.setVisibility(View.INVISIBLE);
         m_title.setVisibility(View.VISIBLE);
         m_device.setVisibility(View.VISIBLE);
+        m_description.setVisibility(View.VISIBLE);
         m_resultCircle.setVisibility(View.INVISIBLE);
         m_resultSymbol.setVisibility(View.INVISIBLE);
         m_resultTitle.setVisibility(View.INVISIBLE);
@@ -200,6 +203,7 @@ public class LookingActivity extends Activity {
         m_resultTitle.setVisibility(View.VISIBLE);
         m_resultSymbol.setVisibility(View.VISIBLE);
         m_resultCircle.setVisibility(View.INVISIBLE);
+        m_description.setVisibility(View.INVISIBLE);
 
         Animation deviceAnim = AnimationUtils
                 .loadAnimation(getApplicationContext(),

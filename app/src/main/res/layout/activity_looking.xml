@@ -101,4 +101,15 @@
             style="@style/PrimaryButton" />
 
     </RelativeLayout>
+
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/lookingTitle"
+        android:id="@+id/lookingDescription"
+        android:layout_marginTop="11.4dp"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/looking_description"
+        android:textColor="@color/half_black"
+        style="@style/OptionBigTypo"/>
 </android.support.constraint.ConstraintLayout>
