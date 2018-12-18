@@ -24,6 +24,8 @@ public class EightFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private ValidateCallback m_bluetoothConnectionCallback;
 
+    private String m_curFragmentClassName;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -58,19 +60,13 @@ public class EightFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        Fragment childFragment;
-
-        if( BTManager.getConnected() ) {
-            childFragment = new InfoFragment();
-        } else {
-            childFragment = new PairingFragment();
-        }
-
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.eight_fragment_container, childFragment).commit();
+        moveToFragment(new PairingFragment());
     }
 
     public void moveToFragment(Fragment targetFragment) {
+        if( targetFragment.getClass().getName().equals(m_curFragmentClassName) ) { return; }
+        m_curFragmentClassName = targetFragment.getClass().getName();
+
         Fragment childFragment = targetFragment;
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.replace(R.id.eight_fragment_container, childFragment).commit();

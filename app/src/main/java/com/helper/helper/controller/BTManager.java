@@ -263,7 +263,7 @@ public class BTManager {
     }
 
     /** Find Bluetooth Device **/
-    private static void prepareDevice()  {
+    private static void prepareDevice() {
 
         /** Find exist bluetooth device and connect **/
         List<BluetoothDevice> devices = new ArrayList<>(m_bluetoothAdapter.getBondedDevices());
@@ -276,24 +276,35 @@ public class BTManager {
                 if( getConnected() ) {
                     return;
                 }
+
                 /** Remove bond device **/
-//                if( !getConnected() ) {
-//                    Method m = null;
-//                    try {
-//                        m = devices.get(i).getClass()
-//                                .getMethod("removeBond", (Class[]) null);
-//                    } catch (NoSuchMethodException e) {
-//                        e.printStackTrace();
-//                    }
-//                    try {
-//                        m.invoke(devices.get(i), (Object[]) null);
-//                    } catch (IllegalAccessException | InvocationTargetException e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    return;
-//                }
+                if( !getConnected() ) {
+                    Method m = null;
+                    try {
+                        m = devices.get(i).getClass()
+                                .getMethod("removeBond", (Class[]) null);
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        m.invoke(devices.get(i), (Object[]) null);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    return;
+                }
             }
+        }
+
+        if( !getConnected() ) {
+            try {
+                m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return;
         }
 
         /** Find device non connection **/
@@ -332,11 +343,6 @@ public class BTManager {
 
         } catch (IOException e) {
             e.printStackTrace();
-            try {
-                m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
-            } catch (JSONException e1) {
-                e1.printStackTrace();
-            }
         }
     }
 
