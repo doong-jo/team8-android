@@ -44,7 +44,7 @@ import java.util.Map;
 public class InfoFragment extends Fragment {
     private final static String TAG = InfoFragment.class.getSimpleName() + "/DEV";
 
-    private BluetoothReadCallback m_bluetoothReadCallback;
+    private BluetoothReadCallback m_bluetoothInfoCallback;
 
     /******************* Define widgtes in view *******************/
     private SeekBar m_brightnessSeek;
@@ -82,7 +82,7 @@ public class InfoFragment extends Fragment {
         userName.setText(tempName + "'s EIGHT");
 
         /** Read Bluetooth Signal -> Callback **/
-        m_bluetoothReadCallback = new BluetoothReadCallback() {
+        m_bluetoothInfoCallback = new BluetoothReadCallback() {
             @Override
             public void onResult(final String signalStr) {
                 getActivity().runOnUiThread(new Runnable() {
@@ -99,7 +99,7 @@ public class InfoFragment extends Fragment {
             }
         };
 
-        BTManager.setInfoReadCb(m_bluetoothReadCallback);
+        BTManager.setInfoReadCb(m_bluetoothInfoCallback);
 
         /** Initialize Device info from bluetooth signal After pairing complete**/
 
