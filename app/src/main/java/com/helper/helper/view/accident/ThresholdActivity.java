@@ -19,7 +19,6 @@ import com.xw.repo.BubbleSeekBar;
 public class ThresholdActivity  extends AppCompatActivity {
 
     private final static String TAG = ThresholdActivity.class.getSimpleName()+"/DEV";
-    private static final String PREFERENCER_ACCIDENT_THRESHOLD = "ACCIDENT_THRESHOLD";
 
     /******************* Define widgtes in view *******************/
     private ImageView m_backBtn;
@@ -40,7 +39,7 @@ public class ThresholdActivity  extends AppCompatActivity {
         /*******************************************************************/
 
         pref = SharedPreferencer.getSharedPreferencer(this, UserManager.getUserEmail(), MODE_PRIVATE);
-        final int accidentThresholdNum = pref.getInt(PREFERENCER_ACCIDENT_THRESHOLD, 0);
+        final int accidentThresholdNum = pref.getInt(SharedPreferencer.ACCIDENT_THRESHOLD, 0);
 
         m_seekbar.setProgress(accidentThresholdNum);
 
@@ -55,7 +54,7 @@ public class ThresholdActivity  extends AppCompatActivity {
         m_seekbar.setOnProgressChangedListener(new BubbleSeekBar.OnProgressChangedListener(){
             @Override
             public void onProgressChanged(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat, boolean fromUser){
-                SharedPreferencer.putInt(PREFERENCER_ACCIDENT_THRESHOLD, progress);
+                SharedPreferencer.putInt(SharedPreferencer.ACCIDENT_THRESHOLD, progress);
             }
 
             @Override
