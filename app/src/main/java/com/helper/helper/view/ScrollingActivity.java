@@ -526,9 +526,22 @@ public class ScrollingActivity extends AppCompatActivity
 
                 break;
             case R.id.nav_accidentThreshold:
-                intent = new Intent(this, ThresholdActivity.class);
-                startActivity(intent);
+                if( !BTManager.getConnected() ) {
+                    new SweetAlertDialog(this)
+                            .setTitleText("Sorry!")
+                            .setContentText("Please pair with your EIGHT.")
+                            .setConfirmButton("Close", new SweetAlertDialog.OnSweetClickListener() {
+                                @Override
+                                public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                    sweetAlertDialog.dismissWithAnimation();
+                                }
+                            })
+                            .show();
 
+                } else {
+                    intent = new Intent(this, ThresholdActivity.class);
+                    startActivity(intent);
+                }
                 break;
         }
 

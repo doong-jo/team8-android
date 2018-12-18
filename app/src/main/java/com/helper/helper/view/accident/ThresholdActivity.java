@@ -11,9 +11,12 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.helper.helper.R;
+import com.helper.helper.controller.BTManager;
 import com.helper.helper.controller.SharedPreferencer;
 import com.helper.helper.controller.UserManager;
 import com.xw.repo.BubbleSeekBar;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 
 public class ThresholdActivity  extends AppCompatActivity {
@@ -31,7 +34,6 @@ public class ThresholdActivity  extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_accident_threshold);
-        final Activity thisActvity = this;
 
         /******************* Connect widgtes with layout *******************/
         m_backBtn = findViewById(R.id.backBtn);
@@ -55,6 +57,13 @@ public class ThresholdActivity  extends AppCompatActivity {
             @Override
             public void onProgressChanged(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat, boolean fromUser){
                 SharedPreferencer.putInt(SharedPreferencer.ACCIDENT_THRESHOLD, progress);
+
+                final String resultStr =
+                        BTManager.BT_SIGNAL_THRESHOLD
+                                + BTManager.BLUETOOTH_SIGNAL_SEPARATE
+                                + progress;
+
+                BTManager.writeToBluetoothDevice(resultStr.getBytes());
             }
 
             @Override

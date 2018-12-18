@@ -66,21 +66,20 @@ public class BTManager {
     /** Bluetooth Signal Rules **/
     public static final String BLUETOOTH_SIGNAL_SEPARATE = "!S!";
 
+    /** Signal **/
     private static final String BT_SIGNAL_ASK_LED = "AL";
     private static final String BT_SIGNAL_RESPONSE_LED = "RL";
     private static final String BT_SIGNAL_RES_DOWNLOAD_LED = "RDL";
     private static final String BT_SIGNAL_RES_EXIST_LED = "REL";
     private static final String BT_SIGNAL_DOWNLOAD_LED = "DL";
     private static final String BT_SIGNAL_DOWNLOAD_DONE_LED = "DDL";
-
     public static final String BT_SIGNAL_BRIGHTNESS = "B";
     public static final String BT_SIGNAL_SPEED = "S";
-
     private static final String BT_SIGNAL_FILTER = "F";
     private static final String BT_SIGNAL_RES_FILTER = "RES";
     private static final String BT_SIGNAL_CONNECTED = "CONNECTED";
-
     public static final String BT_SIGNAL_EMERGENCY = "E";
+    public static final String BT_SIGNAL_THRESHOLD = "T";
 
     private static final int BT_READ_CLOCK_SLEEP = 100;
 
@@ -295,16 +294,6 @@ public class BTManager {
                     return;
                 }
             }
-        }
-
-        if( !getConnected() ) {
-            try {
-                m_connectionResultCb.onDone(FAIL_BLUETOOTH_CONNECT);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return;
         }
 
         /** Find device non connection **/
