@@ -80,7 +80,7 @@ public class BTManager {
     private static final String BT_SIGNAL_RES_FILTER = "RES";
     private static final String BT_SIGNAL_CONNECTED = "CONNECTED";
 
-    public static final String BT_SIGNAL_EMERGENCY = "EMERGENCY";
+    public static final String BT_SIGNAL_EMERGENCY = "E";
 
     private static final int BT_READ_CLOCK_SLEEP = 100;
 
@@ -250,7 +250,7 @@ public class BTManager {
                        @Override
                        public void onDone(float dis) {
                            if( EmergencyManager.getCalcGPSFuzzyLogicResult(dis) ) {
-                               EmergencyManager.setAccidentSensorData(acc, rollover);
+                               EmergencyManager.setAccidentSensorData(rollover, acc);
                                m_activityReadCb.onResult(BT_SIGNAL_EMERGENCY);
                            }
                        }

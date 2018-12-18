@@ -46,7 +46,7 @@ public class EmergencyManager {
     private static final double ACCEL_LOW = 10.0;
     private static final double ACCEL_HIGH = 12.0;
 
-    private static final float DIS_LOW = 40.0f;
+    private static final float DIS_LOW = 50.0f;
     private static final float DIS_HIGH = 20.0f;
 
     private static Location m_accLocation;
