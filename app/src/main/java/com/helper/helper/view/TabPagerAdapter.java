@@ -14,6 +14,7 @@ import android.util.Log;
 import com.helper.helper.view.main.myeight.EightFragment;
 import com.helper.helper.view.main.led.LEDFragment;
 import com.helper.helper.view.main.TrackingFragment;
+import com.helper.helper.view.main.tracking.HeatMapFragment;
 
 public class TabPagerAdapter extends FragmentPagerAdapter {
 
@@ -37,9 +38,9 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
             case 1:
                 LEDFragment LEDfragment = new LEDFragment();
                 return LEDfragment;
-//            case 2:
-//                TrackingFragment trackingFragment = new TrackingFragment();
-//                return trackingFragment;
+            case 2:
+                HeatMapFragment heatFragment = new HeatMapFragment();
+                return heatFragment;
             default:
                 return null;
         }
