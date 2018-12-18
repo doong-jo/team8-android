@@ -15,7 +15,17 @@ import java.util.Set;
 
 public class SharedPreferencer {
     private final static String TAG = SharedPreferencer.class.getSimpleName()+"/DEV";
+
     public final static String JOINPREFNAME= "JOIN_FORM";
+
+    public final static String IS_LAUNCH_STATE = "LAUNCH_STATE";
+    public final static String IS_LAUNCHED = "IS_LAUNCHED";
+    public final static String IS_LOGINED = "IS_LOGIN";
+
+    /** user email is key **/
+    public static final String ACCIDENT_THRESHOLD = "ACCIDENT_THRESHOLD";
+
+
     private static SharedPreferences pref;
 
     public static SharedPreferences getSharedPreferencer(Context context, String name, int mode){
@@ -41,6 +51,12 @@ public class SharedPreferencer {
     public static void putInt(final String key, final int num){
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt(key, num);
+        editor.apply();
+    }
+
+    public static void putBoolean(final String key, final boolean is){
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putBoolean(key, is);
         editor.apply();
     }
 

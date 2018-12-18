@@ -225,6 +225,8 @@ public class LoginFragment extends Fragment {
                                         public void run() {
                                             setLoginBtnStatus(DELAY_LOGIN);
                                             m_snackBar.setVisible(false);
+                                            SharedPreferences pref = SharedPreferencer.getSharedPreferencer(getActivity(), SharedPreferencer.IS_LAUNCH_STATE, Activity.MODE_PRIVATE);
+                                            SharedPreferencer.putBoolean(SharedPreferencer.IS_LOGINED, true);
 
                                             Intent intent=new Intent(getActivity(),ScrollingActivity.class);
                                             startActivity(intent);

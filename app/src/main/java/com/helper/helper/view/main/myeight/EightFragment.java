@@ -15,10 +15,16 @@ import android.widget.RelativeLayout;
 
 import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
+import com.helper.helper.interfaces.ValidateCallback;
+
+import org.json.JSONException;
 
 public class EightFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    private ValidateCallback m_bluetoothConnectionCallback;
+
+    private String m_curFragmentClassName;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,24 +41,32 @@ public class EightFragment extends Fragment {
 //
 //        toolbar.requestLayout();
         // Inflate the layout for this fragment
+
+        m_bluetoothConnectionCallback = new ValidateCallback() {
+            @Override
+            public void onDone(int resultCode) {
+                if (resultCode == BTManager.SUCCESS_BLUETOOTH_CONNECT) {
+                    moveToFragment(new InfoFragment());
+                } else if (resultCode == BTManager.FAIL_BLUETOOTH_CONNECT) {
+                    moveToFragment(new PairingFragment());
+                }
+            }
+        };
+
+        BTManager.setConnectionResultCb(m_bluetoothConnectionCallback);
+
         return inflater.inflate(R.layout.fragment_eight, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        Fragment childFragment;
-
-        if( BTManager.getConnected() ) {
-            childFragment = new InfoFragment();
-        } else {
-            childFragment = new PairingFragment();
-        }
-
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.eight_fragment_container, childFragment).commit();
+        moveToFragment(new PairingFragment());
     }
 
     public void moveToFragment(Fragment targetFragment) {
+        if( targetFragment.getClass().getName().equals(m_curFragmentClassName) ) { return; }
+        m_curFragmentClassName = targetFragment.getClass().getName();
+
         Fragment childFragment = targetFragment;
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.replace(R.id.eight_fragment_container, childFragment).commit();
@@ -79,6 +93,8 @@ public class EightFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        BTManager.setConnectionResultCb(m_bluetoothConnectionCallback);
+
         if ( BTManager.getConnected() ) {
             moveToFragment(new InfoFragment());
         } else {
