@@ -54,6 +54,20 @@
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
+    <style name="DangerButton" parent="android:Widget.Button">
+        <item name="android:background">@drawable/danger_button</item>
+        <item name="android:layout_width">308dp</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:textAppearance">@style/CategoryCardTitleTypo</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="LevelButton" parent="android:Widget.Button">
+        <item name="android:background">@color/gray</item>
+        <item name="android:textAppearance">@style/CategoryCardTitleTypo</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
     <style name="BlockButton" parent="android:Widget.Button">
         <item name="android:width">192dp</item>
         <item name="android:color">#DFE0E2</item>

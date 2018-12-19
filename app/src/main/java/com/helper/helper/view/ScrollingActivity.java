@@ -9,6 +9,7 @@ package com.helper.helper.view;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;

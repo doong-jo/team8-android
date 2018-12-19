@@ -198,6 +198,18 @@
     <!--Accident Threshold-->
     <string name="accident_threshold_set">Please set accident threshold.</string>
     <string name="accident_threshold_description">* The higher the critical point, the higher the frequency of notifications based on the accident coverage rate.</string>
+    <string name="high_button">HIGH</string>
+    <string name="high_desc">It is mainly suitable for the driver who has good road condition and runs at low speed.</string>
+
+    <string name="medium_button">MEDIUM</string>
+    <string name="medium_desc">It is suitable for occasional poor roads and high-speed driving.</string>
+
+    <string name="low_button">LOW</string>
+    <string name="low_desc">It is suitable for people who travel at high speeds with bad road conditions.</string>
+
+    <string name="toggle_desc">The behavior of the accident detection system changes. Please consider carefully.</string>
+    <string name="disable_button">I understood, Disable accident detection.</string>
+    <string name="enable_button">Enable accident detection.</string>
 
     <!--Main Drawer-->
     <string name="nav_tracking_record">Tracking Records</string>

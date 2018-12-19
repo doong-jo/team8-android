@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/topLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="11.4dp"
-        android:paddingBottom="11.4dp"
         android:orientation="horizontal">
         <ImageView
             android:id="@+id/backBtn"
@@ -17,57 +17,196 @@
             android:layout_marginEnd="17.1dp"
             android:layout_marginBottom="17.1dp"
             android:src="@drawable/ic_back" />
-    </RelativeLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:orientation="vertical">
-
-        <ImageView
-            android:layout_width="228dp"
-            android:layout_height="228dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_accident" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22.8dp"
-            android:text="@string/accident_threshold_set"
-            android:textAlignment="center"
-            android:textColor="@color/xxxxgray"
-            android:theme="@style/TitleTypo" />
-
-        <com.xw.repo.BubbleSeekBar
-            android:id="@+id/thresholdSeekbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="22.8dp"
-            android:layout_marginStart="22.8dp"
-            android:layout_marginTop="57dp"
-            app:bsb_bubble_color="@color/accent_orange"
-            app:bsb_bubble_text_color="@color/white"
-            app:bsb_max="@integer/threshold_seekbar_min"
-            app:bsb_min="@integer/threshold_seekbar_max"
-            app:bsb_progress="@integer/threshold_seekbar_progress_def"
-            app:bsb_second_track_color="@color/accent_orange"
-            app:bsb_section_count="@integer/threshold_seekbar_section_count"
-            app:bsb_section_text_position="below_section_mark"
-            app:bsb_seek_step_section="true"
-            app:bsb_show_section_mark="true"
-            app:bsb_touch_to_seek="true"
-            app:bsb_show_thumb_text="true"
-            app:bsb_track_color="@color/accent_orange" />
-
-        <TextView
-            android:layout_width="342dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22.8dp"
-            android:text="@string/accident_threshold_description"
-            android:textColor="@color/xxxgray"
-            android:layout_gravity="center_horizontal"
-            android:theme="@style/BodyTypo" />
-
     </LinearLayout>
-</RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/topLayout">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="22.8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="128dp"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="0.4"
+                        android:orientation="vertical">
+                        <Button
+                            android:id="@+id/high_button"
+                            android:layout_width="128dp"
+                            android:layout_height="128dp"
+                            android:layout_margin="5.7dp"
+                            android:layout_gravity="center"
+                            android:text="@string/high_button"
+                            android:tag="HIGH"
+                            style="@style/LevelButton"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="0.6"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="textStart"
+                            android:layout_margin="11.4dp"
+                            android:text="@string/high_desc"
+                            android:textColor="@color/black"
+                            android:alpha="0.77"
+                            style="@style/BodyTypo"
+                            />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.6"
+                        android:orientation="vertical">
+
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="0.4"
+                        android:orientation="vertical">
+                        <Button
+                            android:id="@+id/medium_button"
+                            android:layout_width="128dp"
+                            android:layout_height="128dp"
+                            android:layout_margin="5.7dp"
+                            android:layout_gravity="center"
+                            android:text="@string/medium_button"
+                            android:tag="MEDIUM"
+                            style="@style/LevelButton"
+                            />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="0.6"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="textStart"
+                            android:layout_margin="11.4dp"
+                            android:text="@string/medium_desc"
+                            android:textColor="@color/black"
+                            android:alpha="0.77"
+                            style="@style/BodyTypo"
+                            />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.6"
+                        android:orientation="vertical">
+
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="0.4"
+                        android:orientation="vertical">
+                        <Button
+                            android:id="@+id/low_button"
+                            android:layout_width="128dp"
+                            android:layout_height="128dp"
+                            android:layout_margin="5.7dp"
+                            android:layout_gravity="center"
+                            android:text="@string/low_button"
+                            android:tag="LOW"
+                            style="@style/LevelButton"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="0.6"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="textStart"
+                            android:layout_margin="11.4dp"
+                            android:text="@string/low_desc"
+                            android:textColor="@color/black"
+                            android:alpha="0.77"
+                            style="@style/BodyTypo"
+                            />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.6"
+                        android:orientation="vertical">
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="11.4dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="11.4dp"
+                    android:textAlignment="textStart"
+                    android:text="@string/toggle_desc"
+                    android:textColor="@color/black"
+                    android:alpha="0.49"
+                    style="@style/BodyTypo"/>
+
+                <Button
+                    android:id="@+id/disableButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="11.4dp"
+                    android:visibility="gone"
+                    android:text="@string/disable_button"
+                    android:tag="DISABLE"
+                    style="@style/DangerButton"/>
+
+                <Button
+                    android:id="@+id/enableBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="11.4dp"
+                    android:visibility="gone"
+                    android:text="@string/enable_button"
+                    android:tag="ENABLE"
+                    style="@style/PrimaryButton"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</android.support.constraint.ConstraintLayout>

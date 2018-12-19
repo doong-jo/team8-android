@@ -19,11 +19,14 @@ public class SharedPreferencer {
     public final static String JOINPREFNAME= "JOIN_FORM";
 
     public final static String IS_LAUNCH_STATE = "LAUNCH_STATE";
-    public final static String IS_LAUNCHED = "IS_LAUNCHED";
-    public final static String IS_LOGINED = "IS_LOGIN";
+        public final static String IS_LAUNCHED = "IS_LAUNCHED";
+        public final static String IS_LOGINED = "IS_LOGIN";
+
+
 
     /** user email is key **/
-    public static final String ACCIDENT_THRESHOLD = "ACCIDENT_THRESHOLD";
+        public final static String ACCIDENT_LEVEL = "LEVEL";
+        public static final String ACCIDENT_ENABLE = "ENABLE";
 
 
     private static SharedPreferences pref;

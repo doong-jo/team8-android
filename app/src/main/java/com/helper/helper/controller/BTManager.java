@@ -79,7 +79,8 @@ public class BTManager {
     private static final String BT_SIGNAL_RES_FILTER = "RES";
     private static final String BT_SIGNAL_CONNECTED = "CONNECTED";
     public static final String BT_SIGNAL_EMERGENCY = "E";
-    public static final String BT_SIGNAL_THRESHOLD = "T";
+    public static final String BT_SIGNAL_THRESHOLD_ENABLE = "TE";
+    public static final String BT_SIGNAL_THRESHOLD_LEVEL = "TL";
 
     private static final int BT_READ_CLOCK_SLEEP = 100;
 
