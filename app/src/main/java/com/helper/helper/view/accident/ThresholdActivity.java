@@ -11,8 +11,12 @@ import com.helper.helper.R;
 import com.helper.helper.controller.BTManager;
 import com.helper.helper.controller.SharedPreferencer;
 import com.helper.helper.controller.UserManager;
+import com.helper.helper.model.User;
 
 import android.view.View.OnClickListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -21,9 +25,9 @@ public class ThresholdActivity  extends AppCompatActivity {
 
     private final static String TAG = ThresholdActivity.class.getSimpleName()+"/DEV";
 
-    private final static String HIGH_LEVEL = "HIGH";
-    private final static String MEDIUM_LEVEL = "MEDIUM";
-    private final static String LOW_LEVEL = "LOW";
+    public final static String HIGH_LEVEL = "HIGH";
+    public final static String MEDIUM_LEVEL = "MEDIUM";
+    public final static String LOW_LEVEL = "LOW";
 
     private final static String ENABLE = "ENABLE";
     private final static String DISABLE = "DISABLE";
@@ -118,6 +122,17 @@ public class ThresholdActivity  extends AppCompatActivity {
                     if ( curLevel.equals(viewLevelTag) ) { return; }
 
                     SharedPreferencer.putString(SharedPreferencer.ACCIDENT_LEVEL, viewLevelTag);
+                    UserManager.setUserAccLevel(viewLevelTag);
+
+                    JSONObject jsonQuery = new JSONObject();
+
+                    User user = UserManager.getUser();
+                    try {
+                        jsonQuery.put(User.KEY_ACC_LEVEL, user.getUserAccLevel());
+                        UserManager.updateUserInfoServerAndXml(getApplicationContext(), jsonQuery);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
                     final String resultStr =
                             BTManager.BT_SIGNAL_THRESHOLD_ENABLE + BTManager.BLUETOOTH_SIGNAL_SEPARATE + viewLevelTag;
@@ -155,10 +170,20 @@ public class ThresholdActivity  extends AppCompatActivity {
                                     @Override
                                     public void onClick(SweetAlertDialog sweetAlertDialog) {
                                         SharedPreferencer.putBoolean(SharedPreferencer.ACCIDENT_ENABLE, isEnabledClicked);
+                                        UserManager.setUserAccEnabled(isEnabledClicked);
 
                                         final String resultStr =
                                                 BTManager.BT_SIGNAL_THRESHOLD_LEVEL + BTManager.BLUETOOTH_SIGNAL_SEPARATE + isEnabledClicked;
 
+                                        JSONObject jsonQuery = new JSONObject();
+
+                                        User user = UserManager.getUser();
+                                        try {
+                                            jsonQuery.put(User.KEY_ACC_ENABLED, user.getUserAccEnabled());
+                                            UserManager.updateUserInfoServerAndXml(getApplicationContext(), jsonQuery);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
                                         BTManager.writeToBluetoothDevice(resultStr.getBytes());
 
                                         // TODO: 19/12/2018 save server (enable state)

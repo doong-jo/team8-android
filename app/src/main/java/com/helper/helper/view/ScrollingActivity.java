@@ -52,6 +52,7 @@ import com.helper.helper.interfaces.BluetoothReadCallback;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LEDCategory;
+import com.helper.helper.model.User;
 import com.helper.helper.view.accident.ThresholdActivity;
 import com.helper.helper.view.main.myeight.EightFragment;
 import com.helper.helper.view.main.myeight.InfoFragment;
@@ -135,37 +136,31 @@ public class ScrollingActivity extends AppCompatActivity
             LinearLayout parentOfConfirmBtn = (LinearLayout)m_loadingDialog.findViewById(R.id.confirm_button).getParent();
             parentOfConfirmBtn.setVisibility(View.GONE);
 
-            UserManager.setUser(FileManager.readXmlUserInfo(this), new ValidateCallback() {
-                @Override
-                public void onDone(int resultCode) {
-                    if( resultCode == UserManager.DONE_SET_USER ) {
-                        if( UserManager.getUser().getUserLEDIndiciesSize() != 0 ) {
-                            DownloadImageTask downloadUserDataLED = new DownloadImageTask(activity, new ValidateCallback() {
-                                @Override
-                                public void onDone(int resultCode) {
-                                    if( resultCode == DownloadImageTask.DONE_LOAD_LED_IMAGES ) {
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                m_loadingDialog.dismissWithAnimation();
-                                            }
-                                        });
-                                    }
-                                }
-                            });
-                            /** Download User's LED **/
-                            downloadUserDataLED.execute(UserManager.getUser().getUserLEDIndiciesURI(getString(R.string.server_uri)));
-                        } else {
+            UserManager.setUser(FileManager.readXmlUserInfo(this));
+            if( UserManager.getUser().getUserLEDIndiciesSize() != 0 ) {
+                DownloadImageTask downloadUserDataLED = new DownloadImageTask(activity, new ValidateCallback() {
+                    @Override
+                    public void onDone(int resultCode) {
+                        if( resultCode == DownloadImageTask.DONE_LOAD_LED_IMAGES ) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    m_loadingDialog.dismiss();
+                                    m_loadingDialog.dismissWithAnimation();
                                 }
                             });
                         }
                     }
-                }
-            });
+                });
+                /** Download User's LED **/
+                downloadUserDataLED.execute(UserManager.getUser().getUserLEDIndiciesURI(getString(R.string.server_uri)));
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        m_loadingDialog.dismiss();
+                    }
+                });
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -311,11 +306,59 @@ public class ScrollingActivity extends AppCompatActivity
         BTManager.setActivityReadCb(m_emergencyCallback);
     }
 
+    private void startInitializeUserData() {
+        if( HttpManager.useCollection(getString(R.string.collection_user)) ) {
+
+            JSONObject reqObject = new JSONObject();
+            try {
+                reqObject.put(User.KEY_EMAIL, UserManager.getUserEmail());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
+                        int arrLen = existIdjsonArray.length();
+                        // write category xml file
+                        List<LEDCategory> ledCategoryList = new ArrayList<>();
+
+                        for (int i = 0; i < existIdjsonArray.length(); i++) {
+                            JSONObject categoryObj = existIdjsonArray.getJSONObject(i);
+
+
+                            LEDCategory category = new LEDCategory(
+                                    categoryObj.getString("name"),
+                                    categoryObj.getString("backgroundColor"),
+                                    categoryObj.getString("notice"),
+                                    categoryObj.getString("character")
+                            );
+                            ledCategoryList.add(category);
+                        }
+                        try {
+                            FileManager.writeXmlCategory(getApplicationContext(), ledCategoryList);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(String err) {
+                        Log.d(TAG, "startInitializeShopData onError: " + err);
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void startInitializeShopData() {
         if( HttpManager.useCollection(getString(R.string.collection_category)) ) {
 
             JSONObject reqObject = new JSONObject();
-            String str = reqObject.toString();
+
             try {
                 HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override

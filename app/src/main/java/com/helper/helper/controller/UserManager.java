@@ -40,26 +40,6 @@ public class UserManager {
         m_user = user;
     }
 
-    public static void setUser(User user, ValidateCallback callback) {
-        m_user = user;
-
-        try {
-            callback.onDone(DONE_SET_USER);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void setUser(final JSONObject jsonObject) throws JSONException {
-        m_user = new User.Builder()
-                .email(jsonObject.getString("email"))
-                .name(jsonObject.getString("name"))
-                .phone(jsonObject.getString("phone"))
-                .ridingType(jsonObject.getString("riding_type"))
-                .ledIndicies(jsonObject.getJSONArray("ledIndicies"))
-                .build();
-    }
-
     public static void setUserName(String name) { m_user.setUserName(name); }
 
     public static void setUserEmail(String email) { m_user.setUserEmail(email); }
@@ -93,6 +73,14 @@ public class UserManager {
         }
     }
 
+    public static void setUserAccEnabled(boolean enabled) {
+        m_user.setUserAccEnabled(enabled);
+    }
+
+    public static void setUserAccLevel(String level) {
+        m_user.setUserAccLevel(level);
+    }
+
     public static String getUserEmail() {
         return m_user.getUserEmail();
     }
@@ -102,10 +90,6 @@ public class UserManager {
     }
 
     public static String getUserPassword() { return m_user.getUserPw(); }
-
-    public static String getUserPhone() {
-        return m_user.getUserPhone();
-    }
 
     public static String getUserRidingType() {
         return m_user.getUserRidingType();
@@ -135,7 +119,7 @@ public class UserManager {
                     @Override
                     public void onSuccess(JSONArray jsonArray) throws JSONException {
                         int a = 1;
-//                        jsonArray
+//                        jsonArrayx
                     }
 
                     @Override

@@ -3,10 +3,8 @@ package com.helper.helper.view.login;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +22,6 @@ import com.helper.helper.controller.FormManager;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.controller.SharedPreferencer;
 import com.helper.helper.controller.UserManager;
-import com.helper.helper.controller.ViewStateManager;
 import com.helper.helper.interfaces.Command;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
@@ -35,6 +32,7 @@ import com.helper.helper.view.widget.SnackBar;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 
 public class AddNameFragment extends Fragment {
     private final static String TAG = JoinFragment.class.getSimpleName() + "/DEV";
@@ -78,7 +76,6 @@ public class AddNameFragment extends Fragment {
                 return false;
             }
         });
-        //setSnackBarStatus
 
         m_nameInput.setEnterFocusCmd(new Command() {
             @Override
@@ -171,10 +168,8 @@ public class AddNameFragment extends Fragment {
     private void getResultExistName(User user, final ValidateCallback callback) throws JSONException {
         if( HttpManager.useCollection(getString(R.string.collection_user)) ) {
 
-            JSONObject reqObject = user.getTransformUserToJSON();
-            reqObject.remove(User.KEY_EMERGENCY);
-            reqObject.remove(User.KEY_LAST_ACCESS);
-//            reqObject.put("lastAccess", new Date().toString());
+            JSONObject reqObject = new JSONObject();
+            reqObject.put(User.KEY_NAME, user.getUserName());
 
             HttpManager.requestHttp(reqObject, "",  "GET", "", new HttpCallback() {
                 @Override

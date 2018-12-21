@@ -34,6 +34,7 @@ import com.helper.helper.controller.SharedPreferencer;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.enums.RidingType;
 import com.helper.helper.interfaces.HttpCallback;
+import com.helper.helper.view.accident.ThresholdActivity;
 import com.soundcloud.android.crop.Crop;
 
 import org.json.JSONArray;
@@ -109,10 +110,9 @@ public class MakeProfileFragment extends Fragment {
         // Default riding_type is bicycle
         toggleImageColorChanger(vehicleImgs[0]);
         m_beforeImgView = vehicleImgs[0];
-        RidingType type;
-        type = RidingType.BICYCLE;
 
-        UserManager.setRidingType(type.value);
+        UserManager.setRidingType(RidingType.BICYCLE.value);
+
         /******************* Make Listener in View *******************/
         m_previewImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,9 +139,7 @@ public class MakeProfileFragment extends Fragment {
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-//                UserManager.setRidingType();
                 JSONObject jsonObject = UserManager.getUser().getTransformUserToJSON();
-
 
                 try {
                     HttpManager.requestHttp(jsonObject, "", "POST", "", new HttpCallback() {
@@ -153,6 +151,8 @@ public class MakeProfileFragment extends Fragment {
                             if (obj.getBoolean("result")) {
 
                                 try {
+                                    UserManager.setUserAccEnabled(true);
+                                    UserManager.setUserAccLevel(ThresholdActivity.HIGH_LEVEL);
                                     FileManager.writeUserProfile(getActivity(), UserManager.getUserProfileBitmap(), UserManager.getUser().getUserName());
                                     FileManager.writeXmlUserInfo(getActivity(), UserManager.getUser());
 
@@ -175,7 +175,7 @@ public class MakeProfileFragment extends Fragment {
                         }
 
                         @Override
-                        public void onError(String err) throws JSONException {
+                        public void onError(String err) {
 
                         }
                     });

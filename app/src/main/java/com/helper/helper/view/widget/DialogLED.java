@@ -133,32 +133,24 @@ public class DialogLED extends FrameLayout {
                 @Override
                 public void onClick(View view) {
                     /** set Bookmark into xml and server **/
+                    User user = UserManager.getUser();
+
                     if( m_bIsBookmarked ) {
                         m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black);
-                        User user = UserManager.getUser();
                         user.removeBookmarkLEDIndex(m_ledData.getIndex());
-
-                        JSONObject jsonQuery = new JSONObject();
-                        try {
-                            jsonQuery.put(User.KEY_LED_BOOKMARKED, user.getUserBookmarked());
-                            UserManager.updateUserInfoServerAndXml(m_context, jsonQuery);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
                     } else {
                         m_bookmarkToggle.setImageResource(R.drawable.ic_bookmark_black_selected);
-                        User user = UserManager.getUser();
                         user.addBookmarkLEDIndex(m_ledData.getIndex());
-
-                        JSONObject jsonQuery = new JSONObject();
-                        try {
-                            jsonQuery.put(User.KEY_LED_BOOKMARKED, user.getUserBookmarked());
-                            UserManager.updateUserInfoServerAndXml(m_context, jsonQuery);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
                     }
 
+                    JSONObject jsonQuery = new JSONObject();
+
+                    try {
+                        jsonQuery.put(User.KEY_LED_BOOKMARKED, user.getUserBookmarked());
+                        UserManager.updateUserInfoServerAndXml(m_context, jsonQuery);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     m_bIsBookmarked = !m_bIsBookmarked;
                 }
             });

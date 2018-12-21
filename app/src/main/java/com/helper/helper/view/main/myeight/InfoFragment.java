@@ -112,61 +112,69 @@ public class InfoFragment extends Fragment {
 //            }
 //        }
 
-        final String[] ledIndicies = CommonManager.splitNoWhiteSpace(UserManager.getUser()
-                .getUserLEDIndicies()
-                .split("\\[")[1]
-                .split("]")[0]);
 
-        for (int i = 0; i < ledIndicies.length; i++) {
-            ledIndicies[i] = ledIndicies[i].replaceAll("\"", "");
-        }
 
-        m_mapDataLED = new HashMap<>();
-
-        if( HttpManager.useCollection(getString(R.string.collection_led)) ) {
-            try {
-                JSONObject reqObject = new JSONObject();
-                JSONObject inObject = new JSONObject();
-
-                inObject.put("$in", ledIndicies);
-                reqObject.put("index", inObject);
-
-                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
-                    @Override
-                    public void onSuccess(JSONArray jsonArray) throws JSONException {
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            LED led = new LED(
-                                    new LED.Builder()
-                                            .index(jsonObject.getString(LED.KEY_INDEX))
-                                            .name(jsonObject.getString(LED.KEY_NAME))
-                                            .creator(jsonObject.getString(LED.KEY_CREATOR))
-                                            .downloadCnt(jsonObject.getInt(LED.KEY_DOWNLOADCNT))
-                                            .type(jsonObject.getString(LED.KEY_TYPE))
-                            );
-                            m_mapDataLED.put(led.getIndex(), led);
-                        }
-
-                        /** Add GridView (Bookmared or Downloaded) **/
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                startChangingLEDinGrid(m_newGrid, ledIndicies);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onError(String err) {
-                        startChangingLEDinGrid(m_newGrid, ledIndicies);
-                    }
-                });
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
 
         return view;
+    }
+
+    private void initLED() {
+        if( UserManager.getUser()
+                .getUserLEDIndicies().length() != 0 ) {
+            final String[] ledIndicies = CommonManager.splitNoWhiteSpace(UserManager.getUser()
+                    .getUserLEDIndicies()
+                    .split("\\[")[1]
+                    .split("]")[0]);
+
+            for (int i = 0; i < ledIndicies.length; i++) {
+                ledIndicies[i] = ledIndicies[i].replaceAll("\"", "");
+            }
+
+            m_mapDataLED = new HashMap<>();
+
+            if( HttpManager.useCollection(getString(R.string.collection_led)) ) {
+                try {
+                    JSONObject reqObject = new JSONObject();
+                    JSONObject inObject = new JSONObject();
+
+                    inObject.put("$in", ledIndicies);
+                    reqObject.put("index", inObject);
+
+                    HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
+                        @Override
+                        public void onSuccess(JSONArray jsonArray) throws JSONException {
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                LED led = new LED(
+                                        new LED.Builder()
+                                                .index(jsonObject.getString(LED.KEY_INDEX))
+                                                .name(jsonObject.getString(LED.KEY_NAME))
+                                                .creator(jsonObject.getString(LED.KEY_CREATOR))
+                                                .downloadCnt(jsonObject.getInt(LED.KEY_DOWNLOADCNT))
+                                                .type(jsonObject.getString(LED.KEY_TYPE))
+                                );
+                                m_mapDataLED.put(led.getIndex(), led);
+                            }
+
+                            /** Add GridView (Bookmared or Downloaded) **/
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startChangingLEDinGrid(m_newGrid, ledIndicies);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(String err) {
+                            startChangingLEDinGrid(m_newGrid, ledIndicies);
+                        }
+                    });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private void startChangingLEDinGrid(GridLayout grid, String[] userIndicies) {

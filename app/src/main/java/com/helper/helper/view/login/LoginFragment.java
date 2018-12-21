@@ -207,9 +207,11 @@ public class LoginFragment extends Fragment {
                                     .ridingType(object.getString(User.KEY_RIDING_TYPE))
                                     .ledIndicies(object.getJSONArray(User.KEY_LED_INDICIES))
                                     .ledBookmarked(object.getJSONArray(User.KEY_LED_BOOKMARKED))
+                                    .accEnabled(User.KEY_ACC_ENABLED)
+                                    .accLevel(User.KEY_ACC_LEVEL)
                                     .build();
 
-                            UserManager.setUser(existIdjsonArray.getJSONObject(0));
+                            UserManager.setUser(user);
 
                             try {
                                 FileManager.writeXmlUserInfo(getActivity(), user);

@@ -46,6 +46,8 @@ import org.json.JSONException;
 
 import org.json.JSONObject;
 
+import java.util.Iterator;
+
 /** Get Phone Number **/
 //        String phone = "";
 //
@@ -353,21 +355,23 @@ public class JoinFragment extends Fragment {
         final String email = user.getUserEmail();
         final String passwd = user.getUserPw();
 
-        if( FormManager.emailCharValidate(email) != FormManager.RESULT_VALIDATION_SUCCESS ) {  callback.onDone(FormManager.RESULT_VALIDATION_EMAIL_WRONG); }
-        else if ( FormManager.passwordValidate(passwd) != FormManager.RESULT_VALIDATION_SUCCESS ) {callback.onDone(FormManager.RESULT_VALIDATION_PW_WRONG); }
-        else { callback.onDone(FormManager.RESULT_VALIDATION_SUCCESS); }
+        if( FormManager.emailCharValidate(email) != FormManager.RESULT_VALIDATION_SUCCESS ) {
+            callback.onDone(FormManager.RESULT_VALIDATION_EMAIL_WRONG);
+        }
+        else if ( FormManager.passwordValidate(passwd) != FormManager.RESULT_VALIDATION_SUCCESS ) {
+            callback.onDone(FormManager.RESULT_VALIDATION_PW_WRONG);
+        }
+        else {
+            callback.onDone(FormManager.RESULT_VALIDATION_SUCCESS);
+        }
     }
 
     private void getResultExistEmail(User user, final ValidateCallback callback) throws  JSONException {
         if( HttpManager.useCollection(getString(R.string.collection_user)) ) {
 
-            JSONObject
-                    reqObject = user.getTransformUserToJSON();
-            reqObject.remove(User.KEY_EMERGENCY);
-            reqObject.remove(User.KEY_LAST_ACCESS);
-            reqObject.remove(User.KEY_PASSWORD);
+            JSONObject reqObject = new JSONObject();
+            reqObject.put(User.KEY_EMAIL, user.getUserEmail());
 
-            Log.d(TAG, "getResultExistEmail: " + reqObject.toString());
             HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                 @Override
                 public void onSuccess(JSONArray jsonArray) throws JSONException {

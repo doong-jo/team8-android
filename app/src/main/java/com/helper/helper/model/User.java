@@ -10,6 +10,7 @@ import android.location.Location;
 
 import com.helper.helper.controller.CommonManager;
 import com.helper.helper.enums.RidingType;
+import com.helper.helper.view.accident.ThresholdActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,72 +27,74 @@ public class User {
 
     private String m_userEmail;
     private String m_userPw;
-    private String m_userPhone;
     private String m_userName;
     private String m_userRidingType;
-    private Boolean m_userEmergency;
-    private Date m_userLastAccess;
+    private Boolean m_userAccEnabled;
+    private String m_userAccLevel;
     private Location m_lastPosition;
     private ArrayList<String> m_ledIndicies;
     private ArrayList<String> m_ledBookmarked;
-    private ArrayList<String> m_trackIndicies;
 
     /** Not Collection field **/
     private String m_userLEDIndex;
-    private int m_accidentThreshold;
 
-    public static final String KEY_LASTPOSITON = "lastPosition";
     public static final String KEY_LED_INDICIES = "ledIndicies";
     public static final String KEY_LED_BOOKMARKED = "ledBookmarked";
-    public static final String KEY_TRACK_INDICIES = "trackIndicies";
     public static final String KEY_EMERGENCY = "emergency";
     public static final String KEY_EMAIL = "email";
     public static final String KEY_PASSWORD = "passwd";
     public static final String KEY_NAME = "name";
-    public static final String KEY_PHONE = "phone";
     public static final String KEY_RIDING_TYPE = "riding_type";
     public static final String KEY_LAST_ACCESS = "lastAccess";
+    public static final String KEY_ACC_ENABLED = "acc_enabled";
+    public static final String KEY_ACC_LEVEL = "acc_level";
 
     public static class Builder {
 
-        private String m_userEmail;
-        private String m_userPw;
-        private String m_userPhone;
-        private String m_userName;
-        private String m_userRidingType;
-        private ArrayList<String> m_ledIndicies = new ArrayList<>();
-        private ArrayList<String> m_ledBookmarked = new ArrayList<>();
+        private String m_buildEmail;
+        private String m_buildPw;
+        private String m_buildName;
+        private String m_buildRidingType;
+        private Boolean m_buildAccEnabled;
+        private String m_buildAccLevel;
+        private ArrayList<String> m_buildLEDIndicies = new ArrayList<>();
+        private ArrayList<String> m_buildLEDBookmarked = new ArrayList<>();
 
         public Builder() {
-            m_userEmail = "";
-            m_userPhone = "";
-            m_userPw = "";
-            m_userPhone = "";
-            m_userName = "";
-            m_userRidingType = "";
+            m_buildEmail = "";
+            m_buildPw = "";
+            m_buildName = "";
+            m_buildRidingType = "";
+            m_buildAccEnabled = false;
+            m_buildAccLevel = ThresholdActivity.HIGH_LEVEL;
         }
         public Builder email(String emailStr) {
-            this.m_userEmail = emailStr;
+            this.m_buildEmail = emailStr;
             return this;
         }
 
         public Builder pw(String pwStr) {
-            this.m_userPw = pwStr;
-            return this;
-        }
-
-        public Builder phone(String phoneStr) {
-            this.m_userPhone = phoneStr;
+            this.m_buildPw = pwStr;
             return this;
         }
 
         public Builder name(String nameStr) {
-            this.m_userName = nameStr;
+            this.m_buildName = nameStr;
             return this;
         }
 
         public Builder ridingType(String ridingTypeStr) {
-            this.m_userRidingType = ridingTypeStr;
+            this.m_buildRidingType = ridingTypeStr;
+            return this;
+        }
+
+        public Builder accEnabled(String accEnabledStr) {
+            this.m_buildAccEnabled = Boolean.valueOf(accEnabledStr);
+            return this;
+        }
+
+        public Builder accLevel(String accLevelStr) {
+            this.m_buildAccLevel = accLevelStr;
             return this;
         }
 
@@ -100,25 +103,10 @@ public class User {
                 int len = ledIndicies.length();
                 for (int i=0; i<len; i++){
                     try {
-                        m_ledIndicies.add(ledIndicies.get(i).toString());
+                        m_buildLEDIndicies.add(ledIndicies.get(i).toString());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }
-            }
-            return this;
-        }
-
-        public Builder ledIndicies(String ledIndicies) {
-
-            if( !ledIndicies.contains(",") ) {
-                m_ledIndicies.add(ledIndicies);
-            } else {
-                String[] ledStrArr = ledIndicies.split(", ");
-
-                for (String str :
-                        ledStrArr) {
-                    m_ledIndicies.add(str);
                 }
             }
             return this;
@@ -129,7 +117,7 @@ public class User {
                 int len = ledBookmarked.length();
                 for (int i=0; i<len; i++){
                     try {
-                        m_ledBookmarked.add(ledBookmarked.get(i).toString());
+                        m_buildLEDBookmarked.add(ledBookmarked.get(i).toString());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -138,22 +126,6 @@ public class User {
             return this;
         }
 
-        public Builder ledBookmarked(String ledBookmarked) {
-
-            if( !ledBookmarked.contains(",") ) {
-                m_ledBookmarked.add(ledBookmarked);
-            } else {
-                String[] ledBookmakredArr = ledBookmarked.split(",");
-
-                for (String str :
-                        ledBookmakredArr) {
-                    m_ledBookmarked.add(str);
-                }
-            }
-            return this;
-        }
-
-
         public User build() {
             return new User(this);
         }
@@ -161,43 +133,18 @@ public class User {
 
 
     public User(Builder builder) {
-        m_userEmail = builder.m_userEmail;
-        m_userPw = builder.m_userPw;
-        m_userPhone = builder.m_userPhone;
-        m_userName = builder.m_userName;
-        m_userRidingType = builder.m_userRidingType;
-        m_userLastAccess = new Date();
-        m_userEmergency = false;
+        m_userEmail = builder.m_buildEmail;
+        m_userPw = builder.m_buildPw;
+        m_userName = builder.m_buildName;
+        m_userRidingType = builder.m_buildRidingType;
         m_lastPosition = new Location("");
-        m_ledIndicies = builder.m_ledIndicies;
-        m_ledBookmarked = builder.m_ledBookmarked;
-        m_trackIndicies = new ArrayList<String>();
-    }
-
-    public void addLEDIndex(String ledIndex) {
-        m_ledIndicies.add(ledIndex);
+        m_ledIndicies = builder.m_buildLEDIndicies;
+        m_ledBookmarked = builder.m_buildLEDBookmarked;
+        m_userAccEnabled = builder.m_buildAccEnabled;
+        m_userAccLevel = builder.m_buildAccLevel;
     }
 
     public void addBookmarkLEDIndex(String ledIndex) { m_ledBookmarked.add(ledIndex); }
-
-    /*
-    for (Iterator i = data.iterator(); i.hasNext(); ) {
-    Object element = i.next();
-
-    if ((..your conition..)) {
-       i.remove();
-    }
-}
-     */
-    public void removeLEDIndex(String targetIndex) {
-        for (Iterator i = m_ledIndicies.iterator(); i.hasNext(); ) {
-            String listOfIndex = (String) i.next();
-
-            if ( targetIndex.equals(listOfIndex) ) {
-                i.remove();
-            }
-        }
-    }
 
     public void removeBookmarkLEDIndex(String targetIndex) {
         for (Iterator i = m_ledBookmarked.iterator(); i.hasNext(); ) {
@@ -227,9 +174,11 @@ public class User {
         m_userLEDIndex = ledIndex;
     }
 
-    public void setAccidentThreshold(int accidentThreshold){
-        m_accidentThreshold = accidentThreshold;
+    public void setUserAccEnabled(Boolean enabled) {
+        m_userAccEnabled = enabled;
     }
+
+    public void setUserAccLevel(String level) { m_userAccLevel = level; }
 
     public String getUserEmail() {
         return m_userEmail;
@@ -241,9 +190,9 @@ public class User {
 
     public String getUserRidingType() { return m_userRidingType; }
 
-    public String getUserPhone() {
-        return m_userPhone;
-    }
+    public Boolean getUserAccEnabled() { return m_userAccEnabled; }
+
+    public String getUserAccLevel() { return m_userAccLevel; }
 
     public String getUserLEDIndicies() {
         return m_ledIndicies.toString();
@@ -255,10 +204,6 @@ public class User {
 
     public String getUserBookmarked() {
         return m_ledBookmarked.toString();
-    }
-
-    public ArrayList<String> getUserLEDArray() {
-        return m_ledIndicies;
     }
 
     public String[] getUserLEDIndiciesURI(String baseUri) {
@@ -288,29 +233,23 @@ public class User {
 
         try {
             if( !m_userEmail.equals("")) {
-                obj.put("email", m_userEmail);
-            }
-            if( !m_userPw.equals("")) {
-                obj.put("passwd", m_userPw);
+                obj.put(KEY_EMAIL, m_userEmail);
             }
             if( !m_userName.equals("") ) {
-                obj.put("name", m_userName);
-            }
-            if( !m_userPhone.equals("")) {
-                obj.put("phone", m_userPhone);
+                obj.put(KEY_NAME, m_userName);
             }
             if( !m_userRidingType.equals("")) {
-                obj.put("riding_type", m_userRidingType);
+                obj.put(KEY_RIDING_TYPE, m_userRidingType);
             }
+            if( !m_userPw.equals("")) {
+                obj.put(KEY_PASSWORD, m_userPw);
+            }
+
+            obj.put(KEY_ACC_ENABLED, true);
+            obj.put(KEY_ACC_LEVEL, ThresholdActivity.HIGH_LEVEL);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return obj;
     }
-
-    public String getUserLEDIndex() {
-        return m_userLEDIndex;
-    }
-
-    public int getUserAccidentThreshold(){ return m_accidentThreshold; }
 }

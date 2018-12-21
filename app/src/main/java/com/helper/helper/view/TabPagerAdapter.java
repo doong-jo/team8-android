@@ -13,7 +13,6 @@ import android.util.Log;
 
 import com.helper.helper.view.main.myeight.EightFragment;
 import com.helper.helper.view.main.led.LEDFragment;
-import com.helper.helper.view.main.TrackingFragment;
 
 public class TabPagerAdapter extends FragmentPagerAdapter {
 
@@ -37,9 +36,6 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
             case 1:
                 LEDFragment LEDfragment = new LEDFragment();
                 return LEDfragment;
-//            case 2:
-//                TrackingFragment trackingFragment = new TrackingFragment();
-//                return trackingFragment;
             default:
                 return null;
         }

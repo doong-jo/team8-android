@@ -70,26 +70,14 @@ public class FileManager {
     private static final String USER_INFO_XML_ELEM_USER = "user";
     private static final String USER_INFO_XML_ELEM_ATTR_EMAIL = "email";
     private static final String USER_INFO_XML_ELEM_ATTR_NAME = "name";
-    private static final String USER_INFO_XML_ELEM_ATTR_PHONE = "phone";
     private static final String USER_INFO_XML_ELEM_ATTR_RIDING_TYPE = "riding_type";
     private static final String USER_INFO_XML_ELEM_ATTR_LED_INDICIES = "ledIndicies";
     private static final String USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED = "ledBookmarked";
-    private static final String USER_INFO_XML_ELEM_ATTR_TRACK_INDICIES = "track_indicies";
+    private static final String USER_INFO_XML_ELEM_ATTR_ACC_ENABLED = "acc_enabled";
+    private static final String USER_INFO_XML_ELEM_ATTR_ACC_LEVEL = "acc_level";
 
     private static final String PROFILE_IMG_NAME = "_profile.jpg";
     private static final String PROFILE_IMG_DIR_NAME = "profile_image";
-
-    private static final String TRACKING_XML_NAME = "tracking.xml";
-
-    private static final String TRACKING_XML_ELEM_ROOT = "tracking";
-    private static final String TRACKING_XML_ELEM_MAP = "map";
-    private static final String TRACKING_XML_ELEM_ATTR_DATE = "date";
-    private static final String TRACKING_XML_ELEM_ATTR_START_TIME = "start_time";
-    private static final String TRACKING_XML_ELEM_ATTR_END_TIME = "end_time";
-    private static final String TRACKING_XML_ELEM_ATTR_DISTANCE = "distance";
-    private static final String TRACKING_XML_ELEM_LOCATION = "location";
-    private static final String TRACKING_XML_ELEM_LATITUDE = "latitude";
-    private static final String TRACKING_XML_ELEM_LONGITUDE = "longitude";
 
     /** Category **/
     public static void writeXmlCategory(Context context, List<LEDCategory> categoriesData) throws IOException {
@@ -385,34 +373,21 @@ public class FileManager {
             Document doc = docBuilder.newDocument();
 
             Element rootElement;
-//            if( fileExists ) {
-//                doc = docBuilder.parse(new File(xmlFilePath));
-//                rootElement = (Element) doc.getDocumentElement();
-//            } else {
-//                rootElement = doc.createElement(EMERGENCY_CONTACTS_XML_ELEM_ROOT);
-//            }
-
             rootElement = doc.createElement(USER_INFO_XML_ELEM_ROOT);
 
-            /* Make elements start */
-
-            Element contactElement = doc.createElement(USER_INFO_XML_ELEM_USER);
-            /* Make elements end */
+            Element userElement = doc.createElement(USER_INFO_XML_ELEM_USER);
 
             /* Define attributes start */
-            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_EMAIL, user.getUserEmail());
-            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_NAME, user.getUserName());
-            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_PHONE, user.getUserPhone());
-            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_RIDING_TYPE, user.getUserRidingType());
-            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_LED_INDICIES, user.getUserLEDIndicies());
-            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED, user.getUserBookmarked());
-//            contactElement.setAttribute(USER_INFO_XML_ELEM_ATTR_TRACK_INDICIES, user.());
+            userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_EMAIL, user.getUserEmail());
+            userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_NAME, user.getUserName());
+            userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_RIDING_TYPE, user.getUserRidingType());
+            userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_LED_INDICIES, user.getUserLEDIndicies());
+            userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED, user.getUserBookmarked());
+            userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_ACC_ENABLED, user.getUserAccEnabled().toString());
+            userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_ACC_LEVEL, user.getUserAccLevel());
 
-            rootElement.appendChild(contactElement);
+            rootElement.appendChild(userElement);
 
-//            if( !fileExists ) {
-//                doc.appendChild(rootElement);
-//            }
             doc.appendChild(rootElement);
 
             // XML 파일로 쓰기
@@ -432,7 +407,6 @@ public class FileManager {
             StreamResult result = new StreamResult(new FileOutputStream(new File(xmlFilePath), false));
 
             transformer.transform(source, result);
-            Log.d(TAG, "writeXmlEmergencyContacts: \n" + source.getNode().getTextContent());
         }
         catch (ParserConfigurationException | TransformerException pce)
         {
@@ -464,10 +438,11 @@ public class FileManager {
         Node map = userInfo.item(0);
         String email = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_EMAIL).getNodeValue();
         String name = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_NAME).getNodeValue();
-        String phone = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_PHONE).getNodeValue();
         String riding_type = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_RIDING_TYPE).getNodeValue();
         String led_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_INDICIES).getNodeValue();
         String led_bookmarked = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED).getNodeValue();
+        String acc_enabled = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_ACC_ENABLED).getNodeValue();
+        String acc_level = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_ACC_LEVEL).getNodeValue();
 
         JSONArray led_indices_jarr = null;
         JSONArray led_bookmarked_jarr = null;
@@ -482,183 +457,14 @@ public class FileManager {
         User user = new User.Builder()
                 .email(email)
                 .name(name)
-                .phone(phone)
                 .ridingType(riding_type)
                 .ledIndicies(led_indices_jarr)
                 .ledBookmarked(led_bookmarked_jarr)
+                .accEnabled(acc_enabled)
+                .accLevel(acc_level)
                 .build();
 
 
         return user;
-    }
-
-    /** Tracking **/
-    public static void writeXmlTrackingData(Context context, TrackingData trackingData) throws IOException {
-        try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-            Storage internalStorage = new Storage(context);
-
-            String path = internalStorage.getInternalFilesDirectory();
-            String dir = path + File.separator + DIR_NAME;
-            String xmlFilePath =  dir + File.separator + TRACKING_XML_NAME;
-
-            boolean fileExists = internalStorage.isFileExist(xmlFilePath);
-
-            Document doc = docBuilder.newDocument();
-
-            Element rootElement;
-            if( fileExists ) {
-                doc = docBuilder.parse(new File(xmlFilePath));
-                rootElement = (Element) doc.getDocumentElement();
-            } else {
-                rootElement = doc.createElement(TRACKING_XML_ELEM_ROOT);
-            }
-
-            /* Make elements start */
-            Element mapElement = doc.createElement(TRACKING_XML_ELEM_MAP);
-            /* Make elements end */
-
-            /* Define attributes start */
-            mapElement.setAttribute(TRACKING_XML_ELEM_ATTR_DATE, trackingData.getDate());
-            mapElement.setAttribute(TRACKING_XML_ELEM_ATTR_START_TIME, trackingData.getStartTime());
-            mapElement.setAttribute(TRACKING_XML_ELEM_ATTR_END_TIME, trackingData.getEndTime());
-            mapElement.setAttribute(TRACKING_XML_ELEM_ATTR_DISTANCE, trackingData.getDistance());
-            /* Define attributes end */
-
-            if( trackingData.getLocationData().size() <= 0 ) {
-                return;
-//                Element locationElement = doc.createElement(TRACKING_XML_ELEM_LOCATION);
-//
-//                Element latitudeElement = doc.createElement(TRACKING_XML_ELEM_LATITUDE);
-//                latitudeElement.appendChild(doc.createTextNode(String.format("%f", 36.500881)));
-//
-//                Element longitudeElement = doc.createElement(TRACKING_XML_ELEM_LATITUDE);
-//                longitudeElement.appendChild(doc.createTextNode(String.format("%f", 127.269924)));
-//
-//                locationElement.appendChild(latitudeElement);
-//                locationElement.appendChild(longitudeElement);
-//
-//                mapElement.appendChild(locationElement);
-            }
-            else {
-                for(LatLng currentLat : trackingData.getLocationData()) {
-                    Element locationElement = doc.createElement(TRACKING_XML_ELEM_LOCATION);
-
-                    Element latitudeElement = doc.createElement(TRACKING_XML_ELEM_LATITUDE);
-                    latitudeElement.appendChild(doc.createTextNode(String.format("%f", currentLat.latitude)));
-
-                    Element longitudeElement = doc.createElement(TRACKING_XML_ELEM_LONGITUDE);
-                    longitudeElement.appendChild(doc.createTextNode(String.format("%f", currentLat.longitude)));
-
-                    locationElement.appendChild(latitudeElement);
-                    locationElement.appendChild(longitudeElement);
-
-                    mapElement.appendChild(locationElement);
-                }
-            }
-
-
-
-            rootElement.appendChild(mapElement);
-
-            if( !fileExists ) {
-                doc.appendChild(rootElement);
-            }
-
-            // XML 파일로 쓰기
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-
-            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            DOMSource source = new DOMSource(doc);
-
-            final boolean dirExists = internalStorage.isDirectoryExists(dir);
-
-            if( !dirExists ) {
-                internalStorage.createDirectory(dir);
-            }
-
-            StreamResult result = new StreamResult(new FileOutputStream(new File(xmlFilePath), false));
-
-            transformer.transform(source, result);
-            Log.d(TAG, "writeXmlTrackingData: \n" + source.getNode().getTextContent());
-        }
-        catch (ParserConfigurationException | TransformerException | SAXException pce)
-        {
-            pce.printStackTrace();
-        }
-    }
-
-    public static List<TrackingData> readXMLTrackingData(Context context) throws IOException {
-        List<TrackingData> lTrackingData = null;
-        try {
-            lTrackingData = new ArrayList<>();
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-            Storage internalStorage = new Storage(context);
-
-            String path = internalStorage.getInternalFilesDirectory();
-            String dir = path + File.separator + DIR_NAME;
-            String xmlFilePath = dir + File.separator + TRACKING_XML_NAME;
-
-            boolean fileExists = internalStorage.isFileExist(xmlFilePath);
-
-            Document doc = docBuilder.newDocument();
-
-            Element rootElement;
-            if (fileExists) {
-                doc = docBuilder.parse(new File(xmlFilePath));
-                rootElement = (Element) doc.getDocumentElement();
-            } else {
-                rootElement = doc.createElement(TRACKING_XML_ELEM_ROOT);
-            }
-
-            NodeList maps = doc.getElementsByTagName(TRACKING_XML_ELEM_MAP);
-
-            String date = "";
-            String startTime = "";
-            String endTime = "";
-            String distance = "";
-            List<LatLng> locations = new ArrayList<LatLng>();
-
-            for (int i = 0; i < maps.getLength(); i++) {
-                Node map = maps.item(i);
-
-                date = map.getAttributes().getNamedItem(TRACKING_XML_ELEM_ATTR_DATE).getNodeValue();
-                startTime = map.getAttributes().getNamedItem(TRACKING_XML_ELEM_ATTR_START_TIME).getNodeValue();
-                endTime = map.getAttributes().getNamedItem(TRACKING_XML_ELEM_ATTR_END_TIME).getNodeValue();
-                distance = map.getAttributes().getNamedItem(TRACKING_XML_ELEM_ATTR_DISTANCE).getNodeValue();
-
-                NodeList locationList = map.getChildNodes();
-
-                int locationInd = 1;
-                String lat = "";
-                String log = "";
-
-                Node location;
-
-                for (int j = 1; j < locationList.getLength(); j += 2) {
-                    location = locationList.item(j);
-
-                    lat = location.getChildNodes().item(1).getChildNodes().item(0).getNodeValue();
-                    log = location.getChildNodes().item(3).getChildNodes().item(0).getNodeValue();
-                }
-
-                if (locationList.getLength() > 0) {
-                    locations.add(new LatLng(Double.parseDouble(lat), Double.parseDouble(log)));
-                }
-
-                lTrackingData.add(new TrackingData(date, startTime, endTime, distance, locations));
-            }
-
-        } catch (ParserConfigurationException | SAXException pce) {
-            pce.printStackTrace();
-        }
-
-        return lTrackingData;
     }
 }
