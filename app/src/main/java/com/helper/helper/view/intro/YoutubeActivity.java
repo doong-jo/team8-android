@@ -41,6 +41,8 @@ public class YoutubeActivity extends YouTubeBaseActivity implements
 
             Intent intent = new Intent(YoutubeActivity.this, LoginActivity.class);
             startActivity(intent);
+
+            finish();
         }
 
         @Override
