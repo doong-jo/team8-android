@@ -13,7 +13,7 @@
     <string name="title_activity_maps">Map</string>
 
     <!--Private key-->
-    <string name="server_uri">http://175.123.140.145</string>
+    <string name="server_uri">http://175.123.140.145:88</string>
     <string name="led_resource_uri">images/LED/</string>
     <string name="youtube_key">n6EydOVvJ00</string>
 
@@ -43,7 +43,7 @@
     <string name="login_question">Already a member?</string>
     <string name="log_in">Log in</string>
     <string name="or_divide">OR</string>
-    <string name="intro_service_url">http://175.123.140.145/images/intro_service_</string>
+    <string name="intro_service_url">http://175.123.140.145:88/images/intro_service_</string>
     <string name="not_match_login">Email or password do not match.</string>
     <!--MakeProfielFragment-->
     <string name="riding_type_bicycle">bicycle</string>
