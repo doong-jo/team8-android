@@ -230,6 +230,8 @@ public class InfoFragment extends Fragment {
             e.printStackTrace();
         }
 
+        initLED();
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             m_brightnessSeek.setProgress((int)(brtVal*100), true);
             m_speedSeek.setProgress((int)(spdVal*100), true);
