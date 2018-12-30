@@ -367,7 +367,7 @@ public class JoinFragment extends Fragment {
             reqObject.remove(User.KEY_LAST_ACCESS);
             reqObject.remove(User.KEY_PASSWORD);
 
-            Log.d(TAG, "getResultExistEmail: " + reqObject.toString());
+
             HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                 @Override
                 public void onSuccess(JSONArray jsonArray) throws JSONException {

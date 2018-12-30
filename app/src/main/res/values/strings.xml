@@ -206,6 +206,7 @@
     <string name="confirm_privacy_term">상기 내용을 확인하였습니다.</string>
 
 
+    <!--//////////////////// Delete //////////////////-->
     <string name="input_text">Looking for…</string>
     <string name="button_send">Go!</string>
     <string name="police_stations">Police Stations in Victoria</string>
@@ -222,6 +223,7 @@
     <string name="button_radius">Radius</string>
     <string name="button_gradient">Gradient</string>
     <string name="button_opacity">Opacity</string>
+    <!-- ///////////////////////////////////////////// -->
 
 
     <string name="privacy_term">
