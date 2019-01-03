@@ -13,9 +13,14 @@
     <string name="title_activity_maps">Map</string>
 
     <!--Private key-->
-    <string name="server_uri">http://175.123.140.145:88</string>
+    <string name="server_uri">http://175.123.140.145:888</string>
     <string name="led_resource_uri">images/LED/</string>
     <string name="youtube_key">n6EydOVvJ00</string>
+
+    <!--Socket Event-->
+    <string name="requset_join_group">REQUSET_JOIN_GROUP</string>
+    <string name="accept_join_group">ACCEPT_JOIN_GROUP</string>
+    <string name="set_group_pattern">SET_GROUP_PATTERN</string>
 
     <!--Collection-->
     <string name="collection_user">user</string>

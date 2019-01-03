@@ -46,6 +46,7 @@ import com.helper.helper.controller.EmergencyManager;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.GoogleMapManager;
 import com.helper.helper.controller.SharedPreferencer;
+import com.helper.helper.controller.SocketManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.controller.ViewStateManager;
 import com.helper.helper.interfaces.BluetoothReadCallback;
@@ -69,10 +70,13 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import io.socket.client.IO;
+import io.socket.client.Socket;
 
 import static android.support.design.widget.TabLayout.*;
 
@@ -93,13 +97,11 @@ public class ScrollingActivity extends AppCompatActivity
     private NavigationView m_navigationView;
 
     private TabLayout m_tabLayout;
-    private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
+    /************************************************************/
 
+    private Socket m_socket;
     private SweetAlertDialog m_loadingDialog;
-    /**************************************************************/
-
-    private BluetoothReadCallback m_emergencyCallback;
     private boolean m_bIsDestroyed;
 
     public ViewPager getViewPager() {
@@ -165,6 +167,10 @@ public class ScrollingActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+        /** Socket **/
+        SocketManager.startSocket(this);
+
+
         /** Set SharedPreferencer **/
         SharedPreferencer.getSharedPreferencer(this, UserManager.getUserEmail(), MODE_PRIVATE);
 
@@ -206,10 +212,10 @@ public class ScrollingActivity extends AppCompatActivity
         m_tabLayout.addTab(m_tabLayout.newTab().setText("LED"));
 //        m_tabLayout.addTab(m_tabLayout.newTab().setText("TRACKING"));
 
-        m_pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), m_tabLayout.getTabCount());
+        TabPagerAdapter pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), m_tabLayout.getTabCount());
 
         m_viewPager = findViewById(R.id.pager);
-        m_viewPager.setAdapter(m_pagerAdapter);
+        m_viewPager.setAdapter(pagerAdapter);
         m_viewPager.addOnPageChangeListener(new TabLayoutOnPageChangeListener(m_tabLayout));
         m_tabLayout.addOnTabSelectedListener(new OnTabSelectedListener() {
             @Override
@@ -267,11 +273,12 @@ public class ScrollingActivity extends AppCompatActivity
         GoogleMapManager.initGoogleMap(this);
 
         /** Bluetooth  **/
-        m_emergencyCallback = new BluetoothReadCallback() {
+        /**************************************************************/
+        BluetoothReadCallback emergencyCallback = new BluetoothReadCallback() {
             @Override
             public void onResult(String result) {
-                if( result.equals(BTManager.BT_SIGNAL_EMERGENCY) ) {
-                    if( EmergencyManager.getEmergencyAlertState() ||
+                if (result.equals(BTManager.BT_SIGNAL_EMERGENCY)) {
+                    if (EmergencyManager.getEmergencyAlertState() ||
                             !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ||
                             !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
                         return;
@@ -285,7 +292,7 @@ public class ScrollingActivity extends AppCompatActivity
                             final Location accLocation = GoogleMapManager.getCurLocation();
                             AddressManager.startAddressIntentService(activity, accLocation);
 
-                            if( m_bIsDestroyed ) {
+                            if (m_bIsDestroyed) {
                                 Intent intent = new Intent(activity, PopupActivity.class);
                                 startActivity(intent);
                             } else {
@@ -303,7 +310,7 @@ public class ScrollingActivity extends AppCompatActivity
             }
         };
 
-        BTManager.setActivityReadCb(m_emergencyCallback);
+        BTManager.setActivityReadCb(emergencyCallback);
     }
 
     private void startInitializeUserData() {
