@@ -226,6 +226,24 @@
     <!-- ///////////////////////////////////////////// -->
 
 
+    <string-array name="spinner_vehicle_type">
+        <item>All</item>
+        <item>Bicycle</item>
+        <item>Motorcycle</item>
+        <item>Smart Mobility</item>
+    </string-array>
+
+    <string-array name="spinner_alarm">
+        <item>All</item>
+        <item>Danger</item>
+        <item>Warning</item>
+    </string-array>
+
+    <string-array name="spinner_date">
+        <item>6개월</item>
+        <item>3개월</item>
+        <item>1개월</item>    </string-array>
+
     <string name="privacy_term">
         <b>제1조. 목적</b>\n\n
         \u0020\u0020\u0020\u00201. 이 약관은 (주)Team 8(이하 “회사”)이 운영하는 HELPER 서비스(이하 “서비스”)를 이용함에 있어 회사와 회원간의 권리ㆍ의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.\n\n

@@ -41,6 +41,7 @@ import com.helper.helper.R;
 import com.helper.helper.controller.GoogleMapManager;
 import com.helper.helper.controller.HttpManager;
 import com.helper.helper.interfaces.HttpCallback;
+import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.Accident;
 
 import org.json.JSONArray;
@@ -88,7 +89,6 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tracking_heatmap, container, false);
 
-        setTrackingData();
         initLayout(view);
 
         m_mapView.onCreate(savedInstanceState);
@@ -139,7 +139,7 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
 
     @SuppressLint("ClickableViewAccessibility")
     public void adjustMapVerticalTouch(View view) {
-        final NestedScrollView mainScrollView = (NestedScrollView) view.findViewById(R.id.heatMapFragment);
+        final NestedScrollView mainScrollView = (NestedScrollView) getActivity().findViewById(R.id.app_nestedScroll);
         ImageView transparentImageView = (ImageView) view.findViewById(R.id.heatMap_transparent_image);
 
         transparentImageView.setOnTouchListener(new View.OnTouchListener() {
@@ -174,38 +174,8 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
     public void onMapReady(GoogleMap googleMap) {
         m_map = googleMap;
 
+        setHeatMap();
 
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            Toast.makeText(getActivity(), "위치 서비스 권한을 확인해주세요.", Toast.LENGTH_SHORT).show();
-
-            return;
-        }
-
-
-        mProvider = new HeatmapTileProvider.Builder().data(m_trackingList).build();
-        mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-        Location location = GoogleMapManager.getCurLocation();
-        if (location != null) {
-            m_map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM_LEVEL));
-        }
-        GoogleMapManager.setLocationCallbackClone(new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                List<Location> locationList = locationResult.getLocations();
-                if (locationList.size() > 0) {
-                    Location location = locationList.get(locationList.size() - 1);
-                    m_map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM_LEVEL));
-
-                }
-            }
-        });
-
-        googleMap.getUiSettings().setCompassEnabled(true);
-        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        googleMap.setMyLocationEnabled(true);
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL));
     }
 
     public void onStart() {
@@ -247,21 +217,69 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
         return list;
     }
 
-    private void setTrackingData() {
+    private void setHeatMap() {
+        Location location = GoogleMapManager.getCurLocation();
+        if (location != null) {
+            m_map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM_LEVEL));
+        }
+
+//        GoogleMapManager.setLocationCallbackClone(new LocationCallback() {
+//            @Override
+//            public void onLocationResult(LocationResult locationResult) {
+//                List<Location> locationList = locationResult.getLocations();
+//                if (locationList.size() > 0) {
+//                    Location location = locationList.get(locationList.size() - 1);
+//                    m_map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM_LEVEL));
+//
+//                }
+//            }
+//        });
+
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            Toast.makeText(getActivity(), "위치 서비스 권한을 확인해주세요.", Toast.LENGTH_SHORT).show();
+
+            return;
+        }
+
+        m_map.getUiSettings().setCompassEnabled(true);
+        m_map.getUiSettings().setMyLocationButtonEnabled(true);
+        m_map.setMyLocationEnabled(true);
+        m_map.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL));
+        try {
+            setTrackingData(new ValidateCallback() {
+                @Override
+                public void onDone(final int resultCode) throws JSONException {
+                    if (getActivity() == null) return;
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (resultCode == 1) {
+                                mProvider = new HeatmapTileProvider.Builder().data(m_trackingList).build();
+                                mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+                            } else {
+
+                            }
+                        }
+                    });
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setTrackingData(final ValidateCallback callback) throws JSONException {
         if (HttpManager.useCollection(getString(R.string.collection_accident))) {
-//            Accident.AccidentBuilder accBuilder = Accident.builder();
             try {
                 JSONObject reqObject = new JSONObject();
-
-
+                reqObject.remove(Accident.ACCIDENT_HAS_ALERTED);
                 HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override
                     public void onSuccess(JSONArray jsonArray) throws JSONException {
-                        int arrLen = jsonArray.length();
-
-                        if (arrLen != 0) {
-
-                            for (int i = 0; i < arrLen; ++i) {
+                        if (jsonArray.length() != 0) {
+                            for (int i = 0; i < jsonArray.length(); ++i) {
                                 JSONObject object = (JSONObject) jsonArray.get(i);
                                 Date convertDate = null;
                                 try {
@@ -276,15 +294,15 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
 
                                 accidentData.add(Accident.builder()
                                         .m_ridingType(object.getString(Accident.ACCIDENT_RIDING_TYPE))
-                                        .m_hasAlerted(object.getBoolean(Accident.ACCIDENT_HAS_ALERTED))
                                         .m_occuredDate(convertDate)
                                         .m_position(position)
                                         .build()
                                 );
-
                             }
-
                             m_trackingList = readItems();
+                            callback.onDone(1);
+                        } else {
+                            callback.onDone(0);
                         }
                     }
 
