@@ -94,6 +94,7 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
     private List<Accident> accidentData = new ArrayList<>();
     private AdapterView.OnItemSelectedListener m_typeListener;
     private AdapterView.OnItemSelectedListener m_alarmListener;
+    private AdapterView.OnItemSelectedListener m_dateListener;
 
     private String m_date;
     private String m_alarm;
@@ -123,6 +124,8 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
         m_spinnerType = view.findViewById(R.id.spinnerType);
         /*******************************************************************/
 
+        m_spinnerDate.setSelection(0,false);
+        m_spinnerAlarm.setSelection(0,false);
         m_spinnerType.setSelection(0,false);
 
         /******************* Make Listener in View *******************/
@@ -168,6 +171,8 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
                         m_alarm = "true";
                         break;
                 }
+
+                setHeatMap();
             }
 
             @Override
@@ -176,6 +181,32 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
             }
         };
         m_spinnerAlarm.setOnItemSelectedListener(m_alarmListener);
+
+        m_dateListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedType = (String)parent.getItemAtPosition(position);
+//                switch (selectedType){
+//                    case ALARM_DEFAULT:
+//                        m_alarm = ALARM_DEFAULT;
+//                        break;
+//                    case ALARM_WARNING:
+//                        m_alarm = "false";
+//                        break;
+//                    case ALARM_DANGER:
+//                        m_alarm = "true";
+//                        break;
+//                }
+
+//                setHeatMap();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        };
+        m_spinnerDate.setOnItemSelectedListener(m_dateListener);
 
         /*************************************************************/
         adjustMapVerticalTouch(view);
@@ -255,10 +286,13 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         m_map = googleMap;
+
         startMap();
+
         m_date = DATE_DEFAULT_MONTH;
         m_alarm = ALARM_DEFAULT;
         m_type = TYPE_DEFALT;
+
         setHeatMap();
     }
 
@@ -355,9 +389,9 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
                                 if (mProvider != null) {
                                     m_trackingList.add(new LatLng(0,0));
                                     mProvider.setData(m_trackingList);
-                                    mOverlay.clearTileCache();
                                 }
                             }
+                            mOverlay.clearTileCache();
                         }
                     });
                 }

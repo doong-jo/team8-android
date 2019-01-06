@@ -464,7 +464,7 @@ public class FileManager {
         Node map = userInfo.item(0);
         String email = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_EMAIL).getNodeValue();
         String name = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_NAME).getNodeValue();
-        String phone = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_PHONE).getNodeValue();
+//        String phone = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_PHONE).getNodeValue();
         String riding_type = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_RIDING_TYPE).getNodeValue();
         String led_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_INDICIES).getNodeValue();
         String led_bookmarked = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED).getNodeValue();
@@ -482,7 +482,7 @@ public class FileManager {
         User user = new User.Builder()
                 .email(email)
                 .name(name)
-                .phone(phone)
+//                .phone(phone)
                 .ridingType(riding_type)
                 .ledIndicies(led_indices_jarr)
                 .ledBookmarked(led_bookmarked_jarr)

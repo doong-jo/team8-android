@@ -167,7 +167,6 @@ public class HttpManager {
             serverEndPoint = getPUTmethodServerEndPoint(queryStr, subURI);
         }
 
-
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
