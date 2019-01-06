@@ -1,34 +1,34 @@
-package com.helper.helper.view.main.tracking;
-
-import android.graphics.Color;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.TileOverlay;
-import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.maps.android.heatmaps.Gradient;
-import com.google.maps.android.heatmaps.HeatmapTileProvider;
-import com.helper.helper.R;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
-
-public class HeatmapsDemoActivity {
-
+//package com.helper.helper.view.main.tracking;
+//
+//import android.graphics.Color;
+//import android.text.Html;
+//import android.text.method.LinkMovementMethod;
+//import android.view.View;
+//import android.widget.AdapterView;
+//import android.widget.ArrayAdapter;
+//import android.widget.Spinner;
+//import android.widget.TextView;
+//import android.widget.Toast;
+//
+//import com.google.android.gms.maps.CameraUpdateFactory;
+//import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.model.TileOverlay;
+//import com.google.android.gms.maps.model.TileOverlayOptions;
+//import com.google.maps.android.heatmaps.Gradient;
+//import com.google.maps.android.heatmaps.HeatmapTileProvider;
+//import com.helper.helper.R;
+//
+//import org.json.JSONArray;
+//import org.json.JSONException;
+//import org.json.JSONObject;
+//
+//import java.io.InputStream;
+//import java.util.ArrayList;
+//import java.util.HashMap;
+//import java.util.Scanner;
+//
+//public class HeatmapsDemoActivity {
+//
 //    /**
 //     * Alternative radius for convolution
 //     */
@@ -198,5 +198,5 @@ public class HeatmapsDemoActivity {
 //            return mUrl;
 //        }
 //    }
-
-}
+//
+//}

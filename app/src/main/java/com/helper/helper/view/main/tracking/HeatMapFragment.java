@@ -9,23 +9,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.NestedScrollView;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,6 +37,7 @@ import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.helper.helper.R;
 import com.helper.helper.controller.GoogleMapManager;
 import com.helper.helper.controller.HttpManager;
+import com.helper.helper.enums.RidingType;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.Accident;
@@ -62,6 +60,19 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
     private final int PROXIMITY_RADIUS = 10000;
     private final int DEFAULT_ZOOM_LEVEL = 15;
 
+    private static final String TYPE_DEFALT = "All";
+    private static final String TYPE_BICYCLE = "Bicycle";
+    private static final String TYPE_MOTORCYCLE = "Motorcycle";
+    private static final String TYPE_SMART_MOBILITY = "Smart Mobility";
+
+    private static final String ALARM_DEFAULT = "All";
+    private static final String ALARM_DANGER = "Danger";
+    private static final String ALARM_WARNING = "Warning";
+
+    private static final String DATE_DEFAULT_MONTH = "6개월";
+    private static final String DATE_THREE_MONTH = "3개월";
+    private static final String DATE_ONE_MONTH = "1개월";
+
     /******************* Define widgtes in view *******************/
     private MapView m_mapView;
     private GoogleMap m_map;
@@ -73,9 +84,20 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
 
     private HeatmapTileProvider mProvider;
     private TileOverlay mOverlay;
+
+    private Spinner m_spinnerDate;
+    private Spinner m_spinnerAlarm;
+    private Spinner m_spinnerType;
+
     /**************************************************************/
     private List<LatLng> m_trackingList = new ArrayList<>();
     private List<Accident> accidentData = new ArrayList<>();
+    private AdapterView.OnItemSelectedListener m_typeListener;
+    private AdapterView.OnItemSelectedListener m_alarmListener;
+
+    private String m_date;
+    private String m_alarm;
+    private String m_type;
 
     public HeatMapFragment() {
     }
@@ -95,7 +117,67 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
         m_mapView.onResume();
         m_mapView.getMapAsync(this);
 
+        /******************* Connect widgtes with layout *******************/
+        m_spinnerDate = view.findViewById(R.id.spinnerDate);
+        m_spinnerAlarm = view.findViewById(R.id.spinnerAlarm);
+        m_spinnerType = view.findViewById(R.id.spinnerType);
+        /*******************************************************************/
 
+        m_spinnerType.setSelection(0,false);
+
+        /******************* Make Listener in View *******************/
+        m_typeListener = new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                String selectedType = (String)parent.getItemAtPosition(position);
+                switch (selectedType){
+                    case TYPE_DEFALT :
+                        m_type = TYPE_DEFALT;
+                        break;
+                    case TYPE_BICYCLE :
+                        m_type = RidingType.BICYCLE.value;
+                        break;
+                    case TYPE_MOTORCYCLE :
+                        m_type = RidingType.MOTORCYCLE.value;
+                        break;
+                    case TYPE_SMART_MOBILITY :
+                        m_type = RidingType.SMART_MOBILITY.value;
+                        break;
+                }
+
+                setHeatMap();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        };
+        m_spinnerType.setOnItemSelectedListener(m_typeListener);
+
+        m_alarmListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedType = (String)parent.getItemAtPosition(position);
+                switch (selectedType){
+                    case ALARM_DEFAULT:
+                        m_alarm = ALARM_DEFAULT;
+                        break;
+                    case ALARM_WARNING:
+                        m_alarm = "false";
+                        break;
+                    case ALARM_DANGER:
+                        m_alarm = "true";
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        };
+        m_spinnerAlarm.setOnItemSelectedListener(m_alarmListener);
+
+        /*************************************************************/
         adjustMapVerticalTouch(view);
         return view;
     }
@@ -173,9 +255,11 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         m_map = googleMap;
-
+        startMap();
+        m_date = DATE_DEFAULT_MONTH;
+        m_alarm = ALARM_DEFAULT;
+        m_type = TYPE_DEFALT;
         setHeatMap();
-
     }
 
     public void onStart() {
@@ -210,14 +294,14 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
     private ArrayList<LatLng> readItems() {
         ArrayList<LatLng> list = new ArrayList<>();
 
-        for (Accident accident : accidentData) {
+        for(Accident accident : accidentData){
             list.add(accident.getPosition());
         }
 
         return list;
     }
 
-    private void setHeatMap() {
+    private void startMap(){
         Location location = GoogleMapManager.getCurLocation();
         if (location != null) {
             m_map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM_LEVEL));
@@ -247,6 +331,9 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
         m_map.getUiSettings().setMyLocationButtonEnabled(true);
         m_map.setMyLocationEnabled(true);
         m_map.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL));
+    }
+
+    private void setHeatMap() {
         try {
             setTrackingData(new ValidateCallback() {
                 @Override
@@ -256,10 +343,20 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
                         @Override
                         public void run() {
                             if (resultCode == 1) {
-                                mProvider = new HeatmapTileProvider.Builder().data(m_trackingList).build();
-                                mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-                            } else {
+                                if (mProvider == null) {
+                                    mProvider = new HeatmapTileProvider.Builder().data(m_trackingList).build();
+                                    mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+                                } else {
+                                    mProvider.setData(m_trackingList);
+                                    mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+                                }
 
+                            } else {
+                                if (mProvider != null) {
+                                    m_trackingList.add(new LatLng(0,0));
+                                    mProvider.setData(m_trackingList);
+                                    mOverlay.clearTileCache();
+                                }
                             }
                         }
                     });
@@ -273,8 +370,16 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
     private void setTrackingData(final ValidateCallback callback) throws JSONException {
         if (HttpManager.useCollection(getString(R.string.collection_accident))) {
             try {
+                accidentData.clear();
+                m_trackingList.clear();
                 JSONObject reqObject = new JSONObject();
-                reqObject.remove(Accident.ACCIDENT_HAS_ALERTED);
+                if(!m_type.equals(TYPE_DEFALT)){
+                    reqObject.put(Accident.ACCIDENT_RIDING_TYPE, m_type);
+                }
+                if(!m_alarm.equals(ALARM_DEFAULT)){
+                    reqObject.put(Accident.ACCIDENT_HAS_ALERTED, m_alarm);
+                }
+
                 HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override
                     public void onSuccess(JSONArray jsonArray) throws JSONException {
@@ -300,6 +405,7 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
                                 );
                             }
                             m_trackingList = readItems();
+                            Log.d(TAG, "onSuccess: accidentData" + accidentData);
                             callback.onDone(1);
                         } else {
                             callback.onDone(0);

@@ -242,7 +242,8 @@
     <string-array name="spinner_date">
         <item>6개월</item>
         <item>3개월</item>
-        <item>1개월</item>    </string-array>
+        <item>1개월</item>
+    </string-array>
 
     <string name="privacy_term">
         <b>제1조. 목적</b>\n\n

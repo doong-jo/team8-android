@@ -18,7 +18,6 @@ public class Accident {
     public static final String ACCIDENT_POSITION_LATITUDE = "latitude";
     public static final String ACCIDENT_POSITION_LONGITUDE = "longitude";
 
-
     private final String m_userId;
     private final String m_ridingType;
     private final boolean m_hasAlerted;
@@ -27,7 +26,24 @@ public class Accident {
     private final Date m_occuredDate;
     private final LatLng m_position;
 
+    public Date getOccuredDate(){
+        return m_occuredDate;
+    }
+
+    public boolean getHasAlerted(){
+        return m_hasAlerted;
+    }
+
+    public String getRidingType(){
+        return m_ridingType;
+    }
+
     public LatLng getPosition(){
         return m_position;
+    }
+
+    @Override
+    public String toString() {
+        return m_ridingType;
     }
 }
