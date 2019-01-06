@@ -14,6 +14,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.ContactItem;
 import com.helper.helper.model.LEDCategory;
+import com.helper.helper.model.Member;
+import com.helper.helper.model.MemberList;
 import com.helper.helper.model.TrackingData;
 import com.helper.helper.model.User;
 import com.snatik.storage.Storage;
@@ -466,5 +468,25 @@ public class FileManager {
 
 
         return user;
+    }
+
+    public static void writeXmlGroupRoom(Context context, List<MemberList> memberData) {
+
+    }
+
+    public static List<MemberList> readXmlGroupRoom(Context context) throws IOException {
+        List<MemberList> memberListItems = null;
+
+        return memberListItems;
+    }
+
+    public static void writeXmlMembers(Context context, List<Member> memberData) {
+
+    }
+
+    public static List<Member> readXmlMembers(Context context) {
+        List<Member> memberItems = null;
+
+        return memberItems;
     }
 }
