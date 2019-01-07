@@ -55,6 +55,7 @@ import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LEDCategory;
 import com.helper.helper.model.User;
 import com.helper.helper.view.accident.ThresholdActivity;
+import com.helper.helper.view.group.GroupActivity;
 import com.helper.helper.view.main.myeight.EightFragment;
 import com.helper.helper.view.main.myeight.InfoFragment;
 import com.helper.helper.view.contact.ContactActivity;
@@ -567,10 +568,6 @@ public class ScrollingActivity extends AppCompatActivity
 
         Intent intent;
         switch (id) {
-            case R.id.nav_trackingRecords:
-
-                break;
-
             case R.id.nav_emergencyContacts:
                 intent = new Intent(this, ContactActivity.class);
                 startActivity(intent);
@@ -593,6 +590,11 @@ public class ScrollingActivity extends AppCompatActivity
                     intent = new Intent(this, ThresholdActivity.class);
                     startActivity(intent);
                 }
+                break;
+
+            case R.id.nav_group:
+                intent = new Intent(this, GroupActivity.class);
+                startActivity(intent);
                 break;
         }
 
