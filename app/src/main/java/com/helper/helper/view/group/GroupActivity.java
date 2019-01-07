@@ -12,10 +12,19 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.helper.helper.R;
+import com.helper.helper.controller.HttpManager;
+import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.model.Member;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.model.MemberList;
+import com.helper.helper.model.User;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -154,6 +163,99 @@ public class GroupActivity extends ListActivity {
             }
         });
         /*************************************************************/
+
+        setGroupList();
+    }
+
+    private void findGroup(final String groupIdx) {
+        final Activity activity = this;
+
+        if (HttpManager.useCollection(activity.getString(R.string.collection_group))) {
+            JSONObject reqObject = new JSONObject();
+
+            try {
+                reqObject.put("index", groupIdx);
+
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray jsonArray) throws JSONException {
+                        JSONObject object = (JSONObject)jsonArray.get(0);
+
+                        String idx = object.getString(MemberList.KEY_INDEX);
+
+                        JSONArray members = object.getJSONArray(MemberList.KEY_MEMBERS);
+                        String membersStr = members.toString();
+                        membersStr = membersStr.replace("[","").replace("]","");
+                        List<String> listNames = Arrays.asList(membersStr.split(","));
+
+                        String masterStr = object.getString(MemberList.KEY_MASTER);
+                        final MemberList memberList = new MemberList(listNames, masterStr, idx);
+
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                addGroup(memberList);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String err) {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity, "Check your network connection", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void setGroupList() {
+        final Activity activity = this;
+
+        if (HttpManager.useCollection(activity.getString(R.string.collection_user))) {
+            JSONObject reqObject = new JSONObject();
+
+            try {
+                reqObject.put(User.KEY_NAME, UserManager.getUserName());
+
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray jsonArray) {
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            try {
+                                JSONObject obj = jsonArray.getJSONObject(i);
+                                JSONArray groups = obj.getJSONArray(User.KEY_GROUPS);
+                                for (int j = 0; j < groups.length(); j++) {
+                                    String groupIdx = String.valueOf(groups.get(0));
+                                    findGroup(groupIdx);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(String err) {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity, "Check your network connection", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void toggleShowNotExistsGroupText() {
@@ -181,11 +283,14 @@ public class GroupActivity extends ListActivity {
         }
     }
 
+
     private void removeCheckedItems() {
         int removeCnt = 0;
         for (int i = 0; i <m_chekcedDelete.size(); i++) {
             int I = m_chekcedDelete.get(i);
             MemberList item = m_adapter.getItem(I-removeCnt++);
+//            removeGroupInServer(item.getIndex());
+
             m_adapter.remove(item);
         }
 
@@ -218,12 +323,13 @@ public class GroupActivity extends ListActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_MAKE_GROUP:
+                setGroupList();
                 // TODO: 04/01/2019 make group list
-                String nameArrStr = data.getStringExtra("membersNames");
-                nameArrStr = nameArrStr.replace("[","").replace("]","");
-                List<String> listNames = Arrays.asList(nameArrStr.split(","));
-
-                addGroup(new MemberList(listNames, UserManager.getUserName()));
+//                String nameArrStr = data.getStringExtra("membersNames");
+//                nameArrStr = nameArrStr.replace("[","").replace("]","");
+//                List<String> listNames = Arrays.asList(nameArrStr.split(","));
+//
+//                addGroup(new MemberList(listNames, UserManager.getUserName()));
                 break;
         }
     }

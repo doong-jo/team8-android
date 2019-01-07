@@ -28,6 +28,7 @@
     <string name="collection_accident">accident</string>
     <string name="collection_category">category</string>
     <string name="collection_devicetest">devicetest</string>
+    <string name="collection_group">group</string>
 
 
     <!--File Format-->

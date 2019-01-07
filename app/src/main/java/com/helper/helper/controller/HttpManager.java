@@ -61,6 +61,10 @@ public class HttpManager {
                 m_collection = Collection.DEVICETEST;
                 return true;
 
+            case "group":
+                m_collection = Collection.GROUP;
+                return true;
+
             default:
                 return false;
         }
@@ -159,12 +163,16 @@ public class HttpManager {
         String queryStr;
         final URL serverEndPoint;
 
-        if( method.equals("GET") || method.equals("POST") ) {
+        int a = 0;
+        if( method.equals("GET") || method.equals("POST") || method.equals("DELETE")) {
             queryStr = getAllKeyValueJSONObject(query);
             serverEndPoint = getGETmethodServerEndPoint(queryStr, subURI);
-        } else { /** PUT, DELETE **/
+            a++;
+        }
+        else { /** PUT, DELETE **/
             queryStr = getParamOfKeyValueJSONObject(query, key);
             serverEndPoint = getPUTmethodServerEndPoint(queryStr, subURI);
+            a++;
         }
 
 

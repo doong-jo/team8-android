@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.helper.helper.R;
 import com.helper.helper.controller.HttpManager;
@@ -20,17 +21,23 @@ import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.CheckedInterface;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.model.Member;
+import com.helper.helper.model.MemberList;
 import com.helper.helper.model.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.SecureRandom;
 import java.security.acl.Group;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -125,16 +132,92 @@ public class MakeGroupActivity extends ListActivity {
                                 }
                             })
                             .show();
-                    return;
+                } else {
+                    insertGroupinServer();
                 }
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("membersNames", m_addedMembersArr.toString());
-                setResult(GroupActivity.REQUEST_MAKE_GROUP, resultIntent);
-                finish();
             }
         });
         /*************************************************************/
+
+        m_addedMembersArr.add(UserManager.getUserName());
     }
+
+    private void insertGroupinServer() {
+        final Activity activity = this;
+
+        if (HttpManager.useCollection(activity.getString(R.string.collection_group))) {
+            JSONObject reqObject = new JSONObject();
+
+            final String groupIdx = UUID.randomUUID().toString();
+
+            try {
+                reqObject.put(MemberList.KEY_INDEX, groupIdx);
+                reqObject.put(MemberList.KEY_MASTER, UserManager.getUserName());
+                reqObject.put(MemberList.KEY_MEMBERS, m_addedMembersArr.toString());
+
+                HttpManager.requestHttp(reqObject, "", "POST", "", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray jsonArray) {
+                        updateUsersHasGroupFields(groupIdx, m_addedMembersArr);
+                    }
+
+                    @Override
+                    public void onError(String err) {
+                        Toast.makeText(activity, "Check your network connection", Toast.LENGTH_LONG).show();
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    int successUpdateIdx = 0;
+    private void updateUsersHasGroupFields(final String groupIdx, final List<String> members) {
+        final Activity activity = this;
+
+        for (String member : members) {
+
+            if (HttpManager.useCollection(activity.getString(R.string.collection_user))) {
+                JSONObject reqObject = new JSONObject();
+
+                try {
+                    reqObject.put(User.KEY_NAME, member);
+                    reqObject.put(User.KEY_GROUPS, groupIdx);
+
+                    HttpManager.requestHttp(reqObject, User.KEY_NAME, "PUT", "join_group/", new HttpCallback() {
+                        @Override
+                        public void onSuccess(JSONArray jsonArray) {
+                            successUpdateIdx++;
+
+                            if( successUpdateIdx == members.size() ) {
+                                successUpdateIdx = 0;
+
+                                Intent resultIntent = new Intent();
+                                resultIntent.putExtra("membersNames", m_addedMembersArr.toString());
+                                setResult(GroupActivity.REQUEST_MAKE_GROUP, resultIntent);
+                                finish();
+                            }
+                        }
+
+                        @Override
+                        public void onError(String err) {
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(activity, "Check your network connection", Toast.LENGTH_LONG).show();
+                                }
+                            });
+
+                        }
+                    });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 
     private void addIntoAddedMemberList(String name) {
         if( m_addedMembersArr.size() == 0 ) {

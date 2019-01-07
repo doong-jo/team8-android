@@ -12,7 +12,8 @@ public enum Collection {
     LED("led"),
     TRACKING("tracking"),
     CATEGORY("category"),
-    DEVICETEST("devicetest");
+    DEVICETEST("devicetest"),
+    GROUP("group");
 
     private String value;
 

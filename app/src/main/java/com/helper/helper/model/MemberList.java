@@ -10,12 +10,18 @@ import java.util.List;
 
 public class MemberList {
 
+    public static final String KEY_INDEX = "index";
+    public static final String KEY_MEMBERS = "members";
+    public static final String KEY_MASTER = "master";
+
     private List<String> m_names;
     private String m_masterMemberName;
+    private String m_index;
 
-    public MemberList(List<String> m_names, String m_masterMemberName) {
+    public MemberList(List<String> m_names, String m_masterMemberName, String index) {
         this.m_names = m_names;
         this.m_masterMemberName = m_masterMemberName;
+        this.m_index = index;
     }
 
     public void setMembers(List<String> m_members) {
@@ -33,4 +39,6 @@ public class MemberList {
     public String getMasterMemberName() {
         return m_masterMemberName;
     }
+
+    public String getIndex() { return m_index; }
 }
