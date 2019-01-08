@@ -16,7 +16,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.helper.helper.R;
+import com.helper.helper.controller.BTManager;
 import com.helper.helper.controller.HttpManager;
+import com.helper.helper.controller.SocketManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.interfaces.CheckedInterface;
 import com.helper.helper.interfaces.HttpCallback;
@@ -28,6 +30,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.Socket;
 import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +48,7 @@ public class DetailGroupActivity extends ListActivity {
 
     private List<Member> m_listViewData = new ArrayList<>();
     private ListView m_listView;
+    private String m_groupIdx;
 
     /******************* Define widgtes in view *******************/
     private DetailMemberListAdapter m_adapter;
@@ -57,8 +61,10 @@ public class DetailGroupActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_group);
+        final Activity activity = this;
 
         String names = getIntent().getStringExtra("memberNames");
+        m_groupIdx = getIntent().getStringExtra("groupIdx");
         String nameArrStr = names.replace("[","").replace("]","");
         List<String> nameList = Arrays.asList(nameArrStr.split(","));
 
@@ -112,6 +118,21 @@ public class DetailGroupActivity extends ListActivity {
             @Override
             public void onClick(View view) {
                 // TODO: 06/01/2019 execute pattern
+
+                BTManager.setShowOnDevice(activity, "start");
+
+                JSONObject reqSyncObj = new JSONObject();
+
+                try {
+                    reqSyncObj.put("name", UserManager.getUserName());
+                    reqSyncObj.put("roomname", m_groupIdx);
+                    reqSyncObj.put("pattern", "start");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                SocketManager.doSyncPattern(reqSyncObj);
+//                SocketManager
             }
         });
         /*************************************************************/

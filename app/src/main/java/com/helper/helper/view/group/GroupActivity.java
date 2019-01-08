@@ -95,9 +95,10 @@ public class GroupActivity extends ListActivity {
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 Intent intent = new Intent(thisActivity, DetailGroupActivity.class);
 
-                String members = ((List<String>)view.getTag()).toString();
-
+                String members = view.getTag(R.string.group_list_item_key_members).toString();
+                String groupIdx = view.getTag(R.string.group_list_item_key_groupIdx).toString();
                 intent.putExtra("memberNames", members);
+                intent.putExtra("groupIdx", groupIdx);
 
                 setResult(GroupActivity.REQUEST_MAKE_GROUP, intent);
                 startActivityForResult(intent, REQUSET_DETAIL_GROUP);
@@ -323,7 +324,7 @@ public class GroupActivity extends ListActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_MAKE_GROUP:
-                setGroupList();
+//                setGroupList();
                 // TODO: 04/01/2019 make group list
 //                String nameArrStr = data.getStringExtra("membersNames");
 //                nameArrStr = nameArrStr.replace("[","").replace("]","");

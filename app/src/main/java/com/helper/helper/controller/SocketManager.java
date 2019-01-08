@@ -8,11 +8,13 @@ package com.helper.helper.controller;
 import android.content.Context;
 
 import com.helper.helper.R;
+import com.helper.helper.model.MemberList;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Timer;
 
 import io.socket.client.IO;
@@ -23,72 +25,61 @@ public class SocketManager {
 
     private final static String TAG = SocketManager.class.getSimpleName() + "/DEV";
 
+    private final static String ON_SYNC_PATTERN = "ON_SYNC_PATTERN";
+    private final static String EMIT_SYNC_PATTERN = "EMIT_SYNC_PATTERN";
+
     private static Socket m_socket;
     private static Emitter.Listener m_onConnect;
     private static Emitter.Listener m_onDisconnect;
 
-    private static Emitter.Listener m_onRequsetJoinGroup;
-    private static Emitter.Listener m_onAcceptJoinGroup;
-    private static Emitter.Listener m_onSetGroupPattern;
+    private static Emitter.Listener m_onSyncPattern;
 
     public static void startSocket(final Context context) {
         connectSocket(context);
 
-        makeListener();
         listen(context);
     }
 
-    private static void listen(Context context) {
-        makeListener();
-
-        m_socket.on(Socket.EVENT_CONNECT, m_onConnect);
-        m_socket.on(Socket.EVENT_DISCONNECT, m_onDisconnect);
-
-        m_socket.on(context.getString(R.string.requset_join_group), m_onRequsetJoinGroup);
-        m_socket.on(context.getString(R.string.accept_join_group), m_onAcceptJoinGroup);
-        m_socket.on(context.getString(R.string.set_group_pattern), m_onSetGroupPattern);
-    }
-
-    private static void makeListener() {
-        m_onConnect = new Emitter.Listener() {
+    private static void listen(final Context context) {
+        m_socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
 
             }
-        };
+        });
 
-        m_onDisconnect = new Emitter.Listener() {
+        m_socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
 
             }
-        };
-
-        m_onRequsetJoinGroup = new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                JSONObject receivedData = (JSONObject) args[0];
-            }
-        };
-
-        m_onAcceptJoinGroup = new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                JSONObject receivedData = (JSONObject) args[0];
-            }
-        };
-
-        m_onSetGroupPattern = new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                JSONObject receivedData = (JSONObject) args[0];
-            }
-        };
+        });
 
     }
 
-    private static void sendToServer(String eventName, JSONObject data) {
-        m_socket.emit(eventName, data);
+    private static void makePatternSyncListenter(List<MemberList> rooms) {
+        for (MemberList room : rooms) {
+            String roomName = room.getIndex();
+
+            m_socket.on(ON_SYNC_PATTERN.concat("_").concat(roomName), new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+
+                }
+            });
+        }
+    }
+
+    public static void doSyncPattern(JSONObject data) {
+
+        try {
+            m_socket.emit(EMIT_SYNC_PATTERN,
+                    data.getString("name"),
+                    data.getString("roomname"),
+                    data.getString("pattern"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void connectSocket(final Context context) {

@@ -80,7 +80,8 @@ public class MemberListItemListAdapter extends ArrayAdapter<MemberList> {
 
         holder.layout.setOnTouchListener(m_itemTouchListener);
 
-        convertView.setTag(item.getNames());
+        convertView.setTag(R.string.group_list_item_key_members, item.getNames());
+        convertView.setTag(R.string.group_list_item_key_groupIdx, item.getIndex());
         return convertView;
     }
 

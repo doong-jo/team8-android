@@ -69,7 +69,7 @@ public class EightFragment extends Fragment {
 
         Fragment childFragment = targetFragment;
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.eight_fragment_container, childFragment).commit();
+        transaction.replace(R.id.eight_fragment_container, childFragment).commitAllowingStateLoss();
     }
 
     @Override

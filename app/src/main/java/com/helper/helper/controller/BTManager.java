@@ -205,7 +205,7 @@ public class BTManager {
     private static void bluetoothSignalHandler(String signalMsg) {
        if( signalMsg.startsWith(BT_SIGNAL_RESPONSE_LED + BLUETOOTH_SIGNAL_SEPARATE) ||
                signalMsg.startsWith(BT_SIGNAL_DOWNLOAD_LED + BLUETOOTH_SIGNAL_SEPARATE) ){
-            m_downloadLEDResultCb.onResult(signalMsg);
+//            m_downloadLEDResultCb.onResult(signalMsg);
        } else if ( signalMsg.contains("info") ){
             m_infoReadCb.onResult(signalMsg);
        } else if ( signalMsg.startsWith(BT_SIGNAL_FILTER + BLUETOOTH_SIGNAL_SEPARATE) ) {
@@ -507,50 +507,54 @@ public class BTManager {
 
     public static void setShowOnDevice(final Context context, final String ledIndex) {
 
-        m_downloadLEDResultCb = new BluetoothReadCallback() {
-            @Override
-            public void onResult(String result) {
-                String[] splitData = result.split(BLUETOOTH_SIGNAL_SEPARATE);
+//        m_downloadLEDResultCb = new BluetoothReadCallback() {
+//            @Override
+//            public void onResult(String result) {
+//                String[] splitData = result.split(BLUETOOTH_SIGNAL_SEPARATE);
+//
+//                String valueData;
+//
+//                switch(splitData[0]) {
+//                    case BT_SIGNAL_RESPONSE_LED:
+//                        valueData = splitData[1];
+//
+//                        if( valueData.equals(BT_SIGNAL_RES_EXIST_LED) ) {
+//                            break;
+//                        } else if ( valueData.equals(BT_SIGNAL_RES_DOWNLOAD_LED) ) {
+//                            try {
+//                                setBitmapByteArray(context, ledIndex);
+//                                sendBitmapByteArray(m_cntSendByteArr++);
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                        break;
+//
+//                    case BT_SIGNAL_DOWNLOAD_LED:
+//                        sendBitmapByteArray(m_cntSendByteArr++);
+//                        break;
+//
+//                    default:
+//                        break;
+//                }
+//            }
+//
+//            @Override
+//            public void onError(String result) {
+//
+//            }
+//        };
 
-                String valueData;
-
-                switch(splitData[0]) {
-                    case BT_SIGNAL_RESPONSE_LED:
-                        valueData = splitData[1];
-
-                        if( valueData.equals(BT_SIGNAL_RES_EXIST_LED) ) {
-                            break;
-                        } else if ( valueData.equals(BT_SIGNAL_RES_DOWNLOAD_LED) ) {
-                            try {
-                                setBitmapByteArray(context, ledIndex);
-                                sendBitmapByteArray(m_cntSendByteArr++);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        break;
-
-                    case BT_SIGNAL_DOWNLOAD_LED:
-                        sendBitmapByteArray(m_cntSendByteArr++);
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-            @Override
-            public void onError(String result) {
-
-            }
-        };
-
-        if( writeToBluetoothDevice(BT_SIGNAL_ASK_LED
+        writeToBluetoothDevice(BT_SIGNAL_ASK_LED
                 .concat(BLUETOOTH_SIGNAL_SEPARATE)
                 .concat(ledIndex)
-                .getBytes()) ) {
-            UserManager.setUserLEDcurShowOn(context, ledIndex);
-        }
+                .getBytes());
+//        if( writeToBluetoothDevice(BT_SIGNAL_ASK_LED
+//                .concat(BLUETOOTH_SIGNAL_SEPARATE)
+//                .concat(ledIndex)
+//                .getBytes()) ) {
+//            UserManager.setUserLEDcurShowOn(context, ledIndex);
+//        }
     }
 
     public static void closeBluetoothSocket() {
