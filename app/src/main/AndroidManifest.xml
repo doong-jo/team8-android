@@ -112,7 +112,19 @@
 
         <activity android:name=".view.accident.ThresholdActivity"
             android:theme="@style/AppTheme">
+        </activity>
 
+        <activity android:name=".view.group.GroupActivity"
+            android:theme="@style/AppTheme">
+        </activity>
+
+        <activity android:name=".view.group.MakeGroupActivity"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustPan">
+        </activity>
+
+        <activity android:name=".view.group.DetailGroupActivity"
+            android:theme="@style/AppTheme">
         </activity>
 
         <!--BLE service class -->

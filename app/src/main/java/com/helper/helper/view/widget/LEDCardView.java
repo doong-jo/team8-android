@@ -160,7 +160,7 @@ public class LEDCardView extends FrameLayout {
                                                         {
                                                             @Override
                                                             public void onClick(final SweetAlertDialog sweetAlertDialog) {
-                                                                BTManager.setShowOnDevice(activity, ledData.getIndex());
+                                                                BTManager.setShowOnDevice(ledData.getIndex());
                                                                 sweetAlertDialog.dismissWithAnimation();
                                                             }})
                                                         .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
@@ -192,7 +192,7 @@ public class LEDCardView extends FrameLayout {
                         .setConfirmButton(context.getString(R.string.led_dialog_showon), new SweetAlertDialog.OnSweetClickListener() {
                             @Override
                             public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                BTManager.setShowOnDevice(context, ledData.getIndex());
+                                BTManager.setShowOnDevice(ledData.getIndex());
                                 m_detailDlg.dismissWithAnimation();
                             }
                         });

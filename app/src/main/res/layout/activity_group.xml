@@ -27,13 +27,13 @@
             android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/contact_title"
+            android:text="@string/group_title"
             android:textColor="@color/black"
             android:alpha="0.77"
             style="@style/CategoryCardTitleTypo"/>
 
         <TextView
-            android:id="@+id/contactDeleteToggle"
+            android:id="@+id/memberDeleteToggle"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"
@@ -42,7 +42,7 @@
             android:layout_marginEnd="22.8dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:text="@string/contact_delete"
+            android:text="@string/group_delete"
             android:textColor="@color/accent_orange"
             android:alpha="0.77"
             style="@style/CategoryCardTitleTypo"/>
@@ -64,14 +64,15 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textViewNoContactsList"
+            android:id="@+id/textViewNoMemberList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal|center_vertical"
             android:gravity="center"
             android:visibility="gone"
             android:layout_margin="20dp"
-            android:text="@string/no_emergency_contacts_list"
+            android:alpha="0.77"
+            android:text="@string/no_group_list"
             style="@style/CategoryCardTitleTypo"/>
 
         <ListView
@@ -90,11 +91,10 @@
         app:fabCustomSize="72.96dp"
         android:layout_width="72.96dp"
         android:layout_height="72.96dp"
-        android:id="@+id/addContactFab"
-        android:src="@drawable/ic_add_person"
+        android:id="@+id/addGroupFab"
+        android:src="@drawable/ic_group_add"
         android:foregroundGravity="center_horizontal"
         android:scaleType="center"
-        android:layout_margin="@dimen/fab_margin"
-        android:onClick="showInternalContacts"/>
+        android:layout_margin="@dimen/fab_margin"/>
 
 </android.support.constraint.ConstraintLayout>

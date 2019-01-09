@@ -5,10 +5,6 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_trackingRecords"
-            android:icon="@drawable/ic_bicycle"
-            android:title="@string/nav_tracking_record" />
-        <item
             android:id="@+id/nav_emergencyContacts"
             android:icon="@drawable/ic_user"
             android:title="@string/nav_emergency_contacts" />
@@ -16,6 +12,11 @@
             android:id="@+id/nav_accidentThreshold"
             android:icon="@drawable/ic_accident"
             android:title="@string/nav_accident_threshold" />
+
+        <item
+            android:id="@+id/nav_group"
+            android:icon="@drawable/ic_group"
+            android:title="@string/nav_group" />
 
         <!--<item-->
             <!--android:id="@+id/nav_assistPlaces"-->

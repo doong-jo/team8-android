@@ -13,9 +13,10 @@
     <string name="title_activity_maps">Map</string>
 
     <!--Private key-->
-    <string name="server_uri">http://175.123.140.145:88</string>
+    <string name="server_uri">http://175.123.140.145:888</string>
     <string name="led_resource_uri">images/LED/</string>
     <string name="youtube_key">n6EydOVvJ00</string>
+
 
     <!--Collection-->
     <string name="collection_user">user</string>
@@ -23,6 +24,7 @@
     <string name="collection_accident">accident</string>
     <string name="collection_category">category</string>
     <string name="collection_devicetest">devicetest</string>
+    <string name="collection_group">group</string>
 
 
     <!--File Format-->
@@ -154,6 +156,22 @@
     <string name="contact_delete">Delete</string>
     <string name="contact_cancel">Cancel</string>
 
+    <!--Group-->
+    <string name="group_title">My Groups</string>
+    <string name="no_group_list">No exists any group.\n Please add your awesome group!</string>
+    <string name="group_delete">Delete</string>
+    <string name="group_cancle">Cancel</string>
+    <string name="plz_add_member">Please add your members.</string>
+
+    <string name="make_group_title">Invite</string>
+    <string name="done_make_group">OK</string>
+
+    <string name="detail_group_title">Detail</string>
+
+    <string name="group_list_item_key_members">members</string>
+    <string name="group_list_item_key_groupIdx">groupIdx</string>
+
+
     <!--SMS content-->
     <string name="sms_content">사고가 발생하였습니다. 도와주세요!!!</string>
     <string name="no_geocoder_available">No geocoder available</string>
@@ -215,6 +233,7 @@
     <string name="nav_tracking_record">Tracking Records</string>
     <string name="nav_emergency_contacts">Emergency Contacts</string>
     <string name="nav_accident_threshold">Accident Threshold</string>
+    <string name="nav_group">Group Sync</string>
 
     <string name="confirm_privacy_term">상기 내용을 확인하였습니다.</string>
     <string name="privacy_term">

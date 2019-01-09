@@ -172,7 +172,7 @@ public class LEDRankCardView extends LinearLayout {
                                                         {
                                                             @Override
                                                             public void onClick(final SweetAlertDialog sweetAlertDialog) {
-                                                                BTManager.setShowOnDevice(activity, ledData.getIndex());
+                                                                BTManager.setShowOnDevice(ledData.getIndex());
                                                                 sweetAlertDialog.dismissWithAnimation();
                                                             }})
                                                         .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
