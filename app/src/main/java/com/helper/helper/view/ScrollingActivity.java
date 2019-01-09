@@ -53,6 +53,7 @@ import com.helper.helper.interfaces.BluetoothReadCallback;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LEDCategory;
+import com.helper.helper.model.MemberList;
 import com.helper.helper.model.User;
 import com.helper.helper.view.accident.ThresholdActivity;
 import com.helper.helper.view.group.GroupActivity;
@@ -73,6 +74,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -131,45 +133,53 @@ public class ScrollingActivity extends AppCompatActivity
             }
         }
 
+        /** Socket **/
+        SocketManager.startSocket(this);
+
         /** Set User Info **/
         try {
-            m_loadingDialog = makeLoadingDialog();
-            m_loadingDialog.show();
-            m_loadingDialog.findViewById(R.id.confirm_button).setVisibility(View.GONE);
-            LinearLayout parentOfConfirmBtn = (LinearLayout)m_loadingDialog.findViewById(R.id.confirm_button).getParent();
-            parentOfConfirmBtn.setVisibility(View.GONE);
-
             UserManager.setUser(FileManager.readXmlUserInfo(this));
-            if( UserManager.getUser().getUserLEDIndiciesSize() != 0 ) {
-                DownloadImageTask downloadUserDataLED = new DownloadImageTask(activity, new ValidateCallback() {
-                    @Override
-                    public void onDone(int resultCode) {
-                        if( resultCode == DownloadImageTask.DONE_LOAD_LED_IMAGES ) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    m_loadingDialog.dismissWithAnimation();
-                                }
-                            });
-                        }
-                    }
-                });
-                /** Download User's LED **/
-                downloadUserDataLED.execute(UserManager.getUser().getUserLEDIndiciesURI(getString(R.string.server_uri)));
-            } else {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        m_loadingDialog.dismiss();
-                    }
-                });
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if (HttpManager.useCollection(activity.getString(R.string.collection_user))) {
+            JSONObject reqObject = new JSONObject();
 
-        /** Socket **/
-        SocketManager.startSocket(this);
+            try {
+                reqObject.put(User.KEY_EMAIL, UserManager.getUserEmail());
+
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray jsonArray) {
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            try {
+                                JSONObject obj = jsonArray.getJSONObject(i);
+                                JSONArray groups = obj.getJSONArray(User.KEY_GROUPS);
+                                for (int j = 0; j < groups.length(); j++) {
+                                    String groupIdx = String.valueOf(groups.get(0));
+                                    findGroup(groupIdx);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(String err) {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity, "Check your network connection", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
 
         /** Set SharedPreferencer **/
@@ -314,46 +324,47 @@ public class ScrollingActivity extends AppCompatActivity
         BTManager.setActivityReadCb(emergencyCallback);
     }
 
-    private void startInitializeUserData() {
-        if( HttpManager.useCollection(getString(R.string.collection_user)) ) {
+    private void findGroup(final String groupIdx) {
+        final Activity activity = this;
 
+        if (HttpManager.useCollection(activity.getString(R.string.collection_group))) {
             JSONObject reqObject = new JSONObject();
-            try {
-                reqObject.put(User.KEY_EMAIL, UserManager.getUserEmail());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
 
             try {
+                reqObject.put("index", groupIdx);
+
                 HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override
-                    public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
-                        int arrLen = existIdjsonArray.length();
-                        // write category xml file
-                        List<LEDCategory> ledCategoryList = new ArrayList<>();
+                    public void onSuccess(JSONArray jsonArray) throws JSONException {
+                        JSONObject object = (JSONObject)jsonArray.get(0);
 
-                        for (int i = 0; i < existIdjsonArray.length(); i++) {
-                            JSONObject categoryObj = existIdjsonArray.getJSONObject(i);
+                        String idx = object.getString(MemberList.KEY_INDEX);
 
+                        JSONArray members = object.getJSONArray(MemberList.KEY_MEMBERS);
+                        String membersStr = members.toString();
+                        membersStr = membersStr.replace("[","").replace("]","");
+                        List<String> listNames = Arrays.asList(membersStr.split(","));
 
-                            LEDCategory category = new LEDCategory(
-                                    categoryObj.getString("name"),
-                                    categoryObj.getString("backgroundColor"),
-                                    categoryObj.getString("notice"),
-                                    categoryObj.getString("character")
-                            );
-                            ledCategoryList.add(category);
-                        }
-                        try {
-                            FileManager.writeXmlCategory(getApplicationContext(), ledCategoryList);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        String masterStr = object.getString(MemberList.KEY_MASTER);
+                        final MemberList memberList = new MemberList(listNames, masterStr, idx);
+
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                /** Socket **/
+                                SocketManager.makePatternSyncListenter(memberList);
+                            }
+                        });
                     }
 
                     @Override
                     public void onError(String err) {
-                        Log.d(TAG, "startInitializeShopData onError: " + err);
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity, "Check your network connection", Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
                 });
             } catch (JSONException e) {

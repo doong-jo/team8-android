@@ -14,6 +14,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Timer;
 
@@ -57,26 +62,34 @@ public class SocketManager {
 
     }
 
-    private static void makePatternSyncListenter(List<MemberList> rooms) {
-        for (MemberList room : rooms) {
-            String roomName = room.getIndex();
+    public static void makePatternSyncListenter(MemberList room) {
+        final String onRoomName = ON_SYNC_PATTERN.concat("_").concat(room.getIndex());
 
-            m_socket.on(ON_SYNC_PATTERN.concat("_").concat(roomName), new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-
-                }
-            });
-        }
+        m_socket.on(onRoomName, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                BTManager.setShowOnDevice((String)args[0], (String)args[1]);
+            }
+        });
     }
 
     public static void doSyncPattern(JSONObject data) {
+        Date date = new Date();
+        Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
+        calendar.setTime(date);   // assigns calendar to given date
+//        int hour = calendar.get(Calendar.HOUR);        // gets hour in 12h format
+//        int min = calendar.get(Calendar.MINUTE) + 1;
+
+        int addSec = calendar.get(Calendar.SECOND) + 15;
+        int sec = addSec >= 60 ? 60 - addSec : addSec;
 
         try {
             m_socket.emit(EMIT_SYNC_PATTERN,
                     data.getString("name"),
                     data.getString("roomname"),
-                    data.getString("pattern"));
+                    data.getString("pattern"),
+                    String.valueOf(sec));
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

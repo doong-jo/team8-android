@@ -119,8 +119,6 @@ public class DetailGroupActivity extends ListActivity {
             public void onClick(View view) {
                 // TODO: 06/01/2019 execute pattern
 
-                BTManager.setShowOnDevice(activity, "start");
-
                 JSONObject reqSyncObj = new JSONObject();
 
                 try {

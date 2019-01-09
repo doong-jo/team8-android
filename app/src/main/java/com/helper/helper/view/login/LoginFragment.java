@@ -205,8 +205,6 @@ public class LoginFragment extends Fragment {
                                     .email(object.getString(User.KEY_EMAIL))
                                     .name(object.getString(User.KEY_NAME))
                                     .ridingType(object.getString(User.KEY_RIDING_TYPE))
-                                    .ledIndicies(object.getJSONArray(User.KEY_LED_INDICIES))
-                                    .ledBookmarked(object.getJSONArray(User.KEY_LED_BOOKMARKED))
                                     .accEnabled(User.KEY_ACC_ENABLED)
                                     .accLevel(User.KEY_ACC_LEVEL)
                                     .build();
