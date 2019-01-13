@@ -64,6 +64,9 @@ public class FileManager {
     private static final String EMERGENCY_CONTACTS_XML_ELEM_ATTR_NAME = "name";
     private static final String EMERGENCY_CONTACTS_XML_ELEM_ATTR_PHONE = "phone";
 
+    private static final String ACCIDENT_XML_NAME = "accident.xml";
+
+
     private static final String USER_XML_NAME = "user_info.xml";
 
     private static final String USER_INFO_XML_ELEM_ROOT = "info";
@@ -325,6 +328,18 @@ public class FileManager {
         }
 
         return contactItems;
+    }
+
+    /** Accident **/
+    public static void writeAccidentData(Context context){
+        Storage internalStorage = new Storage(context);
+
+        String path = internalStorage.getExternalStorageDirectory();
+        String dir = path + File.separator + DIR_NAME;
+        String xmlFilePath = dir + File.separator + ACCIDENT_XML_NAME;
+
+        boolean fileExists = internalStorage.isFileExist(xmlFilePath);
+
     }
 
     /** User **/

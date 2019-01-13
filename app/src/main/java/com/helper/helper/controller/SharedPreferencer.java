@@ -22,6 +22,7 @@ public class SharedPreferencer {
     public final static String IS_LAUNCHED = "IS_LAUNCHED";
     public final static String IS_LOGINED = "IS_LOGIN";
 
+    public static final String ACCIDENT_DATA_DOWNLAOD_DATE= "ACCIDENT_DATA_DOWNLOAD_DATE";
     /** user email is key **/
     public static final String ACCIDENT_THRESHOLD = "ACCIDENT_THRESHOLD";
 

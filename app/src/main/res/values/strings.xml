@@ -225,7 +225,7 @@
     <string name="button_opacity">Opacity</string>
     <!-- ///////////////////////////////////////////// -->
 
-
+    <!--Accident Heatmap-->
     <string-array name="spinner_vehicle_type">
         <item>All</item>
         <item>Bicycle</item>
@@ -244,6 +244,8 @@
         <item>3개월</item>
         <item>1개월</item>
     </string-array>
+    <string name="loading_dialog_accident_data">Loading accident data..</string>
+
 
     <string name="privacy_term">
         <b>제1조. 목적</b>\n\n
