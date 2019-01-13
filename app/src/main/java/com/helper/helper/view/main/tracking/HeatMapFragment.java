@@ -423,8 +423,7 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
                                         m_dangerList.add(new LatLng(0,0));
                                         m_dangerProvider.setData(m_dangerList);
                                     }
-
-                                    mOverlay.clearTileCache();
+                                    mOverlay.remove();
                                     mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_warningProvider));
                                     mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_dangerProvider));
                                 }
@@ -435,7 +434,7 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
                                     m_warningList.add(new LatLng(0,0));
                                     m_dangerProvider.setData(m_dangerList);
                                     m_warningProvider.setData(m_warningList);
-                                    mOverlay.clearTileCache();
+                                    mOverlay.remove();
                                     mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_warningProvider));
                                     mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_dangerProvider));
                                 }
