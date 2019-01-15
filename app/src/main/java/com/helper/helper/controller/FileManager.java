@@ -168,6 +168,51 @@ public class FileManager {
         }
     }
 
+    public static List<LEDCategory> readXmlCategory(Context context) throws IOException {
+        List<LEDCategory> categoriesList = null;
+        try {
+            categoriesList = new ArrayList<>();
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            Storage internalStorage = new Storage(context);
+
+            String path = internalStorage.getInternalFilesDirectory();
+            String dir = path + File.separator + DIR_NAME;
+            String xmlFilePath = dir + File.separator + CATEGORY_XML_NAME;
+
+            boolean fileExists = internalStorage.isFileExist(xmlFilePath);
+
+            Document doc = docBuilder.newDocument();
+
+            Element rootElement;
+            if (fileExists) {
+                doc = docBuilder.parse(new File(xmlFilePath));
+                rootElement = (Element) doc.getDocumentElement();
+            } else {
+                return null;
+            }
+
+            NodeList categories = doc.getElementsByTagName(CATEGORY_XML_ELEM);
+
+            for (int i = 0; i < categories.getLength(); i++) {
+                Node map = categories.item(i);
+
+                String name = map.getAttributes().getNamedItem(CATEGORY_XML_ELEM_ATTR_NAME).getNodeValue();
+                String bkgColor = map.getAttributes().getNamedItem(CATEGORY_XML_ELEM_ATTR_BKG).getNodeValue();
+                String notice = map.getAttributes().getNamedItem(CATEGORY_XML_ELEM_ATTR_NOTICE).getNodeValue();
+                String character = map.getAttributes().getNamedItem(CATEGORY_XML_ELEM_ATTR_CHARACTER).getNodeValue();
+
+                categoriesList.add(new LEDCategory(name, bkgColor, notice, character));
+            }
+
+        } catch (ParserConfigurationException | SAXException pce) {
+            pce.printStackTrace();
+        }
+
+        return categoriesList;
+    }
+
     /** Accident **/
     public static void writeXmlAccident(Context context, List<Accident> accidentData) throws IOException{
         try {
@@ -224,10 +269,10 @@ public class FileManager {
         }
     }
 
-    public static List<LEDCategory> readXmlCategory(Context context) throws IOException {
-        List<LEDCategory> categoriesList = null;
+    public static List<Accident> readXmlAccident(Context context) throws IOException{
+        List<Accident> accidentList= null;
         try {
-            categoriesList = new ArrayList<>();
+            accidentList = new ArrayList<>();
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
@@ -235,7 +280,7 @@ public class FileManager {
 
             String path = internalStorage.getInternalFilesDirectory();
             String dir = path + File.separator + DIR_NAME;
-            String xmlFilePath = dir + File.separator + CATEGORY_XML_NAME;
+            String xmlFilePath = dir + File.separator + ACCIDENT_XML_NAME;
 
             boolean fileExists = internalStorage.isFileExist(xmlFilePath);
 
@@ -249,26 +294,33 @@ public class FileManager {
                 return null;
             }
 
-            NodeList categories = doc.getElementsByTagName(CATEGORY_XML_ELEM);
+            NodeList accidents = doc.getElementsByTagName(ACCIDENT_XML_ELEM);
 
-            for (int i = 0; i < categories.getLength(); i++) {
-                Node map = categories.item(i);
+            for (int i = 0; i < accidents.getLength(); i++) {
+                Node map = accidents.item(i);
 
-                String name = map.getAttributes().getNamedItem(CATEGORY_XML_ELEM_ATTR_NAME).getNodeValue();
-                String bkgColor = map.getAttributes().getNamedItem(CATEGORY_XML_ELEM_ATTR_BKG).getNodeValue();
-                String notice = map.getAttributes().getNamedItem(CATEGORY_XML_ELEM_ATTR_NOTICE).getNodeValue();
-                String character = map.getAttributes().getNamedItem(CATEGORY_XML_ELEM_ATTR_CHARACTER).getNodeValue();
+                String riding_type = map.getAttributes().getNamedItem(ACCIDENT_XML_ELEM_ATTR_RIDING_TYPE).getNodeValue();
+                String occured_date = map.getAttributes().getNamedItem(ACCIDENT_XML_ELEM_ATTR_OCCURED_DATE).getNodeValue();
+                Boolean has_alerted = Boolean.getBoolean(map.getAttributes().getNamedItem(ACCIDENT_XML_ELEM_ATTR_HAS_ALERTED).getNodeValue());
 
-                categoriesList.add(new LEDCategory(name, bkgColor, notice, character));
+                Node mapPosition = map.getChildNodes().item(1);
+                LatLng position = new LatLng( Double.parseDouble(mapPosition.getAttributes().getNamedItem(ACCIDENT_XML_ELEM_ATTR_POSITION_ATTR_LATITUDE).getNodeValue()),
+                        Double.parseDouble(mapPosition.getAttributes().getNamedItem(ACCIDENT_XML_ELEM_ATTR_POSITION_ATTR_LONGITUTDE).getNodeValue()));
+
+                accidentList.add(Accident.builder()
+                        .m_ridingType(riding_type)
+                        .m_hasAlerted(has_alerted)
+                        .m_occuredDate(occured_date)
+                        .m_position(position)
+                        .build());
             }
 
         } catch (ParserConfigurationException | SAXException pce) {
             pce.printStackTrace();
         }
 
-        return categoriesList;
+        return accidentList;
     }
-
     /** Emergency Contacts **/
     public static void writeXmlEmergencyContacts(Context context, List<ContactItem> contactsData) throws IOException {
         try {

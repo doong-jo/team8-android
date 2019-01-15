@@ -504,6 +504,7 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
                             readItems();
                             try {
                                 FileManager.writeXmlAccident(getContext(), accidentData);
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
