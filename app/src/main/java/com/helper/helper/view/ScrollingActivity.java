@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -123,6 +124,12 @@ public class ScrollingActivity extends AppCompatActivity
 
         /******************* Connect widgtes with layout *******************/
         setContentView(R.layout.activity_scrolling);
+
+        RelativeLayout bottomNavLayout = findViewById(R.id.bottomNavigationViewLayout);
+        bottomNavLayout.setVisibility(View.GONE);
+
+        ImageView toolbar_option_btn = findViewById(R.id.toolbar_option_btn);
+        toolbar_option_btn.setVisibility(View.GONE);
 
         /** Set Emergency Contacts **/
         if ( EmergencyManager.getEmergencyContacts() == null ) {
@@ -221,7 +228,7 @@ public class ScrollingActivity extends AppCompatActivity
         m_tabLayout = findViewById(R.id.tabLayout);
         m_tabLayout.addTab(m_tabLayout.newTab().setText("MY EIGHT"));
         m_tabLayout.addTab(m_tabLayout.newTab().setText("LED"));
-//        m_tabLayout.addTab(m_tabLayout.newTab().setText("TRACKING"));
+        m_tabLayout.addTab(m_tabLayout.newTab().setText("TRACKING"));
 
         TabPagerAdapter pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), m_tabLayout.getTabCount());
 

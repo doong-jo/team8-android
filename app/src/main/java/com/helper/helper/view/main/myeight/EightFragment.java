@@ -29,11 +29,6 @@ public class EightFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        RelativeLayout bottomNavLayout = getActivity().findViewById(R.id.bottomNavigationViewLayout);
-        bottomNavLayout.setVisibility(View.GONE);
-
-        ImageView toolbar_option_btn = getActivity().findViewById(R.id.toolbar_option_btn);
-        toolbar_option_btn.setVisibility(View.GONE);
 //        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
 //        AppBarLayout.LayoutParams params =
 //                (AppBarLayout.LayoutParams) toolbar.getLayoutParams();

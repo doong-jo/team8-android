@@ -175,7 +175,6 @@ public class HttpManager {
             a++;
         }
 
-
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {

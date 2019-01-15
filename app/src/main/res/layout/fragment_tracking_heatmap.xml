@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp">
+
+        <Spinner
+            android:id="@+id/spinnerDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:entries="@array/spinner_date" />
+
+        <Spinner
+            android:id="@+id/spinnerAlarm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:entries="@array/spinner_alarm" />
+
+        <Spinner
+            android:id="@+id/spinnerType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:entries="@array/spinner_vehicle_type" />
+    </LinearLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/mapWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/heatMapView"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/mapWrapper"
+            app:layout_constraintTop_toTopOf="@id/mapWrapper" />
+
+        <ImageView
+            android:id="@+id/heatMap_transparent_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="@id/mapWrapper"
+            app:layout_constraintTop_toTopOf="@id/mapWrapper" />
+    </android.support.constraint.ConstraintLayout>
+</LinearLayout>
