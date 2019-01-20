@@ -507,7 +507,7 @@ public class FileManager {
             userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_RIDING_TYPE, user.getUserRidingType());
             userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_LED_INDICIES, user.getUserLEDIndicies());
             userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED, user.getUserBookmarked());
-            userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_ACC_ENABLED, user.getUserAccEnabled().toString());
+//            userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_ACC_ENABLED, user.getUserAccEnabled().toString());
             userElement.setAttribute(USER_INFO_XML_ELEM_ATTR_ACC_LEVEL, user.getUserAccLevel());
 
             rootElement.appendChild(userElement);
@@ -565,8 +565,8 @@ public class FileManager {
         String riding_type = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_RIDING_TYPE).getNodeValue();
         String led_indicies = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_INDICIES).getNodeValue();
         String led_bookmarked = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_LED_BOOKMARKED).getNodeValue();
-        String acc_enabled = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_ACC_ENABLED).getNodeValue();
-        String acc_level = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_ACC_LEVEL).getNodeValue();
+//        String acc_enabled = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_ACC_ENABLED).getNodeValue();
+//        String acc_level = map.getAttributes().getNamedItem(USER_INFO_XML_ELEM_ATTR_ACC_LEVEL).getNodeValue();
 
         JSONArray led_indices_jarr = null;
         JSONArray led_bookmarked_jarr = null;
@@ -584,8 +584,8 @@ public class FileManager {
                 .ridingType(riding_type)
                 .ledIndicies(led_indices_jarr)
                 .ledBookmarked(led_bookmarked_jarr)
-                .accEnabled(acc_enabled)
-                .accLevel(acc_level)
+//                .accEnabled(acc_enabled)
+//                .accLevel(acc_level)
                 .build();
 
 
