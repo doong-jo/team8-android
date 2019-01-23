@@ -75,7 +75,7 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
     private static final int THREE_MONTH_SELECTED_DATE = 3;
     private static final int ONE_MONTH_SELECTED_DATE = 1;
     private static final int MAX_ACCIDENT_DATA_DOWNLOAD_TERM = 30;
-//    private static final int[] ALT_HEATMAP_GRADIENT_COLORS = {
+    //    private static final int[] ALT_HEATMAP_GRADIENT_COLORS = {
 //            Color.argb(0, 0, 255, 255),// transparent
 //            Color.argb(255 / 3 * 2, 0, 255, 255),
 //            Color.rgb(0, 191, 255),
@@ -83,12 +83,12 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
 //            Color.rgb(255, 0, 0)
 //    };
     private static final int[] WARNING_HEATMAP_GRADIENT_COLORS = {
-        Color.argb(0, 108, 255, 15),
-        Color.rgb(122,243,17),
-        Color.rgb(137, 232, 20),
-        Color.rgb(152, 220, 22),
-        Color.rgb(166, 209, 25),
-        Color.rgb(181, 198, 28)
+            Color.argb(0, 108, 255, 15),
+            Color.rgb(122,243,17),
+            Color.rgb(137, 232, 20),
+            Color.rgb(152, 220, 22),
+            Color.rgb(166, 209, 25),
+            Color.rgb(181, 198, 28)
     };
     private static final float[] WARNING_HEATMAP_GRADIENT_START_POINTS = {
             0.1f, 0.20f, 0.30f, 0.40f, 0.50f, 1.0f
@@ -236,7 +236,6 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
 
         /*************************************************************/
         adjustMapVerticalTouch(view);
-
         return view;
     }
 
@@ -252,6 +251,9 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
         }
         else if(isVisibleToUser == true){
             visible = true;
+        }
+        else {
+            visible = false;
         }
     }
 
@@ -282,8 +284,8 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
 
     @SuppressLint("ClickableViewAccessibility")
     public void adjustMapVerticalTouch(View view) {
-        final NestedScrollView mainScrollView = getActivity().findViewById(R.id.app_nestedScroll);
-        ImageView transparentImageView = view.findViewById(R.id.heatMap_transparent_image);
+        final NestedScrollView mainScrollView = (NestedScrollView) getActivity().findViewById(R.id.app_nestedScroll);
+        ImageView transparentImageView = (ImageView) view.findViewById(R.id.heatMap_transparent_image);
 
         transparentImageView.setOnTouchListener(new View.OnTouchListener() {
 
@@ -349,11 +351,8 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
     }
 
     // Datasets from http://data.gov.au
-    private void readItems(List<Accident> accidents) {
-        m_warningList.clear();
-        m_dangerList.clear();
-
-        for(Accident accident : accidents){
+    private void readItems() {
+        for(Accident accident : accidentData){
             if(accident.getHasAlerted() == true){
                 m_dangerList.add(accident.getPosition());
             }
@@ -362,38 +361,6 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
             }
         }
     }
-
-    private void removeUnSelectedData(){
-        List<Accident> accidentTempList = new ArrayList<>(accidentData);
-
-        Calendar cal = Calendar.getInstance();
-        Date currentDate = cal.getTime();
-
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
-        Date selectedDate = new Date();
-        try {
-            selectedDate = format.parse(m_date);
-            currentDate = format.parse(currentDate.toString());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        int intervalDate = currentDate.compareTo(selectedDate);
-        for(Accident accident : accidentTempList){
-            if(!m_alarm.equals(m_spinnerAlarmTexts[0]) && accident.getHasAlerted() != Boolean.getBoolean(m_alarm) ){
-                accidentTempList.remove(accident);
-            }
-            else if(!m_type.equals(m_spinnerTypeTexts[0]) && !accident.getRidingType().equals(m_type)){
-                accidentTempList.remove(accident);
-            }
-            else if(intervalDate > (m_selectedDate*30)){//1 Month to 30Days ?
-                accidentTempList.remove(accident);
-            }
-        }
-
-        readItems(accidentTempList);
-    }
-
 
     private void startMap(){
         Location location = GoogleMapManager.getCurLocation();
@@ -427,59 +394,6 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
         m_map.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL));
     }
 
-    ValidateCallback setMap = new ValidateCallback() {
-
-        @Override
-        public void onDone(final int resultCode) throws JSONException {
-            if (getActivity() == null) return;
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (resultCode == 1) {
-                        if (m_warningProvider == null && m_dangerProvider == null) {
-                            m_warningProvider = new HeatmapTileProvider.Builder().data(m_warningList).build();
-                            m_warningProvider.setGradient(WARNING_HEATMAP_GRADIENT);
-                            m_dangerProvider = new HeatmapTileProvider.Builder().data(m_dangerList).build();
-                            m_dangerProvider.setGradient(DANGER_HEATMAP_GRADIENT);
-                            mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_warningProvider));
-                            mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_dangerProvider));
-                        } else {
-                            if(m_warningList.size() != 0) {
-                                m_warningProvider.setData(m_warningList);
-                            }
-                            else{
-                                m_warningList.add(new LatLng(0,0));
-                                m_warningProvider.setData(m_warningList);
-                            }
-
-                            if(m_dangerList.size() != 0){
-                                m_dangerProvider.setData(m_dangerList);
-                            }
-                            else{
-                                m_dangerList.add(new LatLng(0,0));
-                                m_dangerProvider.setData(m_dangerList);
-                            }
-                            mOverlay.remove();
-                            mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_warningProvider));
-                            mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_dangerProvider));
-                        }
-
-                    } else {
-                        if (m_warningProvider != null && m_dangerProvider != null) {
-                            m_dangerList.add(new LatLng(0,0));
-                            m_warningList.add(new LatLng(0,0));
-                            m_dangerProvider.setData(m_dangerList);
-                            m_warningProvider.setData(m_warningList);
-                            mOverlay.remove();
-                            mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_warningProvider));
-                            mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_dangerProvider));
-                        }
-                    }
-                    m_loadingDialog.dismissWithAnimation();
-                }
-            });
-        }
-    };
 
     private void setHeatMap() {
         try {
@@ -487,9 +401,62 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
                 m_loadingDialog = makeLoadingDialog();
                 m_loadingDialog.show();
                 m_loadingDialog.findViewById(R.id.confirm_button).setVisibility(View.GONE);
-                setTrackingData(setMap);
             }
 
+            setTrackingData(new ValidateCallback() {
+                @Override
+                public void onDone(final int resultCode) throws JSONException {
+                    if (getActivity() == null) return;
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (resultCode == 1) {
+                                if (m_warningProvider == null && m_dangerProvider == null) {
+                                    m_warningProvider = new HeatmapTileProvider.Builder().data(m_warningList).build();
+                                    m_warningProvider.setGradient(WARNING_HEATMAP_GRADIENT);
+                                    m_dangerProvider = new HeatmapTileProvider.Builder().data(m_dangerList).build();
+                                    m_dangerProvider.setGradient(DANGER_HEATMAP_GRADIENT);
+                                    mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_warningProvider));
+                                    mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_dangerProvider));
+                                } else {
+                                    if(m_warningList.size() != 0) {
+                                        m_warningProvider.setData(m_warningList);
+                                    }
+                                    else{
+                                        m_warningList.add(new LatLng(0,0));
+                                        m_warningProvider.setData(m_warningList);
+                                    }
+
+                                    if(m_dangerList.size() != 0){
+                                        m_dangerProvider.setData(m_dangerList);
+                                    }
+                                    else{
+                                        m_dangerList.add(new LatLng(0,0));
+                                        m_dangerProvider.setData(m_dangerList);
+                                    }
+                                    mOverlay.remove();
+                                    mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_warningProvider));
+                                    mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_dangerProvider));
+                                }
+
+                            } else {
+                                if (m_warningProvider != null && m_dangerProvider != null) {
+                                    m_dangerList.add(new LatLng(0,0));
+                                    m_warningList.add(new LatLng(0,0));
+                                    m_dangerProvider.setData(m_dangerList);
+                                    m_warningProvider.setData(m_warningList);
+                                    mOverlay.remove();
+                                    mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_warningProvider));
+                                    mOverlay = m_map.addTileOverlay(new TileOverlayOptions().tileProvider(m_dangerProvider));
+                                }
+                            }
+                            if(m_loadingDialog != null) {
+                                m_loadingDialog.dismissWithAnimation();
+                            }
+                        }
+                    });
+                }
+            });
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -498,12 +465,20 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
     private void setTrackingData(final ValidateCallback callback) throws JSONException {
         if (HttpManager.useCollection(getString(R.string.collection_accident))) {
             try {
+                accidentData.clear();
+                m_warningList.clear();
+                m_dangerList.clear();
                 JSONObject reqObject = new JSONObject();
+                if(!m_type.equals(m_spinnerTypeTexts[0])){
+                    reqObject.put(Accident.ACCIDENT_RIDING_TYPE, m_type);
+                }
+                if(!m_alarm.equals(m_spinnerAlarmTexts[0])){
+                    reqObject.put(Accident.ACCIDENT_HAS_ALERTED, m_alarm);
+                }
 
                 Calendar cal = Calendar.getInstance();
-                final String currentDate  = new SimpleDateFormat("yyyy-MM-dd",Locale.KOREA).format(cal.getTime());
-                cal.add(Calendar.MONTH, -DEFAULT_SELECTED_DATE);
-                final String date = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).format(cal.getTime());
+                cal.add(Calendar.MONTH, -m_selectedDate);
+                String date = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).format(cal.getTime());
 
                 reqObject.put("gte", date);
 //                Date occDate = new Date();
@@ -537,13 +512,14 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
                                         .build()
                                 );
                             }
-                            readItems(accidentData);
+                            readItems();
                             try {
                                 FileManager.writeXmlAccident(getContext(), accidentData);
-                                SharedPreferencer.putString(SharedPreferencer.ACCIDENT_DATA_DOWNLAOD_DATE,currentDate.toString());
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+                            //xml에 데이터 넣기
                             callback.onDone(1);
                         } else {
                             callback.onDone(0);
@@ -559,16 +535,6 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    private void setTrackingDataFromXml(final ValidateCallback callback){
-        try {
-            accidentData = FileManager.readXmlAccident(getContext());
-            removeUnSelectedData();
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -612,12 +578,11 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
-    private void checkAccidentDataDownload(){
+    private void checkAccidentDataDownloadDate(){
         String downloadDateStr = pref.getString(SharedPreferencer.ACCIDENT_DATA_DOWNLAOD_DATE,"");
 
         if(downloadDateStr.equals("")){
             //download 다이얼로그
-            setHeatMap();
         }
         else{
             //날짜
@@ -634,17 +599,12 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
                 e.printStackTrace();
             }
             if(downloadDateTerm > MAX_ACCIDENT_DATA_DOWNLOAD_TERM){
-                //download 다이얼로그 -> 다운받기 누를 시 Server에서 xml에 데이터 저장
-                try {
-                    setTrackingData(setMap);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                //download 다이얼로그 -> 다운받기 누를 시 Server에서 xml에 데이터 저장 -> xml에서 데이터 읽어오기
+                SharedPreferencer.putString("downloadDate",currentDate.toString());
             }
             else{
                 //xml 파일에서 읽어오기
-                SharedPreferencer.putString("downloadDate",currentDate.toString());
-                setTrackingDataFromXml(setMap);
+
             }
         }
     }
@@ -657,6 +617,8 @@ public class HeatMapFragment extends Fragment implements OnMapReadyCallback,
         dlg.setCancelable(false);
         return dlg;
     }
+
+    private void setAccidentDataToFile(){
+
+    }
 }
-
-
