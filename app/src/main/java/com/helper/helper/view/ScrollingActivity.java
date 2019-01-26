@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,14 +47,17 @@ import com.helper.helper.controller.EmergencyManager;
 import com.helper.helper.controller.FileManager;
 import com.helper.helper.controller.GoogleMapManager;
 import com.helper.helper.controller.SharedPreferencer;
+import com.helper.helper.controller.SocketManager;
 import com.helper.helper.controller.UserManager;
 import com.helper.helper.controller.ViewStateManager;
 import com.helper.helper.interfaces.BluetoothReadCallback;
 import com.helper.helper.interfaces.HttpCallback;
 import com.helper.helper.interfaces.ValidateCallback;
 import com.helper.helper.model.LEDCategory;
+import com.helper.helper.model.MemberList;
 import com.helper.helper.model.User;
 import com.helper.helper.view.accident.ThresholdActivity;
+import com.helper.helper.view.group.GroupActivity;
 import com.helper.helper.view.main.myeight.EightFragment;
 import com.helper.helper.view.main.myeight.InfoFragment;
 import com.helper.helper.view.contact.ContactActivity;
@@ -69,10 +73,14 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import io.socket.client.IO;
+import io.socket.client.Socket;
 
 import static android.support.design.widget.TabLayout.*;
 
@@ -93,13 +101,11 @@ public class ScrollingActivity extends AppCompatActivity
     private NavigationView m_navigationView;
 
     private TabLayout m_tabLayout;
-    private TabPagerAdapter m_pagerAdapter;
     private ViewPager m_viewPager;
+    /************************************************************/
 
+    private Socket m_socket;
     private SweetAlertDialog m_loadingDialog;
-    /**************************************************************/
-
-    private BluetoothReadCallback m_emergencyCallback;
     private boolean m_bIsDestroyed;
 
     public ViewPager getViewPager() {
@@ -119,6 +125,12 @@ public class ScrollingActivity extends AppCompatActivity
         /******************* Connect widgtes with layout *******************/
         setContentView(R.layout.activity_scrolling);
 
+        RelativeLayout bottomNavLayout = findViewById(R.id.bottomNavigationViewLayout);
+        bottomNavLayout.setVisibility(View.GONE);
+
+        ImageView toolbar_option_btn = findViewById(R.id.toolbar_option_btn);
+        toolbar_option_btn.setVisibility(View.GONE);
+
         /** Set Emergency Contacts **/
         if ( EmergencyManager.getEmergencyContacts() == null ) {
             try {
@@ -128,42 +140,54 @@ public class ScrollingActivity extends AppCompatActivity
             }
         }
 
+        /** Socket **/
+        SocketManager.startSocket(this);
+
         /** Set User Info **/
         try {
-            m_loadingDialog = makeLoadingDialog();
-            m_loadingDialog.show();
-            m_loadingDialog.findViewById(R.id.confirm_button).setVisibility(View.GONE);
-            LinearLayout parentOfConfirmBtn = (LinearLayout)m_loadingDialog.findViewById(R.id.confirm_button).getParent();
-            parentOfConfirmBtn.setVisibility(View.GONE);
-
             UserManager.setUser(FileManager.readXmlUserInfo(this));
-            if( UserManager.getUser().getUserLEDIndiciesSize() != 0 ) {
-                DownloadImageTask downloadUserDataLED = new DownloadImageTask(activity, new ValidateCallback() {
-                    @Override
-                    public void onDone(int resultCode) {
-                        if( resultCode == DownloadImageTask.DONE_LOAD_LED_IMAGES ) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    m_loadingDialog.dismissWithAnimation();
-                                }
-                            });
-                        }
-                    }
-                });
-                /** Download User's LED **/
-                downloadUserDataLED.execute(UserManager.getUser().getUserLEDIndiciesURI(getString(R.string.server_uri)));
-            } else {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        m_loadingDialog.dismiss();
-                    }
-                });
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if (HttpManager.useCollection(activity.getString(R.string.collection_user))) {
+            JSONObject reqObject = new JSONObject();
+
+            try {
+                reqObject.put(User.KEY_EMAIL, UserManager.getUserEmail());
+
+                HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
+                    @Override
+                    public void onSuccess(JSONArray jsonArray) {
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            try {
+                                JSONObject obj = jsonArray.getJSONObject(i);
+                                JSONArray groups = obj.getJSONArray(User.KEY_GROUPS);
+                                for (int j = 0; j < groups.length(); j++) {
+                                    String groupIdx = String.valueOf(groups.get(0));
+                                    findGroup(groupIdx);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(String err) {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity, "Check your network connection", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
 
         /** Set SharedPreferencer **/
         SharedPreferencer.getSharedPreferencer(this, UserManager.getUserEmail(), MODE_PRIVATE);
@@ -204,12 +228,12 @@ public class ScrollingActivity extends AppCompatActivity
         m_tabLayout = findViewById(R.id.tabLayout);
         m_tabLayout.addTab(m_tabLayout.newTab().setText("MY EIGHT"));
         m_tabLayout.addTab(m_tabLayout.newTab().setText("LED"));
-//        m_tabLayout.addTab(m_tabLayout.newTab().setText("TRACKING"));
+        m_tabLayout.addTab(m_tabLayout.newTab().setText("TRACKING"));
 
-        m_pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), m_tabLayout.getTabCount());
+        TabPagerAdapter pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), m_tabLayout.getTabCount());
 
         m_viewPager = findViewById(R.id.pager);
-        m_viewPager.setAdapter(m_pagerAdapter);
+        m_viewPager.setAdapter(pagerAdapter);
         m_viewPager.addOnPageChangeListener(new TabLayoutOnPageChangeListener(m_tabLayout));
         m_tabLayout.addOnTabSelectedListener(new OnTabSelectedListener() {
             @Override
@@ -267,11 +291,12 @@ public class ScrollingActivity extends AppCompatActivity
         GoogleMapManager.initGoogleMap(this);
 
         /** Bluetooth  **/
-        m_emergencyCallback = new BluetoothReadCallback() {
+        /**************************************************************/
+        BluetoothReadCallback emergencyCallback = new BluetoothReadCallback() {
             @Override
             public void onResult(String result) {
-                if( result.equals(BTManager.BT_SIGNAL_EMERGENCY) ) {
-                    if( EmergencyManager.getEmergencyAlertState() ||
+                if (result.equals(BTManager.BT_SIGNAL_EMERGENCY)) {
+                    if (EmergencyManager.getEmergencyAlertState() ||
                             !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ||
                             !PermissionManager.checkPermissions(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
                         return;
@@ -285,7 +310,7 @@ public class ScrollingActivity extends AppCompatActivity
                             final Location accLocation = GoogleMapManager.getCurLocation();
                             AddressManager.startAddressIntentService(activity, accLocation);
 
-                            if( m_bIsDestroyed ) {
+                            if (m_bIsDestroyed) {
                                 Intent intent = new Intent(activity, PopupActivity.class);
                                 startActivity(intent);
                             } else {
@@ -303,49 +328,50 @@ public class ScrollingActivity extends AppCompatActivity
             }
         };
 
-        BTManager.setActivityReadCb(m_emergencyCallback);
+        BTManager.setActivityReadCb(emergencyCallback);
     }
 
-    private void startInitializeUserData() {
-        if( HttpManager.useCollection(getString(R.string.collection_user)) ) {
+    private void findGroup(final String groupIdx) {
+        final Activity activity = this;
 
+        if (HttpManager.useCollection(activity.getString(R.string.collection_group))) {
             JSONObject reqObject = new JSONObject();
-            try {
-                reqObject.put(User.KEY_EMAIL, UserManager.getUserEmail());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
 
             try {
+                reqObject.put("index", groupIdx);
+
                 HttpManager.requestHttp(reqObject, "", "GET", "", new HttpCallback() {
                     @Override
-                    public void onSuccess(JSONArray existIdjsonArray) throws JSONException {
-                        int arrLen = existIdjsonArray.length();
-                        // write category xml file
-                        List<LEDCategory> ledCategoryList = new ArrayList<>();
+                    public void onSuccess(JSONArray jsonArray) throws JSONException {
+                        JSONObject object = (JSONObject)jsonArray.get(0);
 
-                        for (int i = 0; i < existIdjsonArray.length(); i++) {
-                            JSONObject categoryObj = existIdjsonArray.getJSONObject(i);
+                        String idx = object.getString(MemberList.KEY_INDEX);
 
+                        JSONArray members = object.getJSONArray(MemberList.KEY_MEMBERS);
+                        String membersStr = members.toString();
+                        membersStr = membersStr.replace("[","").replace("]","");
+                        List<String> listNames = Arrays.asList(membersStr.split(","));
 
-                            LEDCategory category = new LEDCategory(
-                                    categoryObj.getString("name"),
-                                    categoryObj.getString("backgroundColor"),
-                                    categoryObj.getString("notice"),
-                                    categoryObj.getString("character")
-                            );
-                            ledCategoryList.add(category);
-                        }
-                        try {
-                            FileManager.writeXmlCategory(getApplicationContext(), ledCategoryList);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        String masterStr = object.getString(MemberList.KEY_MASTER);
+                        final MemberList memberList = new MemberList(listNames, masterStr, idx);
+
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                /** Socket **/
+                                SocketManager.makePatternSyncListenter(memberList);
+                            }
+                        });
                     }
 
                     @Override
                     public void onError(String err) {
-                        Log.d(TAG, "startInitializeShopData onError: " + err);
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity, "Check your network connection", Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
                 });
             } catch (JSONException e) {
@@ -560,10 +586,6 @@ public class ScrollingActivity extends AppCompatActivity
 
         Intent intent;
         switch (id) {
-            case R.id.nav_trackingRecords:
-
-                break;
-
             case R.id.nav_emergencyContacts:
                 intent = new Intent(this, ContactActivity.class);
                 startActivity(intent);
@@ -586,6 +608,11 @@ public class ScrollingActivity extends AppCompatActivity
                     intent = new Intent(this, ThresholdActivity.class);
                     startActivity(intent);
                 }
+                break;
+
+            case R.id.nav_group:
+                intent = new Intent(this, GroupActivity.class);
+                startActivity(intent);
                 break;
         }
 

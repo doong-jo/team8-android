@@ -24,6 +24,7 @@ public class SharedPreferencer {
 
 
 
+    public static final String ACCIDENT_DATA_DOWNLAOD_DATE= "ACCIDENT_DATA_DOWNLOAD_DATE";
     /** user email is key **/
         public final static String ACCIDENT_LEVEL = "LEVEL";
         public static final String ACCIDENT_ENABLE = "ENABLE";

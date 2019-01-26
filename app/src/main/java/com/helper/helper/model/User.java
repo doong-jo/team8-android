@@ -40,14 +40,13 @@ public class User {
 
     public static final String KEY_LED_INDICIES = "ledIndicies";
     public static final String KEY_LED_BOOKMARKED = "ledBookmarked";
-    public static final String KEY_EMERGENCY = "emergency";
     public static final String KEY_EMAIL = "email";
     public static final String KEY_PASSWORD = "passwd";
     public static final String KEY_NAME = "name";
     public static final String KEY_RIDING_TYPE = "riding_type";
-    public static final String KEY_LAST_ACCESS = "lastAccess";
     public static final String KEY_ACC_ENABLED = "acc_enabled";
     public static final String KEY_ACC_LEVEL = "acc_level";
+    public static final String KEY_GROUPS = "groups";
 
     public static class Builder {
 
