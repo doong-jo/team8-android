@@ -13,7 +13,7 @@
     <string name="title_activity_maps">Map</string>
 
     <!--Private key-->
-    <string name="server_uri">http://13.209.167.182:88</string>
+    <string name="server_uri">http://www.8riders.com:88</string>
     <string name="led_resource_uri">images/LED/</string>
     <string name="youtube_key">n6EydOVvJ00</string>
 
